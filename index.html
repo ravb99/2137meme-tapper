@@ -6,12 +6,20 @@
   <title>2137MEME TAPPER</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    body { margin:0; padding:0; background:#0a0a0a; color:#ff0; font-family:'Press Start 2P', system-ui; overflow:hidden; text-align:center; }
+    body { margin:0; padding:0; background:#0a0a0a; color:#ff0; font-family:'Press Start 2P', system-ui; overflow:hidden; text-align:center; touch-action: none; }
     #game { max-width:420px; margin:0 auto; padding:20px; }
-    h1 { font-size:28px; margin:10px 0 5px; text-shadow:0 0 15px #ff0; }
-    #timer { font-size:52px; font-weight:bold; color:#f00; text-shadow:0 0 20px #f00; margin:15px 0; }
+    h1 { font-size:26px; margin:10px 0 5px; text-shadow:0 0 15px #ff0; }
+    #timer { font-size:52px; font-weight:bold; color:#f00; text-shadow:0 0 20px #f00; margin:10px 0; }
     
-    #nosaczContainer { position:relative; width:300px; height:300px; margin:20px auto; cursor:pointer; }
+    #nosaczContainer { 
+      position:relative; 
+      width:300px; 
+      height:300px; 
+      margin:15px auto; 
+      cursor:pointer; 
+      user-select:none; 
+      -webkit-tap-highlight-color: transparent;
+    }
     #nosacz { width:100%; height:100%; border-radius:50%; border:8px solid #ff0; box-shadow:0 0 30px #ff0; }
     
     #noseOverlay { 
@@ -19,12 +27,12 @@
       top:47%; 
       left:50%; 
       transform:translate(-50%, -50%); 
-      width:110px; 
-      height:110px; 
+      width:78px; 
+      height:78px; 
       background:#f44; 
       border-radius:50%; 
       box-shadow:0 0 25px #f00; 
-      transition:all 0.12s; 
+      transition:all 0.08s; 
       cursor:pointer;
     }
 
@@ -33,17 +41,18 @@
       color:#ff0; 
       font-size:42px; 
       font-weight:900; 
-      text-shadow:0 0 15px #f00, 0 0 25px #f00; 
+      text-shadow:0 0 15px #f00; 
       pointer-events:none; 
       animation: kurwaAnim 1.1s forwards; 
-      -webkit-text-stroke: 2px #000;
     }
     @keyframes kurwaAnim {
       0% { transform:translate(-50%, -50%) scale(0.6); opacity:1; }
       100% { transform:translate(-50%, -180px) scale(1.3); opacity:0; }
     }
 
-    #tapCount { font-size:32px; margin:10px 0; }
+    #tapCount { font-size:28px; margin:8px 0; }
+    #leaderboard { margin-top:25px; text-align:left; max-height:320px; overflow-y:auto; }
+    .lb-entry { display:flex; justify-content:space-between; padding:5px 8px; border-bottom:1px solid #333; font-size:15px; }
   </style>
 </head>
 <body>
@@ -57,13 +66,33 @@
     </div>
 
     <div id="tapCount">Taps: <span id="count">0</span></div>
+
+    <div id="result" style="display:none; margin-top:20px;">
+      <h2>Koniec rundy!</h2>
+      <p id="finalScore" style="font-size:26px;"></p>
+      <button onclick="restart()">Jeszcze raz → 21.37s</button>
+    </div>
+
+    <div id="leaderboard">
+      <h3>🏆 TOP 21 TAPPERS</h3>
+      <div id="lbList"></div>
+    </div>
   </div>
+
+  <audio id="kurlaSound" src="https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/sounds/Kurła.m4a"></audio>
 
   <script>
     let timeLeft = 21.37;
     let taps = 0;
     let timer;
     let isRunning = false;
+    let leaderboard = JSON.parse(localStorage.getItem('2137leaderboard')) || [];
+    const sound = document.getElementById('kurlaSound');
+
+    function playKurwa() {
+      sound.currentTime = 0;
+      sound.play().catch(() => {});
+    }
 
     function createKurwa(x, y) {
       const k = document.createElement('div');
@@ -72,7 +101,7 @@
       k.style.left = x + 'px';
       k.style.top = y + 'px';
       document.getElementById('nosaczContainer').appendChild(k);
-      setTimeout(() => k.remove(), 1300);
+      setTimeout(() => k.remove(), 1200);
     }
 
     function tap(e) {
@@ -82,18 +111,16 @@
       document.getElementById('count').textContent = taps;
 
       const nose = document.getElementById('noseOverlay');
-      nose.style.transform = 'translate(-50%, -50%) scale(1.4)';
+      nose.style.transform = 'translate(-50%, -50%) scale(1.45)';
       nose.style.background = '#f00';
 
       setTimeout(() => {
         nose.style.transform = 'translate(-50%, -50%) scale(1)';
         nose.style.background = '#f44';
-      }, 140);
+      }, 80);
 
-      const rect = e.currentTarget.getBoundingClientRect();
-      const clickX = e.clientX - rect.left;
-      const clickY = e.clientY - rect.top;
-      createKurwa(clickX, clickY - 50);
+      playKurwa();
+      createKurwa(e.clientX - e.currentTarget.getBoundingClientRect().left, e.clientY - e.currentTarget.getBoundingClientRect().top - 50);
     }
 
     function startTimer() {
@@ -102,6 +129,8 @@
       timeLeft = 21.37;
       taps = 0;
       document.getElementById('count').textContent = taps;
+      document.getElementById('result').style.display = 'none';
+
       timer = setInterval(() => {
         timeLeft = Math.max(0, timeLeft - 0.01);
         document.getElementById('timer').textContent = timeLeft.toFixed(2);
@@ -112,11 +141,39 @@
     function endRound() {
       clearInterval(timer);
       isRunning = false;
-      alert(`Koniec rundy!\nTwój wynik: ${taps} taps`);
+      document.getElementById('finalScore').innerHTML = `Twój wynik: <b>${taps}</b>`;
+      saveScore(taps);
+      document.getElementById('result').style.display = 'block';
+    }
+
+    function saveScore(score) {
+      const name = Telegram.WebApp.initDataUnsafe?.user?.username || "Anon" + Math.floor(Math.random()*999);
+      leaderboard.push({name, score});
+      leaderboard.sort((a,b) => b.score - a.score);
+      leaderboard = leaderboard.slice(0, 21);
+      localStorage.setItem('2137leaderboard', JSON.stringify(leaderboard));
+      updateLeaderboard();
+    }
+
+    function updateLeaderboard() {
+      const list = document.getElementById('lbList');
+      list.innerHTML = '';
+      leaderboard.forEach((entry, i) => {
+        const div = document.createElement('div');
+        div.className = 'lb-entry';
+        div.innerHTML = `<span>${i+1}. ${entry.name}</span><span>${entry.score}</span>`;
+        list.appendChild(div);
+      });
+    }
+
+    function restart() {
+      document.getElementById('result').style.display = 'none';
+      startTimer();
     }
 
     Telegram.WebApp.ready();
     Telegram.WebApp.expand();
+    updateLeaderboard();
   </script>
 </body>
 </html>
