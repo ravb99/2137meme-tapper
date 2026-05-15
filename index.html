@@ -24,13 +24,28 @@
 
     #timer { font-size:58px; font-weight:900; color:#f00; margin:15px 0 20px; }
 
-    #nosaczContainer { position:relative; width:300px; height:300px; margin:15px auto; cursor:pointer; }
+    #nosaczContainer { 
+      position:relative; 
+      width:300px; 
+      height:300px; 
+      margin:15px auto; 
+      cursor:pointer; 
+    }
     #nosacz { width:100%; height:100%; border-radius:50%; border:8px solid #ff0; box-shadow:0 0 30px #ff0; }
 
+    /* CAŁKOWICIE NIEWIDOCZNY OKRĄG TAPOWANIA */
     #noseOverlay { 
-      position:absolute; top:47%; left:50%; transform:translate(-50%, -50%); 
-      width:78px; height:78px; background:transparent; 
-      pointer-events:all; cursor:pointer;
+      position:absolute; 
+      top:47%; 
+      left:50%; 
+      transform:translate(-50%, -50%); 
+      width:78px; 
+      height:78px; 
+      background: transparent;
+      opacity: 0;
+      border-radius:50%; 
+      pointer-events: all;
+      cursor:pointer;
     }
 
     .kurwa { 
@@ -42,7 +57,7 @@
       100% { transform:translate(-50%, -220px) scale(1.4); opacity:0; }
     }
 
-    #tapCount { font-size:28px; margin:10px 0; }
+    #tapCount { font-size:28px; margin:15px 0; }
 
     button { 
       background: #ff0;
@@ -55,7 +70,6 @@
       border-radius:8px; 
       cursor:pointer; 
       width:85%; 
-      text-transform: uppercase;
     }
     button:active { transform: scale(0.95); background: #ffcc00; }
 
@@ -91,7 +105,6 @@
     </div>
   </div>
 
-  <!-- Modal leaderboard -->
   <div id="leaderboardModal" class="modal">
     <div class="modal-content">
       <h2>🏆 TOP 21 TAPPERS</h2>
@@ -156,7 +169,7 @@
       document.getElementById('count').textContent = taps;
 
       const nose = document.getElementById('noseOverlay');
-      nose.style.transform = 'translate(-50%, -50%) scale(1.45)';
+      nose.style.transform = 'translate(-50%, -50%) scale(1.4)';
       setTimeout(() => nose.style.transform = 'translate(-50%, -50%) scale(1)', 80);
 
       playKurwa();
