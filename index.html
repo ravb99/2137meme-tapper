@@ -16,36 +16,42 @@
       text-align:center; 
       touch-action: none; 
     }
-    #game { max-width:420px; margin:0 auto; padding:20px; }
+    #game { max-width:420px; margin:0 auto; padding:15px; }
     
+    .header {
+      margin: 10px 0 8px;
+    }
     h1 { 
-      font-size:38px; 
-      margin:15px 0 6px; 
-      text-shadow:0 0 25px #ff0; 
-      letter-spacing:3px; 
-      font-weight:700;
+      font-size:42px; 
+      font-weight:900; 
+      margin:0; 
+      text-shadow: 0 0 25px #ff0, 3px 3px 0 #000, -3px -3px 0 #000;
+      letter-spacing:4px;
+      line-height:1;
     }
     .subtitle { 
-      font-size:22px; 
-      color:#aaa; 
-      margin-bottom:25px; 
-      font-weight:400; 
-      letter-spacing:2px;
+      font-size:28px; 
+      font-weight:700; 
+      color:#fff; 
+      margin:0; 
+      text-shadow: 0 0 20px #ff0, 2px 2px 0 #000;
+      letter-spacing:6px;
+      line-height:0.85;
     }
 
     #timer { 
-      font-size:52px; 
-      font-weight:700; 
+      font-size:58px; 
+      font-weight:900; 
       color:#f00; 
-      text-shadow:0 0 20px #f00; 
-      margin:10px 0 20px; 
+      text-shadow:0 0 25px #f00; 
+      margin:15px 0 20px; 
     }
     
     #nosaczContainer { 
       position:relative; 
       width:300px; 
       height:300px; 
-      margin:15px auto; 
+      margin:10px auto; 
       cursor:pointer; 
       user-select:none; 
       -webkit-tap-highlight-color: transparent;
@@ -58,18 +64,6 @@
       box-shadow:0 0 25px #f00; transition:all 0.08s; cursor:pointer;
     }
 
-    .kurwa { 
-      position:absolute; color:#ff0; font-size:42px; font-weight:900; 
-      text-shadow:0 0 15px #f00; pointer-events:none; 
-      animation: kurwaAnim 1.1s forwards; 
-    }
-    @keyframes kurwaAnim {
-      0% { transform:translate(-50%, -50%) scale(0.6); opacity:1; }
-      100% { transform:translate(-50%, -180px) scale(1.3); opacity:0; }
-    }
-
-    #tapCount { font-size:28px; margin:15px 0; }
-
     button { 
       background: linear-gradient(145deg, #ff0, #ffcc00);
       color:#111; 
@@ -81,24 +75,19 @@
       border-radius:12px; 
       cursor:pointer; 
       width:85%; 
-      display:block;
-      box-shadow: 0 8px 20px rgba(255, 204, 0, 0.4);
-      transition: all 0.2s;
-    }
-    button:active {
-      transform: scale(0.95);
-      box-shadow: 0 4px 10px rgba(255, 204, 0, 0.3);
+      box-shadow: 0 8px 20px rgba(255, 204, 0, 0.5);
     }
 
-    .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.98); z-index:100; overflow-y:auto; }
-    .modal-content { max-width:420px; margin:40px auto; padding:20px; text-align:left; }
-    .lb-entry { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #333; font-size:16px; }
+    .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.98); z-index:100; }
+    .modal-content { max-width:420px; margin:40px auto; padding:20px; }
   </style>
 </head>
 <body>
   <div id="game">
-    <h1>2137MEME TAPPER</h1>
-    <div class="subtitle">WORTHLESS</div>
+    <div class="header">
+      <h1>2137MEME</h1>
+      <div class="subtitle">WORTHLESS</div>
+    </div>
     
     <div id="timer">21.37</div>
 
@@ -118,18 +107,18 @@
     </div>
   </div>
 
+  <!-- Modal leaderboard -->
   <div id="leaderboardModal" class="modal">
     <div class="modal-content">
       <h2>🏆 TOP 21 TAPPERS</h2>
       <div id="lbList"></div>
-      <button onclick="hideLeaderboard()" style="width:auto; margin-top:20px;">Zamknij</button>
+      <button onclick="hideLeaderboard()" style="width:auto;">Zamknij</button>
     </div>
   </div>
 
   <audio id="kurlaSound" src="https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/sounds/Kurła.m4a"></audio>
 
   <script>
-    // (Cała logika timera, tap, dźwięk, leaderboard bez zmian - taka sama jak w poprzedniej wersji)
     let timeLeft = 21.37;
     let taps = 0;
     let timer;
@@ -160,23 +149,68 @@
       const nose = document.getElementById('noseOverlay');
       nose.style.transform = 'translate(-50%, -50%) scale(1.45)';
       nose.style.background = '#f00';
-      setTimeout(() => {
-        nose.style.transform = 'translate(-50%, -50%) scale(1)';
-        nose.style.background = '#f44';
-      }, 80);
+      setTimeout(() => { nose.style.transform = 'translate(-50%, -50%) scale(1)'; nose.style.background = '#f44'; }, 80);
 
       playKurwa();
       const rect = e.currentTarget.getBoundingClientRect();
       createKurwa(e.clientX - rect.left, e.clientY - rect.top - 50);
     }
 
-    function startTimer() { /* ... taka sama jak wcześniej ... */ }
-    function endRound() { /* ... */ }
-    function saveScore(score) { /* ... */ }
-    function updateLeaderboard() { /* ... */ }
-    function showLeaderboard() { updateLeaderboard(); document.getElementById('leaderboardModal').style.display = 'block'; }
-    function hideLeaderboard() { document.getElementById('leaderboardModal').style.display = 'none'; }
-    function restart() { /* ... */ }
+    function startTimer() {
+      if (isRunning) return;
+      isRunning = true;
+      timeLeft = 21.37;
+      taps = 0;
+      document.getElementById('count').textContent = taps;
+      document.getElementById('result').style.display = 'none';
+
+      timer = setInterval(() => {
+        timeLeft = Math.max(0, timeLeft - 0.01);
+        document.getElementById('timer').textContent = timeLeft.toFixed(2);
+        if (timeLeft <= 0) endRound();
+      }, 10);
+    }
+
+    function endRound() {
+      clearInterval(timer);
+      isRunning = false;
+      document.getElementById('finalScore').innerHTML = `Twój wynik: <b>${taps}</b>`;
+      saveScore(taps);
+      document.getElementById('result').style.display = 'block';
+    }
+
+    function saveScore(score) {
+      const name = Telegram.WebApp.initDataUnsafe?.user?.username || "Anon" + Math.floor(Math.random()*999);
+      leaderboard.push({name, score});
+      leaderboard.sort((a,b) => b.score - a.score);
+      leaderboard = leaderboard.slice(0, 21);
+      localStorage.setItem('2137leaderboard', JSON.stringify(leaderboard));
+    }
+
+    function updateLeaderboard() {
+      const list = document.getElementById('lbList');
+      list.innerHTML = '';
+      leaderboard.forEach((entry, i) => {
+        const div = document.createElement('div');
+        div.className = 'lb-entry';
+        div.innerHTML = `<span>${i+1}. ${entry.name}</span><span>${entry.score}</span>`;
+        list.appendChild(div);
+      });
+    }
+
+    function showLeaderboard() {
+      updateLeaderboard();
+      document.getElementById('leaderboardModal').style.display = 'block';
+    }
+
+    function hideLeaderboard() {
+      document.getElementById('leaderboardModal').style.display = 'none';
+    }
+
+    function restart() {
+      document.getElementById('result').style.display = 'none';
+      startTimer();
+    }
 
     Telegram.WebApp.ready();
     Telegram.WebApp.expand();
