@@ -8,7 +8,10 @@
   <style>
     body { margin:0; padding:0; background:#0a0a0a; color:#ff0; font-family:'Press Start 2P', system-ui; overflow:hidden; text-align:center; touch-action: none; }
     #game { max-width:420px; margin:0 auto; padding:20px; }
-    h1 { font-size:26px; margin:10px 0 5px; text-shadow:0 0 15px #ff0; }
+    
+    h1 { font-size:34px; margin:15px 0 8px; text-shadow:0 0 20px #ff0; letter-spacing:2px; }
+    .subtitle { font-size:18px; color:#aaa; margin-bottom:20px; font-style:italic; }
+
     #timer { font-size:52px; font-weight:bold; color:#f00; text-shadow:0 0 20px #f00; margin:10px 0; }
     
     #nosaczContainer { 
@@ -50,14 +53,49 @@
       100% { transform:translate(-50%, -180px) scale(1.3); opacity:0; }
     }
 
-    #tapCount { font-size:28px; margin:8px 0; }
-    #leaderboard { margin-top:25px; text-align:left; max-height:320px; overflow-y:auto; }
-    .lb-entry { display:flex; justify-content:space-between; padding:5px 8px; border-bottom:1px solid #333; font-size:15px; }
+    #tapCount { font-size:28px; margin:15px 0; }
+    button { 
+      background:#ff0; 
+      color:#111; 
+      border:none; 
+      padding:16px 32px; 
+      font-size:18px; 
+      margin:15px auto; 
+      border-radius:12px; 
+      cursor:pointer; 
+      width:85%; 
+      display:block;
+    }
+
+    .modal { 
+      display:none; 
+      position:fixed; 
+      top:0; left:0; 
+      width:100%; height:100%; 
+      background:rgba(0,0,0,0.98); 
+      z-index:100; 
+      overflow-y:auto; 
+    }
+    .modal-content { 
+      max-width:420px; 
+      margin:40px auto; 
+      padding:20px; 
+      text-align:left; 
+    }
+    .lb-entry { 
+      display:flex; 
+      justify-content:space-between; 
+      padding:8px 0; 
+      border-bottom:1px solid #333; 
+      font-size:15px; 
+    }
   </style>
 </head>
 <body>
   <div id="game">
     <h1>$2137MEME TAPPER</h1>
+    <div class="subtitle">baaaardzo płasko worthless</div>
+    
     <div id="timer">21.37</div>
 
     <div id="nosaczContainer" onclick="tap(event)">
@@ -67,15 +105,21 @@
 
     <div id="tapCount">Taps: <span id="count">0</span></div>
 
+    <button onclick="showLeaderboard()">🏆 TABELA WYNIKÓW (TOP 21)</button>
+
     <div id="result" style="display:none; margin-top:20px;">
       <h2>Koniec rundy!</h2>
       <p id="finalScore" style="font-size:26px;"></p>
       <button onclick="restart()">Jeszcze raz → 21.37s</button>
     </div>
+  </div>
 
-    <div id="leaderboard">
-      <h3>🏆 TOP 21 TAPPERS</h3>
+  <!-- Modal z tabelą wyników -->
+  <div id="leaderboardModal" class="modal">
+    <div class="modal-content">
+      <h2>🏆 TOP 21 TAPPERS</h2>
       <div id="lbList"></div>
+      <button onclick="hideLeaderboard()" style="width:auto; margin-top:20px;">Zamknij</button>
     </div>
   </div>
 
@@ -120,7 +164,8 @@
       }, 80);
 
       playKurwa();
-      createKurwa(e.clientX - e.currentTarget.getBoundingClientRect().left, e.clientY - e.currentTarget.getBoundingClientRect().top - 50);
+      const rect = e.currentTarget.getBoundingClientRect();
+      createKurwa(e.clientX - rect.left, e.clientY - rect.top - 50);
     }
 
     function startTimer() {
@@ -130,7 +175,7 @@
       taps = 0;
       document.getElementById('count').textContent = taps;
       document.getElementById('result').style.display = 'none';
-
+      
       timer = setInterval(() => {
         timeLeft = Math.max(0, timeLeft - 0.01);
         document.getElementById('timer').textContent = timeLeft.toFixed(2);
@@ -152,7 +197,6 @@
       leaderboard.sort((a,b) => b.score - a.score);
       leaderboard = leaderboard.slice(0, 21);
       localStorage.setItem('2137leaderboard', JSON.stringify(leaderboard));
-      updateLeaderboard();
     }
 
     function updateLeaderboard() {
@@ -166,6 +210,15 @@
       });
     }
 
+    function showLeaderboard() {
+      updateLeaderboard();
+      document.getElementById('leaderboardModal').style.display = 'block';
+    }
+
+    function hideLeaderboard() {
+      document.getElementById('leaderboardModal').style.display = 'none';
+    }
+
     function restart() {
       document.getElementById('result').style.display = 'none';
       startTimer();
@@ -173,7 +226,6 @@
 
     Telegram.WebApp.ready();
     Telegram.WebApp.expand();
-    updateLeaderboard();
   </script>
 </body>
 </html>
