@@ -47,40 +47,46 @@
 
     #result { margin:8px 0 6px; font-size:24px; font-weight:900; }
 
-    /* === RETRO 2010 POLISH COMPUTER STYLE === */
+    /* === RETRO 2010 – SZARY WINDOWS 7 STYLE === */
     .modal { 
       display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
       background:rgba(0,0,0,0.94); z-index:100; 
     }
     .modal-content { 
-      max-width:380px; margin:70px auto; 
-      background:#1a1a1a; 
-      border:6px solid #00ff41; 
-      box-shadow:0 0 30px #00ff41, inset 0 0 25px rgba(0,255,65,0.15);
-      border-radius:3px; overflow:hidden;
+      max-width:380px; margin:60px auto; 
+      background:#2a2a2a; 
+      border:6px solid #777; 
+      box-shadow:0 0 15px rgba(0,0,0,0.8); 
+      border-radius:3px; overflow:hidden; display:flex; flex-direction:column;
+      max-height:85vh;
     }
     .title-bar { 
-      background:#002200; 
-      color:#00ff41; 
+      background:#333; 
+      color:#ddd; 
       padding:9px 12px; 
       font-weight:900; 
       text-align:left; 
-      border-bottom:4px solid #00ff41;
-      font-size:19px; text-shadow:0 0 8px #00ff41;
+      border-bottom:4px solid #555;
+      font-size:19px;
     }
-    .window-body { padding:20px; background:#1a1a1a; }
-    input { 
-      width:100%; padding:14px; font-size:19px; 
-      background:#0f0f0f; color:#ff0; 
-      border:3px solid #00ff41; 
-      font-family:'Oswald'; text-align:center;
-      box-shadow:inset 0 0 12px #00ff41;
+    .window-body { 
+      padding:18px; background:#2a2a2a; 
+      flex:1; overflow:hidden; display:flex; flex-direction:column;
+    }
+    #lbList { 
+      flex:1; overflow-y:auto; padding-right:8px; 
     }
     .lb-entry { 
       display:flex; justify-content:space-between; 
       padding:10px 12px; margin:6px 0; 
-      background:#111; border:2px solid #00ff41; 
+      background:#1f1f1f; border:2px solid #666; 
       color:#ff0; font-size:17px;
+    }
+    input { 
+      width:100%; padding:14px; font-size:19px; 
+      background:#1a1a1a; color:#ff0; 
+      border:3px solid #777; 
+      font-family:'Oswald'; text-align:center;
     }
   </style>
 </head>
@@ -114,7 +120,7 @@
       <div class="title-bar">🏆 TOP 21 TAPPERS - 2137MEME</div>
       <div class="window-body">
         <div id="lbList"></div>
-        <button onclick="hideLeaderboard()" style="margin-top:15px;">Dawaj Janusza!</button>
+        <button onclick="hideLeaderboard()" style="margin-top:10px;">Dawaj Janusza!</button>
       </div>
     </div>
   </div>
@@ -124,10 +130,10 @@
     <div class="modal-content">
       <div class="title-bar">ZMIANA NICKU - 2137MEME</div>
       <div class="window-body">
-        <p style="margin:10px 0 15px; color:#00ff41;">Wpisz nowy nick, stary:</p>
+        <p style="margin:10px 0 15px; color:#ccc;">Wpisz nowy nick, stary:</p>
         <input type="text" id="nickInput" maxlength="20" placeholder="Janusz420">
         <button onclick="saveNewNickname()" style="width:48%; margin-right:4%;">ZATWIERDZAM</button>
-        <button onclick="hideNicknameModal()" style="width:48%; background:#333; color:#ff0;">ANULUJ</button>
+        <button onclick="hideNicknameModal()" style="width:48%; background:#555; color:#ff0;">ANULUJ</button>
       </div>
     </div>
   </div>
@@ -239,7 +245,6 @@
       document.getElementById('leaderboardModal').style.display = 'none';
     }
 
-    // Retro modal nicku
     function changeNickname() {
       document.getElementById('nickInput').value = getPlayerName();
       document.getElementById('nicknameModal').style.display = 'block';
