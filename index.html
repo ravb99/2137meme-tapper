@@ -8,7 +8,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
-    body { margin:0; padding:0; background:#0a0a0a; color:#ff0; font-family:'Oswald', sans-serif; overflow:hidden; height:100vh; touch-action: manipulation; text-align:center; }
+    html, body { 
+      margin:0; padding:0; background:#0a0a0a; color:#ff0; 
+      font-family:'Oswald', sans-serif; overflow:hidden; height:100vh; 
+      touch-action: manipulation; 
+      -webkit-user-scalable: no;
+    }
     #game { max-width:420px; margin:0 auto; padding:4px 15px 8px; height:100vh; display:flex; flex-direction:column; }
     h1 { font-size:42px; font-weight:900; margin:2px 0; letter-spacing:4px; }
     .subtitle { font-size:29px; font-weight:900; color:#fff; margin:0; letter-spacing:7px; }
@@ -19,14 +24,17 @@
     @keyframes kurwaAnim { 0%{transform:translate(-50%,-50%)scale(0.6);opacity:1} 100%{transform:translate(-50%,-190px)scale(1.3);opacity:0} }
     #tapCount { font-size:27px; margin:6px 0 8px; }
     button { background:#ff0; color:#111; border:4px solid #000; padding:12px 20px; font-size:17px; font-weight:900; margin:5px auto; border-radius:8px; width:88%; }
-    #result { margin:8px 0 6px; font-size:24px; font-weight:900; display:none; }
-    .restart-btn {
+
+    /* Przycisk na twarzy Janusza */
+    #restartBtn {
       position:absolute; top:50%; left:50%; transform:translate(-50%, -50%);
-      background:#0f0; color:#000; font-size:20px; font-weight:900;
-      padding:15px 30px; border:6px solid #000; border-radius:12px;
-      box-shadow:0 0 20px #0f0; cursor:pointer; z-index:10;
-      white-space:nowrap;
+      background:#0f0; color:#000; font-size:21px; font-weight:900;
+      padding:16px 32px; border:6px solid #000; border-radius:12px;
+      box-shadow:0 0 25px #0f0; cursor:pointer; z-index:20;
+      white-space:nowrap; display:none;
     }
+
+    #result { margin:8px 0 6px; font-size:24px; font-weight:900; display:none; }
     .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.94); z-index:100; }
     .modal-content { max-width:380px; margin:60px auto; background:#2a2a2a; border:6px solid #777; border-radius:3px; overflow:hidden; display:flex; flex-direction:column; max-height:85vh; }
     .title-bar { background:#333; color:#ddd; padding:9px 12px; font-weight:900; text-align:left; border-bottom:4px solid #555; font-size:19px; }
@@ -40,9 +48,12 @@
     <h1>2137MEME</h1>
     <div class="subtitle">WORTHLESS</div>
     <div id="timer">21.37</div>
+    
     <div id="nosaczContainer">
       <img id="nosacz" src="https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/images/IMG_6353.jpeg" alt="Nosacz"> 
+      <button id="restartBtn" onclick="restartGame()">Na Drugą Nóżkę!</button>
     </div>
+
     <div id="tapCount">Taps: <span id="count">0</span></div>
     
     <button onclick="changeNickname()">Zmień nick</button>
@@ -91,7 +102,7 @@
     let lastFrame = 0;
     const sound = document.getElementById('kurlaSound');
     const nosaczImg = document.getElementById('nosacz');
-    const resultDiv = document.getElementById('result');
+    const restartBtn = document.getElementById('restartBtn');
 
     function getPlayerName() {
       const saved = localStorage.getItem('2137playerName');
@@ -160,7 +171,7 @@
       isRunning = false;
       document.getElementById('finalScore').innerHTML = `Koniec rundy! Twój wynik: <span style="color:#f00;">${taps}</span>`;
       saveScore(taps);
-      resultDiv.style.display = 'block';
+      restartBtn.style.display = 'block';
     }
 
     async function saveScore(score) {
@@ -220,7 +231,7 @@
     }
 
     function restartGame() {
-      resultDiv.style.display = 'none';
+      restartBtn.style.display = 'none';
       timeLeft = 21.37;
       taps = 0;
       isRunning = false;
