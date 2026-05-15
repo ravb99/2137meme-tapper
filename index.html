@@ -2,11 +2,12 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>2137MEME TAPPER</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
+    * { box-sizing: border-box; }
     body { 
       margin:0; padding:0; 
       background:#0a0a0a; 
@@ -15,21 +16,36 @@
       overflow:hidden; 
       text-align:center; 
       touch-action: none; 
+      height:100vh;
     }
-    #game { max-width:420px; margin:0 auto; padding:15px; }
+    #game { 
+      max-width:420px; 
+      margin:0 auto; 
+      padding:10px 15px; 
+      height:100vh;
+      display:flex;
+      flex-direction:column;
+    }
 
-    .header { margin:8px 0 6px; }
-    h1 { font-size:46px; font-weight:900; margin:0; letter-spacing:5px; line-height:0.9; }
-    .subtitle { font-size:34px; font-weight:900; color:#fff; margin:0; letter-spacing:8px; line-height:0.85; }
+    .header { margin:5px 0 8px; }
+    h1 { font-size:42px; font-weight:900; margin:0; letter-spacing:4px; line-height:0.95; }
+    .subtitle { font-size:32px; font-weight:900; color:#fff; margin:0; letter-spacing:6px; line-height:0.9; }
 
-    #timer { font-size:58px; font-weight:900; color:#f00; margin:15px 0 20px; }
+    #timer { 
+      font-size:62px; 
+      font-weight:900; 
+      color:#f00; 
+      margin:10px 0 15px; 
+      text-shadow:0 0 20px #f00;
+    }
 
     #nosaczContainer { 
       position:relative; 
       width:300px; 
       height:300px; 
-      margin:15px auto; 
+      margin:10px auto; 
       cursor:pointer; 
+      flex-shrink:0;
     }
     #nosacz { 
       width:100%; 
@@ -37,33 +53,41 @@
       border-radius:50%; 
       border:8px solid #ff0; 
       box-shadow:0 0 30px #ff0; 
-      transition: filter 0.12s ease-out;
+      transition: filter 0.1s ease-out;
     }
 
     .kurwa { 
-      position:absolute; color:#ff0; font-size:48px; font-weight:900; 
-      pointer-events:none; animation: kurwaAnim 1.2s forwards; 
+      position:absolute; 
+      color:#ff0; 
+      font-size:48px; 
+      font-weight:900; 
+      pointer-events:none; 
+      animation: kurwaAnim 1.1s forwards; 
     }
     @keyframes kurwaAnim {
-      0% { transform:translate(-50%, -50%) scale(0.5); opacity:1; }
-      100% { transform:translate(-50%, -220px) scale(1.4); opacity:0; }
+      0% { transform:translate(-50%, -50%) scale(0.6); opacity:1; }
+      100% { transform:translate(-50%, -200px) scale(1.3); opacity:0; }
     }
 
-    #tapCount { font-size:28px; margin:15px 0; }
+    #tapCount { font-size:32px; margin:10px 0; font-weight:700; }
 
     button { 
       background: #ff0;
       color:#111; 
       border:4px solid #000;
-      padding:18px 32px; 
-      font-size:19px; 
+      padding:16px 24px; 
+      font-size:18px; 
       font-weight:900;
-      margin:15px auto; 
-      border-radius:8px; 
+      margin:8px auto; 
+      border-radius:10px; 
       cursor:pointer; 
-      width:85%; 
+      width:90%; 
+      text-transform: uppercase;
     }
-    button:active { transform: scale(0.95); background: #ffcc00; }
+
+    .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.97); z-index:100; overflow-y:auto; }
+    .modal-content { max-width:420px; margin:30px auto; padding:20px; text-align:left; }
+    .lb-entry { display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #333; font-size:17px; }
   </style>
 </head>
 <body>
@@ -80,11 +104,11 @@
     </div>
 
     <div id="tapCount">Taps: <span id="count">0</span></div>
-    <button onclick="changeNickname()" style="width:80%; padding:10px 20px; font-size:16px;">Zmień nick</button>
 
+    <button onclick="changeNickname()">Zmień nick</button>
     <button onclick="showLeaderboard()">TOP 21 LEADERBOARD</button>
 
-    <div id="result" style="display:none;">
+    <div id="result" style="display:none; margin:15px 0; font-size:26px; font-weight:900;">
       <span id="finalScore"></span>
     </div>
   </div>
@@ -93,7 +117,7 @@
     <div class="modal-content">
       <h2>🏆 TOP 21 TAPPERS</h2>
       <div id="lbList"></div>
-      <button onclick="hideLeaderboard()">Dawaj Janusza!</button>
+      <button onclick="hideLeaderboard()" style="margin-top:20px;">Dawaj Janusza!</button>
     </div>
   </div>
 
@@ -127,11 +151,11 @@
       k.className = 'kurwa';
       k.textContent = 'Kurła!';
       const randomX = Math.random() * 280 + 60;
-      const randomY = Math.random() * 160 + 70;
+      const randomY = Math.random() * 140 + 80;
       k.style.left = randomX + 'px';
       k.style.top = randomY + 'px';
       document.getElementById('nosaczContainer').appendChild(k);
-      setTimeout(() => k.remove(), 1400);
+      setTimeout(() => k.remove(), 1300);
     }
 
     function tap(e) {
@@ -141,19 +165,12 @@
       taps += touchCount;
       document.getElementById('count').textContent = taps;
 
-      // Efekt zaczerwienienia całego Nosacza
-      const intensity = Math.min(0.95, 0.4 + taps * 0.018);
-      nosaczImg.style.filter = `hue-rotate(15deg) saturate(2.8) brightness(1.25)`;
-
-      setTimeout(() => {
-        nosaczImg.style.filter = `hue-rotate(0deg) saturate(1) brightness(1)`;
-      }, 130);
+      // Mocny efekt czerwieni
+      nosaczImg.style.filter = `hue-rotate(20deg) saturate(3) brightness(1.3)`;
+      setTimeout(() => nosaczImg.style.filter = `hue-rotate(0deg) saturate(1) brightness(1)`, 110);
 
       playKurwa();
-
-      for (let i = 0; i < touchCount; i++) {
-        createRandomKurwa();
-      }
+      for (let i = 0; i < touchCount; i++) createRandomKurwa();
     }
 
     function startTimer() {
@@ -215,6 +232,7 @@
       }
     }
 
+    // Multi-touch + mouse
     const container = document.getElementById('nosaczContainer');
     container.addEventListener('touchstart', tap, { passive: true });
     container.addEventListener('mousedown', tap);
