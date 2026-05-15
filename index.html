@@ -43,14 +43,14 @@
   </div>
 
   <script>
-    console.log("=== OSTATNIA WERSJA v4 ===");
+    console.log("=== OSTATECZNA WERSJA v5 ===");
 
     let db;
     try {
       db = Supabase.createClient('https://gmyhsgxnpbvwgexrvpik.supabase.co', 'sb_publishable_dPOUiTHcX9Xk7tQQr3oOWw_0aEfDVUm');
-      console.log("✅ Supabase połączony");
+      console.log("✅ Supabase załadowany");
     } catch (e) {
-      console.error("❌ Błąd Supabase:", e);
+      console.error("❌ Nie udało się załadować Supabase", e);
     }
 
     let timeLeft = 21.37, taps = 0, isRunning = false;
@@ -91,18 +91,18 @@
 
     function endRound() {
       isRunning = false;
-      saveScore(taps);
+      if (db) saveScore(taps);
+      else console.log("Brak Supabase - wynik lokalny:", taps);
     }
 
     async function saveScore(score) {
-      if (!db) return console.log("❌ Brak Supabase");
       const name = localStorage.getItem('2137playerName') || "JanuszTest";
       const {error} = await db.from('scores').insert([{name, score}]);
       console.log(error ? "❌ Błąd zapisu" : "✅ Zapisano globalnie " + score);
     }
 
     async function showLeaderboard() {
-      if (!db) return alert("Brak połączenia z Supabase");
+      if (!db) return alert("Brak Supabase");
       const {data} = await db.from('scores').select('name,score').order('score',{ascending:false}).limit(21);
       const list = document.getElementById('lbList');
       list.innerHTML = '';
@@ -116,11 +116,14 @@
       document.getElementById('leaderboardModal').style.display = 'block';
     }
 
-    document.getElementById('nosaczContainer').addEventListener('touchstart', tap, { passive: false });
+    // Obsługa zarówno telefonu jak i komputera
+    const container = document.getElementById('nosaczContainer');
+    container.addEventListener('touchstart', tap, { passive: false });
+    container.addEventListener('mousedown', tap);
 
     Telegram.WebApp.ready();
     Telegram.WebApp.expand();
-    console.log("=== GOTOWE - TAPAJ NOSACZA ===");
+    console.log("=== GOTOWE - DZIAŁA NA TELEFONIE I KOMPUTERZE ===");
   </script>
 </body>
 </html>
