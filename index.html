@@ -24,13 +24,13 @@
       font-weight:900; 
       margin:2px 0 0 0; 
       letter-spacing:4px; 
-      line-height:0.9;
+      line-height:0.85;
     }
     .subtitle { 
       font-size:29px; 
       font-weight:900; 
       color:#fff; 
-      margin:-4px 0 8px 0; 
+      margin:-6px 0 8px 0; 
       letter-spacing:7px; 
     }
     #timer { font-size:62px; font-weight:900; color:#f00; margin:4px 0 8px; }
@@ -50,7 +50,10 @@
       white-space:nowrap; display:none;
     }
 
-    #result { margin:8px 0 6px; font-size:24px; font-weight:900; display:none; text-align:center; width:100%; }
+    #result { 
+      margin:8px 0 6px; font-size:24px; font-weight:900; 
+      display:none; text-align:center; width:100%; 
+    }
 
     /* Retro modale */
     .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.94); z-index:100; }
@@ -138,7 +141,6 @@
   <audio id="kurlaSound" src="https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/sounds/Kurła.m4a" preload="auto"></audio>
 
   <script>
-    // (cały skrypt bez zmian - identyczny jak w Twoim pliku)
     const SUPABASE_URL = 'https://gmyhsgxnpbvwgexrvpik.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_dPOUiTHcX9Xk7tQQr3oOWw_0aEfDVUm';
 
@@ -216,7 +218,7 @@
 
     function endRound() {
       isRunning = false;
-      document.getElementById('finalScore').innerHTML = `Koniec rundy! Twój wynik: <span style="color:#f00;">${taps}</span>`;
+      document.getElementById('finalScore').innerHTML = `Koniec rundy!<br>Twój wynik: <span style="color:#f00;">${taps}</span>`;
       saveScore(taps);
       restartBtn.style.display = 'block';
     }
@@ -232,7 +234,6 @@
         },
         body: JSON.stringify([{ name, score }])
       });
-      console.log(response.ok ? "✅ Zapisano globalnie" : "❌ Błąd zapisu");
     }
 
     async function updateLeaderboard() {
