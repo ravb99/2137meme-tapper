@@ -43,12 +43,9 @@
   </div>
 
   <script>
-    console.log("=== NOWA WERSJA - START ===");
+    console.log("=== CZYSTA WERSJA START ===");
 
-    const supabase = Supabase.createClient(
-      'https://gmyhsgxnpbvwgexrvpik.supabase.co',
-      'sb_publishable_dPOUiTHcX9Xk7tQQr3oOWw_0aEfDVUm'
-    );
+    const supabase = Supabase.createClient('https://gmyhsgxnpbvwgexrvpik.supabase.co', 'sb_publishable_dPOUiTHcX9Xk7tQQr3oOWw_0aEfDVUm');
 
     let timeLeft = 21.37, taps = 0, isRunning = false;
     const nosacz = document.getElementById('nosacz');
