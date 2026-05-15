@@ -30,7 +30,6 @@
       height:300px; 
       margin:15px auto; 
       cursor:pointer; 
-      user-select:none;
     }
     #nosacz { 
       width:100%; 
@@ -138,23 +137,21 @@
     function tap(e) {
       if (!isRunning) startTimer();
 
-      // Obsługa multi-touch
-      const touches = e.touches ? e.touches.length : 1;
-      taps += touches;
+      const touchCount = e.touches ? e.touches.length : 1;
+      taps += touchCount;
       document.getElementById('count').textContent = taps;
 
-      // Efekt zaczerwienienia
-      const intensity = Math.min(0.9, 0.4 + taps * 0.012);
-      nosaczImg.style.filter = `hue-rotate(12deg) saturate(2.4) brightness(1.2)`;
+      // Efekt zaczerwienienia całego Nosacza
+      const intensity = Math.min(0.95, 0.4 + taps * 0.018);
+      nosaczImg.style.filter = `hue-rotate(15deg) saturate(2.8) brightness(1.25)`;
 
       setTimeout(() => {
         nosaczImg.style.filter = `hue-rotate(0deg) saturate(1) brightness(1)`;
-      }, 110);
+      }, 130);
 
       playKurwa();
 
-      // Losowe Kurła dla każdego palca
-      for (let i = 0; i < touches; i++) {
+      for (let i = 0; i < touchCount; i++) {
         createRandomKurwa();
       }
     }
@@ -209,9 +206,15 @@
       document.getElementById('leaderboardModal').style.display = 'none';
     }
 
-    function changeNickname() { /* ... bez zmian ... */ }
+    function changeNickname() {
+      const current = getPlayerName();
+      const newName = prompt("Wpisz swój nick:", current);
+      if (newName && newName.trim() !== "") {
+        localStorage.setItem('2137playerName', newName.trim());
+        alert("Nick zmieniony na: " + newName.trim());
+      }
+    }
 
-    // Obsługa multi-touch
     const container = document.getElementById('nosaczContainer');
     container.addEventListener('touchstart', tap, { passive: true });
     container.addEventListener('mousedown', tap);
