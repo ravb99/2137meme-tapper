@@ -43,12 +43,15 @@
   </div>
 
   <script>
-    console.log("=== WERSJA Z GLOBALNĄ TABELĄ v3 ===");
+    console.log("=== OSTATNIA WERSJA v4 ===");
 
-    const db = Supabase.createClient(
-      'https://gmyhsgxnpbvwgexrvpik.supabase.co',
-      'sb_publishable_dPOUiTHcX9Xk7tQQr3oOWw_0aEfDVUm'
-    );
+    let db;
+    try {
+      db = Supabase.createClient('https://gmyhsgxnpbvwgexrvpik.supabase.co', 'sb_publishable_dPOUiTHcX9Xk7tQQr3oOWw_0aEfDVUm');
+      console.log("✅ Supabase połączony");
+    } catch (e) {
+      console.error("❌ Błąd Supabase:", e);
+    }
 
     let timeLeft = 21.37, taps = 0, isRunning = false;
     const nosacz = document.getElementById('nosacz');
@@ -92,12 +95,14 @@
     }
 
     async function saveScore(score) {
+      if (!db) return console.log("❌ Brak Supabase");
       const name = localStorage.getItem('2137playerName') || "JanuszTest";
       const {error} = await db.from('scores').insert([{name, score}]);
-      console.log(error ? "❌ Błąd Supabase" : "✅ Zapisano globalnie " + score);
+      console.log(error ? "❌ Błąd zapisu" : "✅ Zapisano globalnie " + score);
     }
 
     async function showLeaderboard() {
+      if (!db) return alert("Brak połączenia z Supabase");
       const {data} = await db.from('scores').select('name,score').order('score',{ascending:false}).limit(21);
       const list = document.getElementById('lbList');
       list.innerHTML = '';
@@ -115,7 +120,7 @@
 
     Telegram.WebApp.ready();
     Telegram.WebApp.expand();
-    console.log("=== TAPANIE + GLOBALNA TABELA GOTOWE ===");
+    console.log("=== GOTOWE - TAPAJ NOSACZA ===");
   </script>
 </body>
 </html>
