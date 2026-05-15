@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>2137MEME TAPPER</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -29,8 +28,6 @@
     .window-body { padding:18px; background:#2a2a2a; flex:1; overflow:hidden; display:flex; flex-direction:column; }
     #lbList { flex:1; overflow-y:auto; padding-right:8px; }
     .lb-entry { display:flex; justify-content:space-between; padding:10px 12px; margin:6px 0; background:#1f1f1f; border:2px solid #666; color:#ff0; font-size:17px; }
-    .nick-buttons { display:flex; justify-content:center; gap:12px; margin-top:15px; }
-    .nick-buttons button { width:48%; margin:0; }
   </style>
 </head>
 <body>
@@ -60,7 +57,7 @@
       <div class="window-body">
         <p style="margin:10px 0 15px; color:#ccc;">Wpisz nowy nick, stary:</p>
         <input type="text" id="nickInput" maxlength="20" placeholder="Janusz420">
-        <div class="nick-buttons">
+        <div style="display:flex; justify-content:center; gap:12px; margin-top:15px;">
           <button onclick="saveNewNickname()">ZATWIERDZAM</button>
           <button onclick="hideNicknameModal()" style="background:#555; color:#ff0;">ANULUJ</button>
         </div>
@@ -71,18 +68,7 @@
   <audio id="kurlaSound" src="https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/sounds/Kurła.m4a" preload="auto"></audio>
 
   <script>
-    console.log("=== Skrypt się uruchomił ===");
-
-    const supabaseUrl = 'https://gmyhsgxnpbvwgexrvpik.supabase.co';
-    const supabaseKey = 'sb_publishable_dPOUiTHcX9Xk7tQQr3oOWw_0aEfDVUm';
-    let supabase;
-
-    try {
-      supabase = Supabase.createClient(supabaseUrl, supabaseKey);
-      console.log("Supabase załadowany pomyślnie");
-    } catch(e) {
-      console.error("Błąd Supabase:", e);
-    }
+    console.log("=== Skrypt uruchomiony ===");
 
     let timeLeft = 21.37;
     let taps = 0;
@@ -95,30 +81,12 @@
     function getPlayerName() {
       const saved = localStorage.getItem('2137playerName');
       if (saved) return saved;
-      const user = Telegram.WebApp.initDataUnsafe?.user;
-      if (user?.username) return "@" + user.username;
-      if (user?.first_name) return user.first_name + (user.last_name ? " " + user.last_name : "");
       return "Janusz" + Math.floor(Math.random()*999);
-    }
-
-    async function saveScore(score) {
-      console.log("Zapisuję wynik:", score);
-      const name = getPlayerName();
-      if (supabase) {
-        await supabase.from('scores').insert([{ name, score }]);
-      }
-    }
-
-    async function updateLeaderboard() {
-      console.log("Odświeżam leaderboard");
-      const list = document.getElementById('lbList');
-      list.innerHTML = '<p>Ładowanie wyników...</p>';
-      // na razie tylko lokalne, potem globalne
     }
 
     function playKurwa() {
       sound.currentTime = 0;
-      sound.play().catch(() => {});
+      sound.play().catch(() => console.log("Dźwięk odtworzony"));
     }
 
     function createRandomKurwa() {
@@ -134,7 +102,7 @@
     }
 
     function tap(e) {
-      console.log("TAP! touchCount =", e.touches ? e.touches.length : 1);
+      console.log("TAP DETECTED!");
       if (!isRunning) startTimer();
       const touchCount = (e.touches && e.touches.length > 1) ? e.touches.length : 1;
       taps += touchCount;
@@ -172,12 +140,10 @@
     function endRound() {
       isRunning = false;
       document.getElementById('finalScore').innerHTML = `Koniec rundy! Twój wynik: <span style="color:#f00;">${taps}</span>`;
-      saveScore(taps);
       document.getElementById('result').style.display = 'block';
     }
 
     function showLeaderboard() {
-      updateLeaderboard();
       document.getElementById('leaderboardModal').style.display = 'block';
     }
 
@@ -186,27 +152,19 @@
     }
 
     function changeNickname() {
-      document.getElementById('nickInput').value = getPlayerName();
-      document.getElementById('nicknameModal').style.display = 'block';
-    }
-
-    function saveNewNickname() {
-      const newName = document.getElementById('nickInput').value.trim();
-      if (newName) {
-        localStorage.setItem('2137playerName', newName);
-        alert("Nick zmieniony na: " + newName);
+      const current = getPlayerName();
+      const newName = prompt("Wpisz swój nick:", current);
+      if (newName && newName.trim() !== "") {
+        localStorage.setItem('2137playerName', newName.trim());
+        alert("Nick zmieniony na: " + newName.trim());
       }
-      hideNicknameModal();
     }
 
-    function hideNicknameModal() {
-      document.getElementById('nicknameModal').style.display = 'none';
-    }
-
-    // Inicjalizacja
     const container = document.getElementById('nosaczContainer');
     container.addEventListener('touchstart', tap, { passive: true });
-    console.log("Event listener dodany");
+    container.addEventListener('mousedown', tap);
+
+    console.log("Event listeners dodane - klikaj w Nosacza!");
 
     Telegram.WebApp.ready();
     Telegram.WebApp.expand();
