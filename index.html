@@ -50,16 +50,9 @@
     }
 
     #noseOverlay { 
-      position:absolute; 
-      top:47%; 
-      left:50%; 
-      transform:translate(-50%, -50%); 
-      width:172px; 
-      height:172px; 
-      background: transparent;
-      opacity: 0;
-      border-radius:50%; 
-      pointer-events: all;
+      position:absolute; top:47%; left:50%; transform:translate(-50%, -50%); 
+      width:172px; height:172px; background:transparent; opacity:0; 
+      border-radius:50%; pointer-events:all;
     }
 
     .kurwa { 
@@ -74,19 +67,25 @@
     #tapCount { font-size:27px; margin:6px 0 8px; }
 
     button { 
-      background: #ff0;
-      color:#111; 
-      border:4px solid #000;
-      padding:12px 20px; 
-      font-size:17px; 
-      font-weight:900;
-      margin:5px auto; 
-      border-radius:8px; 
-      cursor:pointer; 
-      width:88%; 
+      background: #ff0; color:#111; border:4px solid #000;
+      padding:12px 20px; font-size:17px; font-weight:900;
+      margin:5px auto; border-radius:8px; cursor:pointer; width:88%; 
     }
 
     #result { margin:8px 0 6px; font-size:24px; font-weight:900; }
+
+    /* === MODAL - Tabela na podstronie === */
+    .modal { 
+      display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
+      background:rgba(0,0,0,0.98); z-index:100; overflow-y:auto;
+    }
+    .modal-content { 
+      max-width:420px; margin:40px auto; padding:20px; text-align:left; 
+    }
+    .lb-entry { 
+      display:flex; justify-content:space-between; padding:10px 0; 
+      border-bottom:1px solid #333; font-size:17px; 
+    }
   </style>
 </head>
 <body>
@@ -113,11 +112,12 @@
     </div>
   </div>
 
+  <!-- Tabela na podstronie -->
   <div id="leaderboardModal" class="modal">
     <div class="modal-content">
-      <h2>🏆 TOP 21 TAPPERS</h2>
+      <h2 style="text-align:center; margin-bottom:20px;">🏆 TOP 21 TAPPERS</h2>
       <div id="lbList"></div>
-      <button onclick="hideLeaderboard()">Dawaj Janusza!</button>
+      <button onclick="hideLeaderboard()" style="margin-top:20px;">Dawaj Janusza!</button>
     </div>
   </div>
 
@@ -132,7 +132,7 @@
     const sound = document.getElementById('kurlaSound');
     const nosaczImg = document.getElementById('nosacz');
 
-    function getPlayerName() { /* ... bez zmian ... */ 
+    function getPlayerName() {
       const saved = localStorage.getItem('2137playerName');
       if (saved) return saved;
       const user = Telegram.WebApp.initDataUnsafe?.user;
@@ -160,13 +160,7 @@
 
     function tap(e) {
       if (!isRunning) startTimer();
-
-      // Poprawka multi-tap: tylko jeden palec = 1 tap
-      let touchCount = 1;
-      if (e.touches && e.touches.length > 1) {
-        touchCount = e.touches.length;   // dopiero przy 2+ palcach liczy więcej
-      }
-
+      const touchCount = (e.touches && e.touches.length > 1) ? e.touches.length : 1;
       taps += touchCount;
       document.getElementById('count').textContent = taps;
 
@@ -177,7 +171,7 @@
       for (let i = 0; i < touchCount; i++) createRandomKurwa();
     }
 
-    function startTimer() { /* bez zmian - requestAnimationFrame */ 
+    function startTimer() {
       if (isRunning) return;
       isRunning = true;
       timeLeft = 21.37;
@@ -206,7 +200,7 @@
       document.getElementById('result').style.display = 'block';
     }
 
-    function saveScore(score) { /* bez zmian */ 
+    function saveScore(score) {
       const name = getPlayerName();
       leaderboard.push({name, score});
       leaderboard.sort((a,b) => b.score - a.score);
@@ -214,7 +208,7 @@
       localStorage.setItem('2137leaderboard', JSON.stringify(leaderboard));
     }
 
-    function updateLeaderboard() { /* bez zmian */ 
+    function updateLeaderboard() {
       const list = document.getElementById('lbList');
       list.innerHTML = '';
       leaderboard.forEach((entry, i) => {
@@ -225,10 +219,16 @@
       });
     }
 
-    function showLeaderboard() { updateLeaderboard(); document.getElementById('leaderboardModal').style.display = 'block'; }
-    function hideLeaderboard() { document.getElementById('leaderboardModal').style.display = 'none'; }
+    function showLeaderboard() {
+      updateLeaderboard();
+      document.getElementById('leaderboardModal').style.display = 'block';
+    }
 
-    function changeNickname() { /* bez zmian */ 
+    function hideLeaderboard() {
+      document.getElementById('leaderboardModal').style.display = 'none';
+    }
+
+    function changeNickname() {
       const current = getPlayerName();
       const newName = prompt("Wpisz swój nick:", current);
       if (newName && newName.trim() !== "") {
@@ -239,7 +239,6 @@
 
     const container = document.getElementById('nosaczContainer');
     container.addEventListener('touchstart', tap, { passive: true });
-    // Usunąłem mousedown - był źródłem podwójnego liczenia
 
     Telegram.WebApp.ready();
     Telegram.WebApp.expand();
