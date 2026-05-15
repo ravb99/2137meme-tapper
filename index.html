@@ -19,12 +19,8 @@
       height:100vh;
     }
     #game { 
-      max-width:420px; 
-      margin:0 auto; 
-      padding:4px 15px 8px; 
-      height:100vh; 
-      display:flex; 
-      flex-direction:column;
+      max-width:420px; margin:0 auto; padding:4px 15px 8px; 
+      height:100vh; display:flex; flex-direction:column;
     }
 
     .header { margin:2px 0 3px; }
@@ -33,36 +29,13 @@
 
     #timer { font-size:62px; font-weight:900; color:#f00; margin:6px 0 8px; }
 
-    #nosaczContainer { 
-      position:relative; 
-      width:298px; 
-      height:298px; 
-      margin:4px auto 6px; 
-      cursor:pointer; 
-    }
-    #nosacz { 
-      width:100%; 
-      height:100%; 
-      border-radius:50%; 
-      border:8px solid #ff0; 
-      box-shadow:0 0 30px #ff0; 
-      transition: filter 0.09s ease-out;
-    }
+    #nosaczContainer { position:relative; width:298px; height:298px; margin:4px auto 6px; cursor:pointer; }
+    #nosacz { width:100%; height:100%; border-radius:50%; border:8px solid #ff0; box-shadow:0 0 30px #ff0; transition: filter 0.09s ease-out; }
 
-    #noseOverlay { 
-      position:absolute; top:47%; left:50%; transform:translate(-50%, -50%); 
-      width:172px; height:172px; background:transparent; opacity:0; 
-      border-radius:50%; pointer-events:all;
-    }
+    #noseOverlay { position:absolute; top:47%; left:50%; transform:translate(-50%, -50%); width:172px; height:172px; background:transparent; opacity:0; border-radius:50%; pointer-events:all; }
 
-    .kurwa { 
-      position:absolute; color:#ff0; font-size:46px; font-weight:900; 
-      pointer-events:none; animation: kurwaAnim 1.1s forwards; 
-    }
-    @keyframes kurwaAnim {
-      0% { transform:translate(-50%, -50%) scale(0.6); opacity:1; }
-      100% { transform:translate(-50%, -190px) scale(1.3); opacity:0; }
-    }
+    .kurwa { position:absolute; color:#ff0; font-size:46px; font-weight:900; pointer-events:none; animation: kurwaAnim 1.1s forwards; }
+    @keyframes kurwaAnim { 0% { transform:translate(-50%, -50%) scale(0.6); opacity:1; } 100% { transform:translate(-50%, -190px) scale(1.3); opacity:0; } }
 
     #tapCount { font-size:27px; margin:6px 0 8px; }
 
@@ -74,17 +47,40 @@
 
     #result { margin:8px 0 6px; font-size:24px; font-weight:900; }
 
-    /* === MODAL - Tabela na podstronie === */
+    /* === RETRO 2010 POLISH COMPUTER STYLE === */
     .modal { 
       display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
-      background:rgba(0,0,0,0.98); z-index:100; overflow-y:auto;
+      background:rgba(0,0,0,0.94); z-index:100; 
     }
     .modal-content { 
-      max-width:420px; margin:40px auto; padding:20px; text-align:left; 
+      max-width:380px; margin:70px auto; 
+      background:#1a1a1a; 
+      border:6px solid #00ff41; 
+      box-shadow:0 0 30px #00ff41, inset 0 0 25px rgba(0,255,65,0.15);
+      border-radius:3px; overflow:hidden;
+    }
+    .title-bar { 
+      background:#002200; 
+      color:#00ff41; 
+      padding:9px 12px; 
+      font-weight:900; 
+      text-align:left; 
+      border-bottom:4px solid #00ff41;
+      font-size:19px; text-shadow:0 0 8px #00ff41;
+    }
+    .window-body { padding:20px; background:#1a1a1a; }
+    input { 
+      width:100%; padding:14px; font-size:19px; 
+      background:#0f0f0f; color:#ff0; 
+      border:3px solid #00ff41; 
+      font-family:'Oswald'; text-align:center;
+      box-shadow:inset 0 0 12px #00ff41;
     }
     .lb-entry { 
-      display:flex; justify-content:space-between; padding:10px 0; 
-      border-bottom:1px solid #333; font-size:17px; 
+      display:flex; justify-content:space-between; 
+      padding:10px 12px; margin:6px 0; 
+      background:#111; border:2px solid #00ff41; 
+      color:#ff0; font-size:17px;
     }
   </style>
 </head>
@@ -112,12 +108,27 @@
     </div>
   </div>
 
-  <!-- Tabela na podstronie -->
+  <!-- Tabela wyników -->
   <div id="leaderboardModal" class="modal">
     <div class="modal-content">
-      <h2 style="text-align:center; margin-bottom:20px;">🏆 TOP 21 TAPPERS</h2>
-      <div id="lbList"></div>
-      <button onclick="hideLeaderboard()" style="margin-top:20px;">Dawaj Janusza!</button>
+      <div class="title-bar">🏆 TOP 21 TAPPERS - 2137MEME</div>
+      <div class="window-body">
+        <div id="lbList"></div>
+        <button onclick="hideLeaderboard()" style="margin-top:15px;">Dawaj Janusza!</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Zmiana nicku -->
+  <div id="nicknameModal" class="modal">
+    <div class="modal-content">
+      <div class="title-bar">ZMIANA NICKU - 2137MEME</div>
+      <div class="window-body">
+        <p style="margin:10px 0 15px; color:#00ff41;">Wpisz nowy nick, stary:</p>
+        <input type="text" id="nickInput" maxlength="20" placeholder="Janusz420">
+        <button onclick="saveNewNickname()" style="width:48%; margin-right:4%;">ZATWIERDZAM</button>
+        <button onclick="hideNicknameModal()" style="width:48%; background:#333; color:#ff0;">ANULUJ</button>
+      </div>
     </div>
   </div>
 
@@ -228,13 +239,23 @@
       document.getElementById('leaderboardModal').style.display = 'none';
     }
 
+    // Retro modal nicku
     function changeNickname() {
-      const current = getPlayerName();
-      const newName = prompt("Wpisz swój nick:", current);
-      if (newName && newName.trim() !== "") {
-        localStorage.setItem('2137playerName', newName.trim());
-        alert("Nick zmieniony na: " + newName.trim());
+      document.getElementById('nickInput').value = getPlayerName();
+      document.getElementById('nicknameModal').style.display = 'block';
+    }
+
+    function saveNewNickname() {
+      const newName = document.getElementById('nickInput').value.trim();
+      if (newName) {
+        localStorage.setItem('2137playerName', newName);
+        alert("Nick zmieniony na: " + newName);
       }
+      hideNicknameModal();
+    }
+
+    function hideNicknameModal() {
+      document.getElementById('nicknameModal').style.display = 'none';
     }
 
     const container = document.getElementById('nosaczContainer');
