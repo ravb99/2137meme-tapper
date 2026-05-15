@@ -16,24 +16,22 @@
       text-align:center; 
       touch-action: none; 
     }
-    #game { max-width:420px; margin:0 auto; padding:10px; }
+    #game { max-width:420px; margin:0 auto; padding:15px; }
     
-    .header { margin:8px 0 5px; }
+    .header { margin:10px 0 8px; }
     h1 { 
-      font-size:48px; 
+      font-size:46px; 
       font-weight:900; 
       margin:0; 
-      text-shadow: 0 0 25px #ff0, 4px 4px 0 #000; 
       letter-spacing:4px;
-      line-height:0.9;
+      line-height:0.92;
     }
     .subtitle { 
-      font-size:36px; 
+      font-size:34px; 
       font-weight:900; 
       color:#fff; 
       margin:0; 
-      text-shadow: 0 0 20px #ff0, 3px 3px 0 #000;
-      letter-spacing:6px;
+      letter-spacing:8px;
       line-height:0.85;
     }
 
@@ -41,17 +39,15 @@
       font-size:58px; 
       font-weight:900; 
       color:#f00; 
-      text-shadow:0 0 25px #f00; 
-      margin:12px 0 20px; 
+      margin:15px 0 20px; 
     }
     
     #nosaczContainer { 
       position:relative; 
       width:300px; 
       height:300px; 
-      margin:10px auto; 
+      margin:15px auto; 
       cursor:pointer; 
-      user-select:none; 
     }
     #nosacz { width:100%; height:100%; border-radius:50%; border:8px solid #ff0; box-shadow:0 0 30px #ff0; }
     
@@ -62,20 +58,15 @@
     }
 
     .kurwa { 
-      position:absolute; 
-      color:#ff0; 
-      font-size:48px; 
-      font-weight:900; 
-      text-shadow:0 0 20px #f00; 
-      pointer-events:none; 
-      animation: kurwaAnim 1.2s forwards; 
+      position:absolute; color:#ff0; font-size:48px; font-weight:900; 
+      pointer-events:none; animation: kurwaAnim 1.2s forwards; 
     }
     @keyframes kurwaAnim {
       0% { transform:translate(-50%, -50%) scale(0.5); opacity:1; }
       100% { transform:translate(-50%, -220px) scale(1.4); opacity:0; }
     }
 
-    #tapCount { font-size:28px; margin:10px 0; }
+    #tapCount { font-size:28px; margin:15px 0; }
 
     button { 
       background: linear-gradient(145deg, #ff0, #ffcc00);
@@ -90,6 +81,10 @@
       width:85%; 
       box-shadow: 0 8px 25px rgba(255, 204, 0, 0.5);
     }
+
+    .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.98); z-index:100; overflow-y:auto; }
+    .modal-content { max-width:420px; margin:40px auto; padding:20px; text-align:left; }
+    .lb-entry { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #333; font-size:16px; }
   </style>
 </head>
 <body>
@@ -117,11 +112,12 @@
     </div>
   </div>
 
+  <!-- Osobna podstrona z tabelą -->
   <div id="leaderboardModal" class="modal">
     <div class="modal-content">
       <h2>🏆 TOP 21 TAPPERS</h2>
       <div id="lbList"></div>
-      <button onclick="hideLeaderboard()" style="width:auto;">Zamknij</button>
+      <button onclick="hideLeaderboard()" style="width:auto; margin-top:20px;">Zamknij</button>
     </div>
   </div>
 
@@ -144,11 +140,8 @@
       const k = document.createElement('div');
       k.className = 'kurwa';
       k.textContent = 'Kurła!';
-      
-      // Losowa pozycja na górnej połowie ekranu
-      const randomX = Math.random() * 300 + 60;
-      const randomY = Math.random() * 150 + 80;
-      
+      const randomX = Math.random() * 280 + 60;
+      const randomY = Math.random() * 160 + 70;
       k.style.left = randomX + 'px';
       k.style.top = randomY + 'px';
       document.getElementById('nosaczContainer').appendChild(k);
@@ -169,7 +162,7 @@
       }, 80);
 
       playKurwa();
-      createRandomKurwa();           // <-- teraz losowo
+      createRandomKurwa();
     }
 
     function startTimer() {
