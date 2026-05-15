@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>2137MEME TAPPER</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
     body { 
       margin:0; padding:0; 
@@ -16,25 +16,23 @@
       text-align:center; 
       touch-action: none; 
     }
-    #game { max-width:420px; margin:0 auto; padding:15px; }
+    #game { max-width:420px; margin:0 auto; padding:10px; }
     
-    .header {
-      margin: 10px 0 8px;
-    }
+    .header { margin:8px 0 5px; }
     h1 { 
-      font-size:42px; 
+      font-size:48px; 
       font-weight:900; 
       margin:0; 
-      text-shadow: 0 0 25px #ff0, 3px 3px 0 #000, -3px -3px 0 #000;
+      text-shadow: 0 0 25px #ff0, 4px 4px 0 #000; 
       letter-spacing:4px;
-      line-height:1;
+      line-height:0.9;
     }
     .subtitle { 
-      font-size:28px; 
-      font-weight:700; 
+      font-size:36px; 
+      font-weight:900; 
       color:#fff; 
       margin:0; 
-      text-shadow: 0 0 20px #ff0, 2px 2px 0 #000;
+      text-shadow: 0 0 20px #ff0, 3px 3px 0 #000;
       letter-spacing:6px;
       line-height:0.85;
     }
@@ -44,7 +42,7 @@
       font-weight:900; 
       color:#f00; 
       text-shadow:0 0 25px #f00; 
-      margin:15px 0 20px; 
+      margin:12px 0 20px; 
     }
     
     #nosaczContainer { 
@@ -54,7 +52,6 @@
       margin:10px auto; 
       cursor:pointer; 
       user-select:none; 
-      -webkit-tap-highlight-color: transparent;
     }
     #nosacz { width:100%; height:100%; border-radius:50%; border:8px solid #ff0; box-shadow:0 0 30px #ff0; }
     
@@ -63,6 +60,22 @@
       width:78px; height:78px; background:#f44; border-radius:50%; 
       box-shadow:0 0 25px #f00; transition:all 0.08s; cursor:pointer;
     }
+
+    .kurwa { 
+      position:absolute; 
+      color:#ff0; 
+      font-size:48px; 
+      font-weight:900; 
+      text-shadow:0 0 20px #f00; 
+      pointer-events:none; 
+      animation: kurwaAnim 1.2s forwards; 
+    }
+    @keyframes kurwaAnim {
+      0% { transform:translate(-50%, -50%) scale(0.5); opacity:1; }
+      100% { transform:translate(-50%, -220px) scale(1.4); opacity:0; }
+    }
+
+    #tapCount { font-size:28px; margin:10px 0; }
 
     button { 
       background: linear-gradient(145deg, #ff0, #ffcc00);
@@ -75,11 +88,8 @@
       border-radius:12px; 
       cursor:pointer; 
       width:85%; 
-      box-shadow: 0 8px 20px rgba(255, 204, 0, 0.5);
+      box-shadow: 0 8px 25px rgba(255, 204, 0, 0.5);
     }
-
-    .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.98); z-index:100; }
-    .modal-content { max-width:420px; margin:40px auto; padding:20px; }
   </style>
 </head>
 <body>
@@ -107,7 +117,6 @@
     </div>
   </div>
 
-  <!-- Modal leaderboard -->
   <div id="leaderboardModal" class="modal">
     <div class="modal-content">
       <h2>🏆 TOP 21 TAPPERS</h2>
@@ -131,14 +140,19 @@
       sound.play().catch(() => {});
     }
 
-    function createKurwa(x, y) {
+    function createRandomKurwa() {
       const k = document.createElement('div');
       k.className = 'kurwa';
       k.textContent = 'Kurła!';
-      k.style.left = x + 'px';
-      k.style.top = y + 'px';
+      
+      // Losowa pozycja na górnej połowie ekranu
+      const randomX = Math.random() * 300 + 60;
+      const randomY = Math.random() * 150 + 80;
+      
+      k.style.left = randomX + 'px';
+      k.style.top = randomY + 'px';
       document.getElementById('nosaczContainer').appendChild(k);
-      setTimeout(() => k.remove(), 1200);
+      setTimeout(() => k.remove(), 1400);
     }
 
     function tap(e) {
@@ -149,11 +163,13 @@
       const nose = document.getElementById('noseOverlay');
       nose.style.transform = 'translate(-50%, -50%) scale(1.45)';
       nose.style.background = '#f00';
-      setTimeout(() => { nose.style.transform = 'translate(-50%, -50%) scale(1)'; nose.style.background = '#f44'; }, 80);
+      setTimeout(() => {
+        nose.style.transform = 'translate(-50%, -50%) scale(1)';
+        nose.style.background = '#f44';
+      }, 80);
 
       playKurwa();
-      const rect = e.currentTarget.getBoundingClientRect();
-      createKurwa(e.clientX - rect.left, e.clientY - rect.top - 50);
+      createRandomKurwa();           // <-- teraz losowo
     }
 
     function startTimer() {
