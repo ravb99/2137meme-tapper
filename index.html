@@ -31,12 +31,7 @@
     h1 { font-size:42px; font-weight:900; margin:0; letter-spacing:4px; line-height:0.95; }
     .subtitle { font-size:29px; font-weight:900; color:#fff; margin:0; letter-spacing:7px; line-height:0.9; }
 
-    #timer { 
-      font-size:62px; 
-      font-weight:900; 
-      color:#f00; 
-      margin:6px 0 8px; 
-    }
+    #timer { font-size:62px; font-weight:900; color:#f00; margin:6px 0 8px; }
 
     #nosaczContainer { 
       position:relative; 
@@ -82,7 +77,7 @@
       background: #ff0;
       color:#111; 
       border:4px solid #000;
-      padding:12px 20px;        /* <<< ZMNIEJSZONA WYSOKOŚĆ */
+      padding:12px 20px; 
       font-size:17px; 
       font-weight:900;
       margin:5px auto; 
@@ -91,15 +86,7 @@
       width:88%; 
     }
 
-    #result { 
-      margin:8px 0 6px; 
-      font-size:24px; 
-      font-weight:900; 
-    }
-
-    .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.98); z-index:100; }
-    .modal-content { max-width:420px; margin:40px auto; padding:20px; text-align:left; }
-    .lb-entry { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #333; font-size:16px; }
+    #result { margin:8px 0 6px; font-size:24px; font-weight:900; }
   </style>
 </head>
 <body>
@@ -126,7 +113,6 @@
     </div>
   </div>
 
-  <!-- reszta modalu i audio bez zmian -->
   <div id="leaderboardModal" class="modal">
     <div class="modal-content">
       <h2>🏆 TOP 21 TAPPERS</h2>
@@ -138,7 +124,6 @@
   <audio id="kurlaSound" src="https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/sounds/Kurła.m4a" preload="auto"></audio>
 
   <script>
-    // (Cały skrypt bez zmian - ten sam co miałeś wcześniej)
     let timeLeft = 21.37;
     let taps = 0;
     let isRunning = false;
@@ -147,7 +132,7 @@
     const sound = document.getElementById('kurlaSound');
     const nosaczImg = document.getElementById('nosacz');
 
-    function getPlayerName() {
+    function getPlayerName() { /* ... bez zmian ... */ 
       const saved = localStorage.getItem('2137playerName');
       if (saved) return saved;
       const user = Telegram.WebApp.initDataUnsafe?.user;
@@ -175,7 +160,13 @@
 
     function tap(e) {
       if (!isRunning) startTimer();
-      const touchCount = e.touches ? e.touches.length : 1;
+
+      // Poprawka multi-tap: tylko jeden palec = 1 tap
+      let touchCount = 1;
+      if (e.touches && e.touches.length > 1) {
+        touchCount = e.touches.length;   // dopiero przy 2+ palcach liczy więcej
+      }
+
       taps += touchCount;
       document.getElementById('count').textContent = taps;
 
@@ -186,7 +177,7 @@
       for (let i = 0; i < touchCount; i++) createRandomKurwa();
     }
 
-    function startTimer() {
+    function startTimer() { /* bez zmian - requestAnimationFrame */ 
       if (isRunning) return;
       isRunning = true;
       timeLeft = 21.37;
@@ -215,7 +206,7 @@
       document.getElementById('result').style.display = 'block';
     }
 
-    function saveScore(score) {
+    function saveScore(score) { /* bez zmian */ 
       const name = getPlayerName();
       leaderboard.push({name, score});
       leaderboard.sort((a,b) => b.score - a.score);
@@ -223,7 +214,7 @@
       localStorage.setItem('2137leaderboard', JSON.stringify(leaderboard));
     }
 
-    function updateLeaderboard() {
+    function updateLeaderboard() { /* bez zmian */ 
       const list = document.getElementById('lbList');
       list.innerHTML = '';
       leaderboard.forEach((entry, i) => {
@@ -237,7 +228,7 @@
     function showLeaderboard() { updateLeaderboard(); document.getElementById('leaderboardModal').style.display = 'block'; }
     function hideLeaderboard() { document.getElementById('leaderboardModal').style.display = 'none'; }
 
-    function changeNickname() {
+    function changeNickname() { /* bez zmian */ 
       const current = getPlayerName();
       const newName = prompt("Wpisz swój nick:", current);
       if (newName && newName.trim() !== "") {
@@ -248,7 +239,7 @@
 
     const container = document.getElementById('nosaczContainer');
     container.addEventListener('touchstart', tap, { passive: true });
-    container.addEventListener('mousedown', tap);
+    // Usunąłem mousedown - był źródłem podwójnego liczenia
 
     Telegram.WebApp.ready();
     Telegram.WebApp.expand();
