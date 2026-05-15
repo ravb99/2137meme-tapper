@@ -2,11 +2,12 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>2137MEME TAPPER</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body { 
       margin:0; padding:0; 
       background:#0a0a0a; 
@@ -14,26 +15,34 @@
       font-family:'Oswald', system-ui; 
       overflow:hidden; 
       text-align:center; 
-      touch-action: manipulation; /* zapobiega zoomowaniu */
+      touch-action: manipulation; 
+      height:100vh;
     }
-    #game { max-width:420px; margin:0 auto; padding:4px 15px 8px; }
+    #game { 
+      max-width:420px; 
+      margin:0 auto; 
+      padding:4px 15px 8px; 
+      height:100vh; 
+      display:flex; 
+      flex-direction:column;
+    }
 
-    .header { margin:4px 0 4px; }
-    h1 { font-size:44px; font-weight:900; margin:0; letter-spacing:4px; line-height:0.95; }
-    .subtitle { font-size:31px; font-weight:900; color:#fff; margin:0; letter-spacing:7px; line-height:0.9; }
+    .header { margin:2px 0 3px; }
+    h1 { font-size:42px; font-weight:900; margin:0; letter-spacing:4px; line-height:0.95; }
+    .subtitle { font-size:29px; font-weight:900; color:#fff; margin:0; letter-spacing:7px; line-height:0.9; }
 
     #timer { 
-      font-size:64px; 
+      font-size:62px; 
       font-weight:900; 
       color:#f00; 
-      margin:6px 0 12px; 
+      margin:6px 0 8px; 
     }
 
     #nosaczContainer { 
       position:relative; 
-      width:300px; 
-      height:300px; 
-      margin:6px auto 8px; 
+      width:298px; 
+      height:298px; 
+      margin:4px auto 6px; 
       cursor:pointer; 
     }
     #nosacz { 
@@ -45,19 +54,17 @@
       transition: filter 0.09s ease-out;
     }
 
-    /* Niewidoczny okrąg tylko wokół nosa */
     #noseOverlay { 
       position:absolute; 
       top:47%; 
       left:50%; 
       transform:translate(-50%, -50%); 
-      width:168px; 
-      height:168px; 
+      width:172px; 
+      height:172px; 
       background: transparent;
       opacity: 0;
       border-radius:50%; 
       pointer-events: all;
-      cursor:pointer;
     }
 
     .kurwa { 
@@ -69,30 +76,30 @@
       100% { transform:translate(-50%, -190px) scale(1.3); opacity:0; }
     }
 
-    #tapCount { font-size:28px; margin:10px 0; }
+    #tapCount { font-size:27px; margin:6px 0 8px; }
 
     button { 
       background: #ff0;
       color:#111; 
       border:4px solid #000;
-      padding:14px 24px; 
-      font-size:18px; 
+      padding:12px 20px;        /* <<< ZMNIEJSZONA WYSOKOŚĆ */
+      font-size:17px; 
       font-weight:900;
-      margin:6px auto; 
+      margin:5px auto; 
       border-radius:8px; 
       cursor:pointer; 
       width:88%; 
     }
 
-    .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.98); z-index:100; overflow-y:auto; }
-    .modal-content { max-width:420px; margin:30px auto; padding:20px; text-align:left; }
-    .lb-entry { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #333; font-size:16px; }
-
     #result { 
-      margin:10px 0 6px; 
-      font-size:25px; 
+      margin:8px 0 6px; 
+      font-size:24px; 
       font-weight:900; 
     }
+
+    .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.98); z-index:100; }
+    .modal-content { max-width:420px; margin:40px auto; padding:20px; text-align:left; }
+    .lb-entry { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #333; font-size:16px; }
   </style>
 </head>
 <body>
@@ -110,14 +117,16 @@
     </div>
 
     <div id="tapCount">Taps: <span id="count">0</span></div>
-    <button onclick="changeNickname()" style="width:88%;">Zmień nick</button>
-    <button onclick="showLeaderboard()" style="width:88%;">TOP 21 LEADERBOARD</button>
+    
+    <button onclick="changeNickname()">Zmień nick</button>
+    <button onclick="showLeaderboard()">TOP 21 LEADERBOARD</button>
 
     <div id="result" style="display:none;">
       <span id="finalScore"></span>
     </div>
   </div>
 
+  <!-- reszta modalu i audio bez zmian -->
   <div id="leaderboardModal" class="modal">
     <div class="modal-content">
       <h2>🏆 TOP 21 TAPPERS</h2>
@@ -129,9 +138,9 @@
   <audio id="kurlaSound" src="https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/sounds/Kurła.m4a" preload="auto"></audio>
 
   <script>
+    // (Cały skrypt bez zmian - ten sam co miałeś wcześniej)
     let timeLeft = 21.37;
     let taps = 0;
-    let timer;
     let isRunning = false;
     let lastFrame = 0;
     let leaderboard = JSON.parse(localStorage.getItem('2137leaderboard')) || [];
@@ -166,13 +175,12 @@
 
     function tap(e) {
       if (!isRunning) startTimer();
-
       const touchCount = e.touches ? e.touches.length : 1;
       taps += touchCount;
       document.getElementById('count').textContent = taps;
 
       nosaczImg.style.filter = `hue-rotate(20deg) saturate(3.4) brightness(1.38)`;
-      setTimeout(() => nosaczImg.style.filter = `hue-rotate(0deg) saturate(1) brightness(1)`, 95);
+      setTimeout(() => nosaczImg.style.filter = '', 95);
 
       playKurwa();
       for (let i = 0; i < touchCount; i++) createRandomKurwa();
@@ -191,10 +199,8 @@
         const delta = (now - lastFrame) / 1000;
         lastFrame = now;
         timeLeft -= delta;
-
-        if (timeLeft <= 0) {
-          endRound();
-        } else {
+        if (timeLeft <= 0) endRound();
+        else {
           document.getElementById('timer').textContent = timeLeft.toFixed(2);
           requestAnimationFrame(loop);
         }
@@ -228,14 +234,8 @@
       });
     }
 
-    function showLeaderboard() {
-      updateLeaderboard();
-      document.getElementById('leaderboardModal').style.display = 'block';
-    }
-
-    function hideLeaderboard() {
-      document.getElementById('leaderboardModal').style.display = 'none';
-    }
+    function showLeaderboard() { updateLeaderboard(); document.getElementById('leaderboardModal').style.display = 'block'; }
+    function hideLeaderboard() { document.getElementById('leaderboardModal').style.display = 'none'; }
 
     function changeNickname() {
       const current = getPlayerName();
