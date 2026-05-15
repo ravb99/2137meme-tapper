@@ -43,9 +43,12 @@
   </div>
 
   <script>
-    console.log("=== WERSJA BEZ KONFLIKTU supabase ===");
+    console.log("=== WERSJA Z GLOBALNĄ TABELĄ v3 ===");
 
-    const db = Supabase.createClient('https://gmyhsgxnpbvwgexrvpik.supabase.co', 'sb_publishable_dPOUiTHcX9Xk7tQQr3oOWw_0aEfDVUm');
+    const db = Supabase.createClient(
+      'https://gmyhsgxnpbvwgexrvpik.supabase.co',
+      'sb_publishable_dPOUiTHcX9Xk7tQQr3oOWw_0aEfDVUm'
+    );
 
     let timeLeft = 21.37, taps = 0, isRunning = false;
     const nosacz = document.getElementById('nosacz');
@@ -91,7 +94,7 @@
     async function saveScore(score) {
       const name = localStorage.getItem('2137playerName') || "JanuszTest";
       const {error} = await db.from('scores').insert([{name, score}]);
-      console.log(error ? "❌ Błąd" : "✅ Zapisano globalnie " + score);
+      console.log(error ? "❌ Błąd Supabase" : "✅ Zapisano globalnie " + score);
     }
 
     async function showLeaderboard() {
@@ -112,7 +115,7 @@
 
     Telegram.WebApp.ready();
     Telegram.WebApp.expand();
-    console.log("=== GOTOWE ===");
+    console.log("=== TAPANIE + GLOBALNA TABELA GOTOWE ===");
   </script>
 </body>
 </html>
