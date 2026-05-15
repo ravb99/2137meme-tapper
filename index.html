@@ -5,16 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>2137MEME TAPPER</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body { 
-      margin:0; padding:0; background:#0a0a0a; color:#ff0; 
-      font-family:'Oswald', system-ui; overflow:hidden; 
-      text-align:center; touch-action: manipulation; height:100vh;
+      margin:0; padding:0; 
+      background:#0a0a0a; 
+      color:#ff0; 
+      font-family:'Oswald', system-ui; 
+      overflow:hidden; 
+      text-align:center; 
+      touch-action: manipulation; 
+      height:100vh;
     }
-    #game { max-width:420px; margin:0 auto; padding:4px 15px 8px; height:100vh; display:flex; flex-direction:column; }
+    #game { 
+      max-width:420px; margin:0 auto; padding:4px 15px 8px; 
+      height:100vh; display:flex; flex-direction:column;
+    }
 
     .header { margin:2px 0 3px; }
     h1 { font-size:42px; font-weight:900; margin:0; letter-spacing:4px; line-height:0.95; }
@@ -40,6 +47,7 @@
 
     #result { margin:8px 0 6px; font-size:24px; font-weight:900; }
 
+    /* === RETRO 2010 STYLE === */
     .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.94); z-index:100; }
     .modal-content { max-width:380px; margin:60px auto; background:#2a2a2a; border:6px solid #777; box-shadow:0 0 15px rgba(0,0,0,0.8); border-radius:3px; overflow:hidden; display:flex; flex-direction:column; max-height:85vh; }
     .title-bar { background:#333; color:#ddd; padding:9px 12px; font-weight:900; text-align:left; border-bottom:4px solid #555; font-size:19px; }
@@ -53,19 +61,29 @@
 </head>
 <body>
   <div id="game">
-    <div class="header"><h1>2137MEME</h1><div class="subtitle">WORTHLESS</div></div>
+    <div class="header">
+      <h1>2137MEME</h1>
+      <div class="subtitle">WORTHLESS</div>
+    </div>
+    
     <div id="timer">21.37</div>
+
     <div id="nosaczContainer">
       <img id="nosacz" src="https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/images/IMG_6353.jpeg" alt="Nosacz"> 
       <div id="noseOverlay"></div>
     </div>
+
     <div id="tapCount">Taps: <span id="count">0</span></div>
     
     <button onclick="changeNickname()">Zmień nick</button>
     <button onclick="showLeaderboard()">TOP 21 LEADERBOARD</button>
-    <div id="result" style="display:none; margin:8px 0 6px; font-size:24px; font-weight:900;"></div>
+
+    <div id="result" style="display:none;">
+      <span id="finalScore"></span>
+    </div>
   </div>
 
+  <!-- Tabela wyników -->
   <div id="leaderboardModal" class="modal">
     <div class="modal-content">
       <div class="title-bar">🏆 TOP 21 TAPPERS - 2137MEME</div>
@@ -76,12 +94,14 @@
     </div>
   </div>
 
+  <!-- Zmiana nicku -->
   <div id="nicknameModal" class="modal">
     <div class="modal-content">
       <div class="title-bar">ZMIANA NICKU - 2137MEME</div>
       <div class="window-body">
         <p style="margin:10px 0 15px; color:#ccc;">Wpisz nowy nick, stary:</p>
         <input type="text" id="nickInput" maxlength="20" placeholder="Janusz420">
+        
         <div class="nick-buttons">
           <button onclick="saveNewNickname()">ZATWIERDZAM</button>
           <button onclick="hideNicknameModal()" style="background:#555; color:#ff0;">ANULUJ</button>
@@ -93,15 +113,11 @@
   <audio id="kurlaSound" src="https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/sounds/Kurła.m4a" preload="auto"></audio>
 
   <script>
-    const supabaseUrl = 'https://gmyhsgxnpbvwgexrvpik.supabase.co';
-    const supabaseKey = 'sb_publishable_dPOUiTHcX9Xk7tQQr3oOWw_0aEfDVUm';
-    const supabase = Supabase.createClient(supabaseUrl, supabaseKey);
-
     let timeLeft = 21.37;
     let taps = 0;
     let isRunning = false;
     let lastFrame = 0;
-
+    let leaderboard = JSON.parse(localStorage.getItem('2137leaderboard')) || [];
     const sound = document.getElementById('kurlaSound');
     const nosaczImg = document.getElementById('nosacz');
 
@@ -112,23 +128,6 @@
       if (user?.username) return "@" + user.username;
       if (user?.first_name) return user.first_name + (user.last_name ? " " + user.last_name : "");
       return "Janusz" + Math.floor(Math.random()*999);
-    }
-
-    async function saveScore(score) {
-      const name = getPlayerName();
-      await supabase.from('scores').insert([{ name, score }]);
-    }
-
-    async function updateLeaderboard() {
-      const { data } = await supabase.from('scores').select('name, score').order('score', { ascending: false }).limit(21);
-      const list = document.getElementById('lbList');
-      list.innerHTML = '';
-      (data || []).forEach((entry, i) => {
-        const div = document.createElement('div');
-        div.className = 'lb-entry';
-        div.innerHTML = `<span>${i+1}. ${entry.name}</span><span>${entry.score}</span>`;
-        list.appendChild(div);
-      });
     }
 
     function playKurwa() {
@@ -188,6 +187,25 @@
       document.getElementById('finalScore').innerHTML = `Koniec rundy! Twój wynik: <span style="color:#f00;">${taps}</span>`;
       saveScore(taps);
       document.getElementById('result').style.display = 'block';
+    }
+
+    function saveScore(score) {
+      const name = getPlayerName();
+      leaderboard.push({name, score});
+      leaderboard.sort((a,b) => b.score - a.score);
+      leaderboard = leaderboard.slice(0, 21);
+      localStorage.setItem('2137leaderboard', JSON.stringify(leaderboard));
+    }
+
+    function updateLeaderboard() {
+      const list = document.getElementById('lbList');
+      list.innerHTML = '';
+      leaderboard.forEach((entry, i) => {
+        const div = document.createElement('div');
+        div.className = 'lb-entry';
+        div.innerHTML = `<span>${i+1}. ${entry.name}</span><span>${entry.score}</span>`;
+        list.appendChild(div);
+      });
     }
 
     function showLeaderboard() {
