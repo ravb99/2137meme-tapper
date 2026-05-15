@@ -42,9 +42,8 @@
       100% { transform:translate(-50%, -220px) scale(1.4); opacity:0; }
     }
 
-    #tapCount { font-size:28px; margin:15px 0; }
+    #tapCount { font-size:28px; margin:10px 0; }
 
-    /* Czyste przyciski bez glow */
     button { 
       background: #ff0;
       color:#111; 
@@ -52,17 +51,13 @@
       padding:18px 32px; 
       font-size:19px; 
       font-weight:900;
-      margin:20px auto; 
+      margin:15px auto; 
       border-radius:8px; 
       cursor:pointer; 
       width:85%; 
       text-transform: uppercase;
-      letter-spacing:1px;
     }
-    button:active {
-      transform: scale(0.95);
-      background: #ffcc00;
-    }
+    button:active { transform: scale(0.95); background: #ffcc00; }
 
     .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.98); z-index:100; overflow-y:auto; }
     .modal-content { max-width:420px; margin:40px auto; padding:20px; text-align:left; }
@@ -87,6 +82,7 @@
     </div>
 
     <div id="tapCount">Taps: <span id="count">0</span></div>
+    <button onclick="changeNickname()" style="width:80%; padding:10px 20px; font-size:16px;">Zmień nick</button>
 
     <button onclick="showLeaderboard()">TOP 21 LEADERBOARD</button>
 
@@ -95,6 +91,7 @@
     </div>
   </div>
 
+  <!-- Modal leaderboard -->
   <div id="leaderboardModal" class="modal">
     <div class="modal-content">
       <h2>🏆 TOP 21 TAPPERS</h2>
@@ -112,6 +109,29 @@
     let isRunning = false;
     let leaderboard = JSON.parse(localStorage.getItem('2137leaderboard')) || [];
     const sound = document.getElementById('kurlaSound');
+
+    function getPlayerName() {
+      const saved = localStorage.getItem('2137playerName');
+      if (saved) return saved;
+
+      const user = Telegram.WebApp.initDataUnsafe?.user;
+      if (user?.username) return "@" + user.username;
+      if (user?.first_name) return user.first_name + (user.last_name ? " " + user.last_name : "");
+      return "Janusz" + Math.floor(Math.random()*999);
+    }
+
+    function savePlayerName(name) {
+      localStorage.setItem('2137playerName', name);
+    }
+
+    function changeNickname() {
+      const current = getPlayerName();
+      const newName = prompt("Wpisz swój nick:", current);
+      if (newName && newName.trim() !== "") {
+        savePlayerName(newName.trim());
+        alert("Nick zmieniony na: " + newName.trim());
+      }
+    }
 
     function playKurwa() {
       sound.currentTime = 0;
@@ -167,7 +187,7 @@
     }
 
     function saveScore(score) {
-      const name = Telegram.WebApp.initDataUnsafe?.user?.username || "Anon" + Math.floor(Math.random()*999);
+      const name = getPlayerName();
       leaderboard.push({name, score});
       leaderboard.sort((a,b) => b.score - a.score);
       leaderboard = leaderboard.slice(0, 21);
