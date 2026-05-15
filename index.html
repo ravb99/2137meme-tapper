@@ -7,8 +7,8 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    body { 
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
+    html, body { 
       margin:0; padding:0; 
       background:#0a0a0a; 
       color:#ff0; 
@@ -32,8 +32,6 @@
     #nosaczContainer { position:relative; width:298px; height:298px; margin:4px auto 6px; cursor:pointer; }
     #nosacz { width:100%; height:100%; border-radius:50%; border:8px solid #ff0; box-shadow:0 0 30px #ff0; transition: filter 0.09s ease-out; }
 
-    #noseOverlay { position:absolute; top:47%; left:50%; transform:translate(-50%, -50%); width:172px; height:172px; background:transparent; opacity:0; border-radius:50%; pointer-events:all; }
-
     .kurwa { position:absolute; color:#ff0; font-size:46px; font-weight:900; pointer-events:none; animation: kurwaAnim 1.1s forwards; }
     @keyframes kurwaAnim { 0% { transform:translate(-50%, -50%) scale(0.6); opacity:1; } 100% { transform:translate(-50%, -190px) scale(1.3); opacity:0; } }
 
@@ -47,7 +45,7 @@
 
     #result { margin:8px 0 6px; font-size:24px; font-weight:900; }
 
-    /* === RETRO 2010 – SZARY WINDOWS 7 STYLE === */
+    /* === RETRO 2010 STYLE === */
     .modal { 
       display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
       background:rgba(0,0,0,0.94); z-index:100; 
@@ -112,7 +110,6 @@
 
     <div id="nosaczContainer">
       <img id="nosacz" src="https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/images/IMG_6353.jpeg" alt="Nosacz"> 
-      <div id="noseOverlay"></div>
     </div>
 
     <div id="tapCount">Taps: <span id="count">0</span></div>
@@ -121,7 +118,8 @@
     <button onclick="showLeaderboard()">TOP 21 LEADERBOARD</button>
 
     <div id="result" style="display:none;">
-      <span id="finalScore"></span>
+      <span id="finalScore"></span><br><br>
+      <button onclick="restartGame()" style="background:#0f0; color:#000; font-size:18px;">Na Drugą Nóżkę!</button>
     </div>
   </div>
 
@@ -217,8 +215,10 @@
         const delta = (now - lastFrame) / 1000;
         lastFrame = now;
         timeLeft -= delta;
-        if (timeLeft <= 0) endRound();
-        else {
+        if (timeLeft <= 0) {
+          document.getElementById('timer').textContent = "0.00";
+          endRound();
+        } else {
           document.getElementById('timer').textContent = timeLeft.toFixed(2);
           requestAnimationFrame(loop);
         }
@@ -233,7 +233,6 @@
       document.getElementById('result').style.display = 'block';
     }
 
-    // ==================== GLOBALNA TABELA ====================
     async function saveScore(score) {
       const name = getPlayerName();
       const response = await fetch(`${SUPABASE_URL}/rest/v1/scores`, {
@@ -294,8 +293,18 @@
       document.getElementById('nicknameModal').style.display = 'none';
     }
 
+    function restartGame() {
+      document.getElementById('result').style.display = 'none';
+      timeLeft = 21.37;
+      taps = 0;
+      isRunning = false;
+      document.getElementById('count').textContent = 0;
+      document.getElementById('timer').textContent = "21.37";
+    }
+
     const container = document.getElementById('nosaczContainer');
     container.addEventListener('touchstart', tap, { passive: true });
+    container.addEventListener('mousedown', tap);
 
     Telegram.WebApp.ready();
     Telegram.WebApp.expand();
