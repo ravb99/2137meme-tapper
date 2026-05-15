@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>2137MEME TAPPER</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
@@ -43,25 +42,8 @@
   </div>
 
   <script>
-    console.log("=== DEBUG v7 - Opóźnione ładowanie Supabase ===");
-
-    let db = null;
-
-    // Czekamy aż Supabase się załaduje
-    function initSupabase() {
-      if (typeof Supabase !== "undefined") {
-        try {
-          db = Supabase.createClient('https://gmyhsgxnpbvwgexrvpik.supabase.co', 'sb_publishable_dPOUiTHcX9Xk7tQQr3oOWw_0aEfDVUm');
-          console.log("✅ Supabase połączony pomyślnie");
-        } catch (e) {
-          console.error("❌ Błąd Supabase:", e);
-        }
-      } else {
-        console.log("⏳ Czekam na Supabase...");
-        setTimeout(initSupabase, 500);
-      }
-    }
-    initSupabase();
+    const SUPABASE_URL = 'https://gmyhsgxnpbvwgexrvpik.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_dPOUiTHcX9Xk7tQQr3oOWw_0aEfDVUm';
 
     let timeLeft = 21.37, taps = 0, isRunning = false;
     const nosacz = document.getElementById('nosacz');
@@ -101,23 +83,34 @@
 
     function endRound() {
       isRunning = false;
-      if (db) saveScore(taps);
-      else console.log("Brak Supabase - wynik lokalny:", taps);
+      saveScore(taps);
     }
 
     async function saveScore(score) {
-      if (!db) return;
       const name = localStorage.getItem('2137playerName') || "JanuszTest";
-      const {error} = await db.from('scores').insert([{name, score}]);
-      console.log(error ? "❌ Błąd zapisu" : "✅ Zapisano globalnie " + score);
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/scores`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`
+        },
+        body: JSON.stringify([{ name, score }])
+      });
+      console.log(response.ok ? "✅ Zapisano globalnie " + score : "❌ Błąd zapisu");
     }
 
     async function showLeaderboard() {
-      if (!db) return alert("Supabase nie jest jeszcze gotowy");
-      const {data} = await db.from('scores').select('name,score').order('score',{ascending:false}).limit(21);
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/scores?select=name,score&order=score.desc&limit=21`, {
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`
+        }
+      });
+      const data = await response.json();
       const list = document.getElementById('lbList');
       list.innerHTML = '';
-      (data||[]).forEach((e,i) => {
+      data.forEach((e,i) => {
         const d = document.createElement('div');
         d.style.padding = '8px';
         d.style.borderBottom = '1px solid #555';
@@ -132,7 +125,7 @@
 
     Telegram.WebApp.ready();
     Telegram.WebApp.expand();
-    console.log("=== TAPANIE DZIAŁA - czekamy na Supabase ===");
+    console.log("=== GLOBALNA TABELA PRZEZ REST API ===");
   </script>
 </body>
 </html>
