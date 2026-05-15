@@ -43,9 +43,9 @@
   </div>
 
   <script>
-    console.log("=== CZYSTA WERSJA START ===");
+    console.log("=== WERSJA BEZ KONFLIKTU supabase ===");
 
-    const supabase = Supabase.createClient('https://gmyhsgxnpbvwgexrvpik.supabase.co', 'sb_publishable_dPOUiTHcX9Xk7tQQr3oOWw_0aEfDVUm');
+    const db = Supabase.createClient('https://gmyhsgxnpbvwgexrvpik.supabase.co', 'sb_publishable_dPOUiTHcX9Xk7tQQr3oOWw_0aEfDVUm');
 
     let timeLeft = 21.37, taps = 0, isRunning = false;
     const nosacz = document.getElementById('nosacz');
@@ -90,12 +90,12 @@
 
     async function saveScore(score) {
       const name = localStorage.getItem('2137playerName') || "JanuszTest";
-      const {error} = await supabase.from('scores').insert([{name, score}]);
-      console.log(error ? "❌ Błąd Supabase" : "✅ Zapisano globalnie " + score);
+      const {error} = await db.from('scores').insert([{name, score}]);
+      console.log(error ? "❌ Błąd" : "✅ Zapisano globalnie " + score);
     }
 
     async function showLeaderboard() {
-      const {data} = await supabase.from('scores').select('name,score').order('score',{ascending:false}).limit(21);
+      const {data} = await db.from('scores').select('name,score').order('score',{ascending:false}).limit(21);
       const list = document.getElementById('lbList');
       list.innerHTML = '';
       (data||[]).forEach((e,i) => {
@@ -112,7 +112,7 @@
 
     Telegram.WebApp.ready();
     Telegram.WebApp.expand();
-    console.log("=== GOTOWE - TAPAJ NOSACZA ===");
+    console.log("=== GOTOWE ===");
   </script>
 </body>
 </html>
