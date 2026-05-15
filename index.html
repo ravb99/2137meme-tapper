@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>2137MEME TAPPER</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -89,7 +90,6 @@
       font-family:'Oswald'; text-align:center;
     }
 
-    /* Wycentrowane przyciski w modalu nicku */
     .nick-buttons {
       display: flex;
       justify-content: center;
@@ -156,11 +156,15 @@
   <audio id="kurlaSound" src="https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/sounds/Kurła.m4a" preload="auto"></audio>
 
   <script>
+    const supabaseUrl = 'https://gmyhsgxnpbvwgexrvpik.supabase.co';
+    const supabaseKey = 'sb_publishable_dPOUiTHcX9Xk7tQQr3oOWw_0aEfDVUm';
+    const supabase = Supabase.createClient(supabaseUrl, supabaseKey);
+
     let timeLeft = 21.37;
     let taps = 0;
     let isRunning = false;
     let lastFrame = 0;
-    let leaderboard = JSON.parse(localStorage.getItem('2137leaderboard')) || [];
+
     const sound = document.getElementById('kurlaSound');
     const nosaczImg = document.getElementById('nosacz');
 
@@ -171,6 +175,30 @@
       if (user?.username) return "@" + user.username;
       if (user?.first_name) return user.first_name + (user.last_name ? " " + user.last_name : "");
       return "Janusz" + Math.floor(Math.random()*999);
+    }
+
+    async function saveScore(score) {
+      const name = getPlayerName();
+      await supabase.from('scores').insert([{ name: name, score: score }]);
+    }
+
+    async function updateLeaderboard() {
+      const { data } = await supabase
+        .from('scores')
+        .select('name, score')
+        .order('score', { ascending: false })
+        .limit(21);
+
+      const list = document.getElementById('lbList');
+      list.innerHTML = '';
+      if (data) {
+        data.forEach((entry, i) => {
+          const div = document.createElement('div');
+          div.className = 'lb-entry';
+          div.innerHTML = `<span>${i+1}. ${entry.name}</span><span>${entry.score}</span>`;
+          list.appendChild(div);
+        });
+      }
     }
 
     function playKurwa() {
@@ -230,25 +258,6 @@
       document.getElementById('finalScore').innerHTML = `Koniec rundy! Twój wynik: <span style="color:#f00;">${taps}</span>`;
       saveScore(taps);
       document.getElementById('result').style.display = 'block';
-    }
-
-    function saveScore(score) {
-      const name = getPlayerName();
-      leaderboard.push({name, score});
-      leaderboard.sort((a,b) => b.score - a.score);
-      leaderboard = leaderboard.slice(0, 21);
-      localStorage.setItem('2137leaderboard', JSON.stringify(leaderboard));
-    }
-
-    function updateLeaderboard() {
-      const list = document.getElementById('lbList');
-      list.innerHTML = '';
-      leaderboard.forEach((entry, i) => {
-        const div = document.createElement('div');
-        div.className = 'lb-entry';
-        div.innerHTML = `<span>${i+1}. ${entry.name}</span><span>${entry.score}</span>`;
-        list.appendChild(div);
-      });
     }
 
     function showLeaderboard() {
