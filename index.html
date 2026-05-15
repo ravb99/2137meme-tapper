@@ -10,14 +10,9 @@
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body { 
-      margin:0; padding:0; 
-      background:#0a0a0a; 
-      color:#ff0; 
-      font-family:'Oswald', system-ui; 
-      overflow:hidden; 
-      text-align:center; 
-      touch-action: manipulation; 
-      height:100vh;
+      margin:0; padding:0; background:#0a0a0a; color:#ff0; 
+      font-family:'Oswald', system-ui; overflow:hidden; 
+      text-align:center; touch-action: manipulation; height:100vh;
     }
     #game { 
       max-width:420px; margin:0 auto; padding:4px 15px 8px; 
@@ -48,58 +43,15 @@
 
     #result { margin:8px 0 6px; font-size:24px; font-weight:900; }
 
-    /* === RETRO 2010 – SZARY WINDOWS 7 STYLE === */
-    .modal { 
-      display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
-      background:rgba(0,0,0,0.94); z-index:100; 
-    }
-    .modal-content { 
-      max-width:380px; margin:60px auto; 
-      background:#2a2a2a; 
-      border:6px solid #777; 
-      box-shadow:0 0 15px rgba(0,0,0,0.8); 
-      border-radius:3px; overflow:hidden; display:flex; flex-direction:column;
-      max-height:85vh;
-    }
-    .title-bar { 
-      background:#333; 
-      color:#ddd; 
-      padding:9px 12px; 
-      font-weight:900; 
-      text-align:left; 
-      border-bottom:4px solid #555;
-      font-size:19px;
-    }
-    .window-body { 
-      padding:18px; background:#2a2a2a; 
-      flex:1; overflow:hidden; display:flex; flex-direction:column;
-    }
-    #lbList { 
-      flex:1; overflow-y:auto; padding-right:8px; 
-    }
-    .lb-entry { 
-      display:flex; justify-content:space-between; 
-      padding:10px 12px; margin:6px 0; 
-      background:#1f1f1f; border:2px solid #666; 
-      color:#ff0; font-size:17px;
-    }
-    input { 
-      width:100%; padding:14px; font-size:19px; 
-      background:#1a1a1a; color:#ff0; 
-      border:3px solid #777; 
-      font-family:'Oswald'; text-align:center;
-    }
+    .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.94); z-index:100; }
+    .modal-content { max-width:380px; margin:60px auto; background:#2a2a2a; border:6px solid #777; box-shadow:0 0 15px rgba(0,0,0,0.8); border-radius:3px; overflow:hidden; display:flex; flex-direction:column; max-height:85vh; }
+    .title-bar { background:#333; color:#ddd; padding:9px 12px; font-weight:900; text-align:left; border-bottom:4px solid #555; font-size:19px; }
+    .window-body { padding:18px; background:#2a2a2a; flex:1; overflow:hidden; display:flex; flex-direction:column; }
+    #lbList { flex:1; overflow-y:auto; padding-right:8px; }
+    .lb-entry { display:flex; justify-content:space-between; padding:10px 12px; margin:6px 0; background:#1f1f1f; border:2px solid #666; color:#ff0; font-size:17px; }
 
-    .nick-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      margin-top: 15px;
-    }
-    .nick-buttons button {
-      width: 48%;
-      margin: 0;
-    }
+    .nick-buttons { display:flex; justify-content:center; gap:12px; margin-top:15px; }
+    .nick-buttons button { width:48%; margin:0; }
   </style>
 </head>
 <body>
@@ -126,7 +78,6 @@
     </div>
   </div>
 
-  <!-- Tabela wyników -->
   <div id="leaderboardModal" class="modal">
     <div class="modal-content">
       <div class="title-bar">🏆 TOP 21 TAPPERS - 2137MEME</div>
@@ -137,14 +88,12 @@
     </div>
   </div>
 
-  <!-- Zmiana nicku -->
   <div id="nicknameModal" class="modal">
     <div class="modal-content">
       <div class="title-bar">ZMIANA NICKU - 2137MEME</div>
       <div class="window-body">
         <p style="margin:10px 0 15px; color:#ccc;">Wpisz nowy nick, stary:</p>
         <input type="text" id="nickInput" maxlength="20" placeholder="Janusz420">
-        
         <div class="nick-buttons">
           <button onclick="saveNewNickname()">ZATWIERDZAM</button>
           <button onclick="hideNicknameModal()" style="background:#555; color:#ff0;">ANULUJ</button>
@@ -179,26 +128,19 @@
 
     async function saveScore(score) {
       const name = getPlayerName();
-      await supabase.from('scores').insert([{ name: name, score: score }]);
+      await supabase.from('scores').insert([{ name, score }]);
     }
 
     async function updateLeaderboard() {
-      const { data } = await supabase
-        .from('scores')
-        .select('name, score')
-        .order('score', { ascending: false })
-        .limit(21);
-
+      const { data } = await supabase.from('scores').select('name, score').order('score', { ascending: false }).limit(21);
       const list = document.getElementById('lbList');
       list.innerHTML = '';
-      if (data) {
-        data.forEach((entry, i) => {
-          const div = document.createElement('div');
-          div.className = 'lb-entry';
-          div.innerHTML = `<span>${i+1}. ${entry.name}</span><span>${entry.score}</span>`;
-          list.appendChild(div);
-        });
-      }
+      (data || []).forEach((entry, i) => {
+        const div = document.createElement('div');
+        div.className = 'lb-entry';
+        div.innerHTML = `<span>${i+1}. ${entry.name}</span><span>${entry.score}</span>`;
+        list.appendChild(div);
+      });
     }
 
     function playKurwa() {
