@@ -32,6 +32,8 @@
       color:#fff; 
       margin:-8px 0 8px 0; 
       letter-spacing:7px; 
+      width:100%; 
+      text-align:center;
     }
     #timer { font-size:62px; font-weight:900; color:#f00; margin:4px 0 8px; }
     #nosaczContainer { position:relative; width:298px; height:298px; margin:4px auto 6px; }
@@ -141,7 +143,7 @@
   <audio id="kurlaSound" src="https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/sounds/Kurła.m4a" preload="auto"></audio>
 
   <script>
-    // Mocna blokada zooma i przesuwania
+    // Mocna blokada
     document.documentElement.style.touchAction = 'none';
     document.body.style.touchAction = 'none';
     document.addEventListener('touchmove', function(e) {
