@@ -11,7 +11,7 @@
     html, body { 
       margin:0; padding:0; background:#0a0a0a; color:#ff0; 
       font-family:'Oswald', sans-serif; overflow:hidden; height:100vh; 
-      touch-action: none !important; 
+      touch-action: none; 
       overscroll-behavior: none;
       -webkit-user-scalable: no;
     }
@@ -20,17 +20,17 @@
       height:100vh; display:flex; flex-direction:column; align-items:center;
     }
     h1 { 
-      font-size:48px; 
+      font-size:54px; 
       font-weight:900; 
       margin:2px 0 0 0; 
       letter-spacing:4px; 
-      line-height:0.85;
+      line-height:0.8;
     }
     .subtitle { 
       font-size:29px; 
       font-weight:900; 
       color:#fff; 
-      margin:-6px 0 8px 0; 
+      margin:-8px 0 8px 0; 
       letter-spacing:7px; 
     }
     #timer { font-size:62px; font-weight:900; color:#f00; margin:4px 0 8px; }
@@ -141,13 +141,11 @@
   <audio id="kurlaSound" src="https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/sounds/Kurła.m4a" preload="auto"></audio>
 
   <script>
-    // === MOCNA BLOKADA PRZESUWANIA ===
+    // Mocna blokada zooma i przesuwania
     document.documentElement.style.touchAction = 'none';
     document.body.style.touchAction = 'none';
     document.addEventListener('touchmove', function(e) {
-      if (e.touches.length > 1 || e.scale !== 1) {
-        e.preventDefault();
-      }
+      if (e.touches.length > 1 || e.scale !== 1) e.preventDefault();
     }, { passive: false });
 
     const SUPABASE_URL = 'https://gmyhsgxnpbvwgexrvpik.supabase.co';
@@ -227,7 +225,7 @@
 
     function endRound() {
       isRunning = false;
-      document.getElementById('finalScore').innerHTML = `Koniec rundy!<br>Twój wynik: <span style="color:#f00;">${taps}</span>`;
+      document.getElementById('finalScore').innerHTML = `Koniec rundy! Twój wynik: <span style="color:#f00;">${taps}</span>`;
       saveScore(taps);
       restartBtn.style.display = 'block';
     }
