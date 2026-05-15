@@ -11,7 +11,7 @@
     html, body { 
       margin:0; padding:0; background:#0a0a0a; color:#ff0; 
       font-family:'Oswald', sans-serif; overflow:hidden; height:100vh; 
-      touch-action: manipulation; 
+      touch-action: none; 
       overscroll-behavior: none;
       -webkit-user-scalable: no;
     }
@@ -112,7 +112,7 @@
     </div>
   </div>
 
-  <!-- Sukces po zmianie nicku (retro styl) -->
+  <!-- Sukces po zmianie nicku -->
   <div id="successModal" class="modal">
     <div class="modal-content">
       <div class="title-bar">✅ NICK ZMIENIONY</div>
@@ -126,6 +126,13 @@
   <audio id="kurlaSound" src="https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/sounds/Kurła.m4a" preload="auto"></audio>
 
   <script>
+    // === OSTATECZNA BLOKADA ZOOMA ===
+    document.documentElement.style.touchAction = 'none';
+    document.body.style.touchAction = 'none';
+    document.addEventListener('touchmove', e => {
+      if (e.touches.length > 1) e.preventDefault();
+    }, { passive: false });
+
     const SUPABASE_URL = 'https://gmyhsgxnpbvwgexrvpik.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_dPOUiTHcX9Xk7tQQr3oOWw_0aEfDVUm';
 
