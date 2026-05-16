@@ -57,7 +57,6 @@
       display:none; text-align:center; width:100%; color:#ff0;
     }
 
-    /* Retro modale */
     .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.94); z-index:100; }
     .modal-content { 
       max-width:380px; margin:40px auto; 
@@ -170,7 +169,7 @@
     const SUPABASE_KEY = 'sb_publishable_dPOUiTHcX9Xk7tQQr3oOWw_0aEfDVUm';
 
     let currentPlayer = { name: "Janusz", pin: "" };
-    let currentTab = 0; // 0 = Best Round, 1 = All Time
+    let currentTab = 0;
 
     let timeLeft = 21.37;
     let taps = 0;
@@ -241,7 +240,7 @@
     function tap(e) {
       if (restartBtn.style.display === 'block') return;
       if (!isRunning) startTimer();
-      taps += 1;   // JEDNO TĄPNIĘCIE = 1 PUNKT
+      taps += 1;
       document.getElementById('count').textContent = taps;
 
       nosaczImg.style.filter = `hue-rotate(20deg) saturate(3.4) brightness(1.38)`;
@@ -284,20 +283,26 @@
     }
 
     async function saveScore(roundScore) {
-      await fetch(`${SUPABASE_URL}/rest/v1/scores`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': SUPABASE_KEY,
-          'Authorization': `Bearer ${SUPABASE_KEY}`
-        },
-        body: JSON.stringify([{
-          name: currentPlayer.name,
-          pin: currentPlayer.pin,
-          round_score: roundScore,
-          total_score: roundScore
-        }])
-      });
+      alert("Zapisuję wynik: " + roundScore + "\nNick: " + currentPlayer.name + "\nPIN: " + currentPlayer.pin); // <--- debug
+      try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/scores`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`
+          },
+          body: JSON.stringify([{
+            name: currentPlayer.name,
+            pin: currentPlayer.pin,
+            round_score: roundScore,
+            total_score: roundScore
+          }])
+        });
+        alert("Odpowiedź Supabase: " + response.status); // <--- debug
+      } catch (e) {
+        alert("Błąd zapisu: " + e.message);
+      }
     }
 
     async function updateLeaderboard() {
