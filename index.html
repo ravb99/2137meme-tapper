@@ -241,7 +241,7 @@
     function tap(e) {
       if (restartBtn.style.display === 'block') return;
       if (!isRunning) startTimer();
-      taps += 1;                    // <--- JEDNO TĄPNIĘCIE = 1 PUNKT
+      taps += 1;                    // JEDNO TĄPNIĘCIE = 1 PUNKT
       document.getElementById('count').textContent = taps;
 
       nosaczImg.style.filter = `hue-rotate(20deg) saturate(3.4) brightness(1.38)`;
@@ -251,7 +251,29 @@
       createRandomKurwa();
     }
 
-    function startTimer() { /* bez zmian */ }
+    function startTimer() {
+      if (isRunning) return;
+      isRunning = true;
+      timeLeft = 21.37;
+      taps = 0;
+      document.getElementById('count').textContent = taps;
+      lastFrame = performance.now();
+
+      function loop(now) {
+        if (!isRunning) return;
+        const delta = (now - lastFrame) / 1000;
+        lastFrame = now;
+        timeLeft -= delta;
+        if (timeLeft <= 0) {
+          document.getElementById('timer').textContent = "0.00";
+          endRound();
+        } else {
+          document.getElementById('timer').textContent = timeLeft.toFixed(2);
+          requestAnimationFrame(loop);
+        }
+      }
+      requestAnimationFrame(loop);
+    }
 
     function endRound() {
       isRunning = false;
