@@ -19,8 +19,22 @@
       max-width:420px; margin:0 auto; padding:4px 15px 8px; 
       height:100vh; display:flex; flex-direction:column; align-items:center;
     }
-    h1 { font-size:54px; font-weight:900; margin:2px 0 0 0; letter-spacing:4px; line-height:0.85; }
-    .subtitle { font-size:29px; font-weight:900; color:#fff; margin:-8px 0 8px 0; letter-spacing:7px; width:100%; text-align:center; }
+    h1 { 
+      font-size:54px; 
+      font-weight:900; 
+      margin:2px 0 0 0; 
+      letter-spacing:4px; 
+      line-height:0.85;
+    }
+    .subtitle { 
+      font-size:29px; 
+      font-weight:900; 
+      color:#fff; 
+      margin:-8px 0 8px 0; 
+      letter-spacing:7px; 
+      width:100%; 
+      text-align:center;
+    }
     #timer { font-size:62px; font-weight:900; color:#f00; margin:4px 0 8px; }
     #nosaczContainer { position:relative; width:298px; height:298px; margin:4px auto 6px; }
     #nosacz { width:100%; height:100%; border-radius:50%; border:8px solid #ff0; box-shadow:0 0 30px #ff0; transition: filter 0.09s ease-out; }
@@ -55,14 +69,18 @@
       background:#333; color:#ddd; padding:9px 12px; font-weight:900; 
       text-align:left; border-bottom:4px solid #555; font-size:19px;
     }
+    .tab-buttons { display:flex; background:#222; }
+    .tab-btn { flex:1; padding:12px; background:#222; color:#ff0; border:none; font-weight:900; font-size:17px; }
+    .tab-btn.active { background:#ff0; color:#111; }
     .window-body { 
       padding:15px; background:#2a2a2a; flex:1; 
       display:flex; flex-direction:column; overflow:hidden;
     }
-    .tab-buttons { display:flex; background:#222; }
-    .tab-btn { flex:1; padding:12px; background:#222; color:#ff0; border:none; font-weight:900; font-size:17px; }
-    .tab-btn.active { background:#ff0; color:#111; }
-    #lbList { flex:1; overflow-y:auto; padding-right:10px; }
+    #lbList { 
+      flex:1; 
+      overflow-y:auto; 
+      padding-right:10px; 
+    }
     .lb-entry { 
       display:flex; justify-content:space-between; 
       padding:10px 12px; margin:6px 0; 
@@ -97,7 +115,7 @@
     </div>
   </div>
 
-  <!-- Leaderboard z dwoma tabelami -->
+  <!-- Leaderboard z przełącznikami -->
   <div id="leaderboardModal" class="modal">
     <div class="modal-content">
       <div class="title-bar">🏆 LEADERBOARD - 2137MEME</div>
@@ -195,7 +213,7 @@
 
     function verifyOrSetPin() {
       const pin = document.getElementById('pinInput').value.trim();
-      if (pin.length !== 4) return alert("PIN musi mieć 4 cyfry!");
+      if (pin.length !== 4) return alert("PIN musi mieć dokładnie 4 cyfry!");
 
       currentPlayer.pin = pin;
       localStorage.setItem('2137player', JSON.stringify(currentPlayer));
@@ -203,10 +221,60 @@
       alert(`Zapisano!\nNick: ${currentPlayer.name}\nPIN: ${pin}`);
     }
 
-    function playKurwa() { /* bez zmian */ }
-    function createRandomKurwa() { /* bez zmian */ }
-    function tap(e) { /* bez zmian */ }
-    function startTimer() { /* bez zmian */ }
+    function playKurwa() {
+      sound.currentTime = 0;
+      sound.play().catch(() => {});
+    }
+
+    function createRandomKurwa() {
+      const k = document.createElement('div');
+      k.className = 'kurwa';
+      k.textContent = 'Kurła!';
+      const randomX = Math.random() * 280 + 60;
+      const randomY = Math.random() * 160 + 70;
+      k.style.left = randomX + 'px';
+      k.style.top = randomY + 'px';
+      document.getElementById('nosaczContainer').appendChild(k);
+      setTimeout(() => k.remove(), 1300);
+    }
+
+    function tap(e) {
+      if (restartBtn.style.display === 'block') return;
+      if (!isRunning) startTimer();
+      const touchCount = (e.touches && e.touches.length > 1) ? e.touches.length : 1;
+      taps += touchCount;
+      document.getElementById('count').textContent = taps;
+
+      nosaczImg.style.filter = `hue-rotate(20deg) saturate(3.4) brightness(1.38)`;
+      setTimeout(() => nosaczImg.style.filter = '', 95);
+
+      playKurwa();
+      for (let i = 0; i < touchCount; i++) createRandomKurwa();
+    }
+
+    function startTimer() {
+      if (isRunning) return;
+      isRunning = true;
+      timeLeft = 21.37;
+      taps = 0;
+      document.getElementById('count').textContent = taps;
+      lastFrame = performance.now();
+
+      function loop(now) {
+        if (!isRunning) return;
+        const delta = (now - lastFrame) / 1000;
+        lastFrame = now;
+        timeLeft -= delta;
+        if (timeLeft <= 0) {
+          document.getElementById('timer').textContent = "0.00";
+          endRound();
+        } else {
+          document.getElementById('timer').textContent = timeLeft.toFixed(2);
+          requestAnimationFrame(loop);
+        }
+      }
+      requestAnimationFrame(loop);
+    }
 
     function endRound() {
       isRunning = false;
@@ -244,7 +312,7 @@
       data.forEach((entry, i) => {
         const div = document.createElement('div');
         div.className = 'lb-entry';
-        div.innerHTML = `<span>${i+1}. ${entry.name}</span><span>${entry[field]}</span>`;
+        div.innerHTML = `<span>${i+1}. ${entry.name}</span><span>${entry[field] || 0}</span>`;
         list.appendChild(div);
       });
     }
