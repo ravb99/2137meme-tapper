@@ -168,8 +168,9 @@
     const SUPABASE_URL = 'https://gmyhsgxnpbvwgexrvpik.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_dPOUiTHcX9Xk7tQQr3oOWw_0aEfDVUm';
 
-    let currentPlayer = { name: "Janusz", pin: "" };
+    let currentPlayer = { name: "", pin: "" };
     let currentTab = 0;
+    let isNewNick = false;
 
     let timeLeft = 21.37;
     let taps = 0;
@@ -187,7 +188,7 @@
     }
 
     function showNicknameModal() {
-      document.getElementById('nickInput').value = currentPlayer.name;
+      document.getElementById('nickInput').value = currentPlayer.name || "";
       document.getElementById('nicknameModal').style.display = 'block';
     }
 
@@ -195,29 +196,66 @@
       document.getElementById('nicknameModal').style.display = 'none';
     }
 
-    function checkNickAndContinue() {
+    async function checkNickAndContinue() {
       const name = document.getElementById('nickInput').value.trim();
       if (!name) return alert("Wpisz nick!");
+
       currentPlayer.name = name;
       hideNicknameModal();
 
-      document.getElementById('pinInput').value = "";
-      document.getElementById('pinModalTitle').textContent = currentPlayer.pin ? "WPISZ PIN" : "USTAW PIN (4 cyfry)";
-      document.getElementById('pinModal').style.display = 'block';
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/scores?select=pin&name=eq.${encodeURIComponent(name)}&limit=1`, {
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+        });
+        const data = await res.json();
+
+        if (data.length > 0 && data[0].pin) {
+          isNewNick = false;
+          document.getElementById('pinModalTitle').textContent = "WPISZ PIN";
+        } else {
+          isNewNick = true;
+          document.getElementById('pinModalTitle').textContent = "USTAW PIN (4 cyfry)";
+        }
+
+        document.getElementById('pinInput').value = "";
+        document.getElementById('pinModal').style.display = 'block';
+      } catch (e) {
+        alert("Błąd połączenia");
+      }
     }
 
     function hidePinModal() {
       document.getElementById('pinModal').style.display = 'none';
     }
 
-    function verifyOrSetPin() {
+    async function verifyOrSetPin() {
       const pin = document.getElementById('pinInput').value.trim();
       if (pin.length !== 4) return alert("PIN musi mieć dokładnie 4 cyfry!");
 
-      currentPlayer.pin = pin;
-      localStorage.setItem('2137player', JSON.stringify(currentPlayer));
-      hidePinModal();
-      alert(`Zapisano!\nNick: ${currentPlayer.name}\nPIN: ${pin}`);
+      if (isNewNick) {
+        currentPlayer.pin = pin;
+        localStorage.setItem('2137player', JSON.stringify(currentPlayer));
+        hidePinModal();
+        alert(`Nowy nick zapisany!\nNick: ${currentPlayer.name}\nPIN: ${pin}`);
+      } else {
+        try {
+          const res = await fetch(`${SUPABASE_URL}/rest/v1/scores?select=pin&name=eq.${encodeURIComponent(currentPlayer.name)}&pin=eq.${pin}&limit=1`, {
+            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+          });
+          const data = await res.json();
+
+          if (data.length > 0) {
+            currentPlayer.pin = pin;
+            localStorage.setItem('2137player', JSON.stringify(currentPlayer));
+            hidePinModal();
+            alert(`Zalogowano pomyślnie!\nNick: ${currentPlayer.name}`);
+          } else {
+            alert("Błędny PIN!");
+          }
+        } catch (e) {
+          alert("Błąd walidacji");
+        }
+      }
     }
 
     function playKurwa() {
@@ -237,27 +275,20 @@
       setTimeout(() => k.remove(), 1100);
     }
 
-    // ==================== WYCZULONY MULTITAP ====================
+    // === NAPRAWIONY MULTITAP ===
     function tap(e) {
       if (restartBtn.style.display === 'block') return;
       if (!isRunning) startTimer();
 
-      const touchCount = e.touches ? e.touches.length : 1;
-      taps += touchCount;                    // każdy palec liczy się osobno
+      taps += 1;   // dokładnie 1 punkt na jedno dotknięcie
       document.getElementById('count').textContent = taps;
 
-      // Bardzo szybki flash
       nosaczImg.style.filter = `hue-rotate(35deg) saturate(4.5) brightness(1.7)`;
       setTimeout(() => nosaczImg.style.filter = '', 38);
 
       playKurwa();
-
-      // Im więcej palców — tym więcej "Kurła!"
-      for (let i = 0; i < Math.min(touchCount, 5); i++) {
-        createRandomKurwa();
-      }
+      createRandomKurwa();
     }
-    // ===========================================================
 
     function startTimer() {
       if (isRunning) return;
