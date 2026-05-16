@@ -283,7 +283,7 @@
     }
 
     async function saveScore(roundScore) {
-      alert("Zapisuję wynik: " + roundScore + "\nNick: " + currentPlayer.name + "\nPIN: " + currentPlayer.pin); // <--- debug
+      alert("Zapisuję wynik: " + roundScore + "\nNick: " + currentPlayer.name + "\nPIN: " + currentPlayer.pin);
       try {
         const response = await fetch(`${SUPABASE_URL}/rest/v1/scores`, {
           method: 'POST',
@@ -299,26 +299,47 @@
             total_score: roundScore
           }])
         });
-        alert("Odpowiedź Supabase: " + response.status); // <--- debug
+        alert("Odpowiedź Supabase (POST): " + response.status);
       } catch (e) {
         alert("Błąd zapisu: " + e.message);
       }
     }
 
     async function updateLeaderboard() {
+      alert("Pobieram leaderboard..."); 
       const field = currentTab === 0 ? 'round_score' : 'total_score';
-      const response = await fetch(`${SUPABASE_URL}/rest/v1/scores?select=name,${field}&order=${field}.desc&limit=21`, {
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-      });
-      const data = await response.json();
-      const list = document.getElementById('lbList');
-      list.innerHTML = '';
-      data.forEach((entry, i) => {
-        const div = document.createElement('div');
-        div.className = 'lb-entry';
-        div.innerHTML = `<span>${i+1}. ${entry.name}</span><span>${entry[field] || 0}</span>`;
-        list.appendChild(div);
-      });
+      
+      try {
+        const url = `${SUPABASE_URL}/rest/v1/scores?select=name,${field}&order=${field}.desc&limit=21`;
+        alert("URL zapytania: " + url);
+
+        const response = await fetch(url, {
+          headers: { 
+            'apikey': SUPABASE_KEY, 
+            'Authorization': `Bearer ${SUPABASE_KEY}` 
+          }
+        });
+
+        alert("Status GET: " + response.status);
+
+        const data = await response.json();
+        alert("Liczba pobranych wyników: " + data.length);
+
+        const list = document.getElementById('lbList');
+        list.innerHTML = '';
+        if (data.length === 0) {
+          list.innerHTML = '<div style="color:#f66; padding:30px; text-align:center;">Brak wyników jeszcze...<br><small>RLS wyłączone?</small></div>';
+        } else {
+          data.forEach((entry, i) => {
+            const div = document.createElement('div');
+            div.className = 'lb-entry';
+            div.innerHTML = `<span>${i+1}. ${entry.name}</span><span>${entry[field] || 0}</span>`;
+            list.appendChild(div);
+          });
+        }
+      } catch (e) {
+        alert("Błąd pobierania: " + e.message);
+      }
     }
 
     function switchTab(tab) {
