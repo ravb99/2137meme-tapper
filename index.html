@@ -283,9 +283,8 @@
     }
 
     async function saveScore(roundScore) {
-      alert("Zapisuję wynik: " + roundScore + "\nNick: " + currentPlayer.name + "\nPIN: " + currentPlayer.pin);
       try {
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/scores`, {
+        await fetch(`${SUPABASE_URL}/rest/v1/scores`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -299,17 +298,12 @@
             total_score: roundScore
           }])
         });
-        alert("Odpowiedź Supabase (POST): " + response.status);
-      } catch (e) {
-        alert("Błąd zapisu: " + e.message);
-      }
+      } catch (e) {}
     }
 
     async function updateLeaderboard() {
-      const field = currentTab === 0 ? 'round_score' : 'total_score';
       try {
-        const url = `${SUPABASE_URL}/rest/v1/scores?select=name,${field}&order=${field}.desc&limit=21`;
-        const response = await fetch(url, {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/scores?select=name,pin,round_score,total_score&limit=200`, {
           headers: { 
             'apikey': SUPABASE_KEY, 
             'Authorization': `Bearer ${SUPABASE_KEY}` 
@@ -317,22 +311,38 @@
         });
 
         const data = await response.json();
+        const grouped = {};
+
+        data.forEach(row => {
+          const key = `${row.name}|${row.pin}`;
+          if (!grouped[key]) {
+            grouped[key] = { name: row.name, best: row.round_score || 0, total: row.total_score || 0 };
+          } else {
+            grouped[key].best = Math.max(grouped[key].best, row.round_score || 0);
+            grouped[key].total += row.round_score || 0;
+          }
+        });
+
         const list = document.getElementById('lbList');
         list.innerHTML = '';
 
-        if (data.length === 0) {
-          list.innerHTML = '<div style="color:#f66; padding:30px; text-align:center;">Brak wyników jeszcze...</div>';
-          return;
-        }
+        const sorted = Object.values(grouped).sort((a, b) => {
+          return currentTab === 0 ? b.best - a.best : b.total - a.total;
+        });
 
-        data.forEach((entry, i) => {
+        sorted.forEach((player, i) => {
           const div = document.createElement('div');
           div.className = 'lb-entry';
-          div.innerHTML = `<span>${i+1}. ${entry.name}</span><span style="color:#0f0;">${entry[field] || 0}</span>`;
+          const score = currentTab === 0 ? player.best : player.total;
+          div.innerHTML = `<span>${i+1}. ${player.name}</span><span style="color:#0f0; font-weight:900;">${score}</span>`;
           list.appendChild(div);
         });
+
+        if (sorted.length === 0) {
+          list.innerHTML = '<div style="color:#f66; padding:30px; text-align:center;">Brak wyników jeszcze...</div>';
+        }
       } catch (e) {
-        alert("Błąd pobierania leaderboardu: " + e.message);
+        console.error(e);
       }
     }
 
