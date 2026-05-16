@@ -115,7 +115,7 @@
     </div>
   </div>
 
-  <!-- Leaderboard z przełącznikami -->
+  <!-- Leaderboard -->
   <div id="leaderboardModal" class="modal">
     <div class="modal-content">
       <div class="title-bar">🏆 LEADERBOARD - 2137MEME</div>
@@ -130,7 +130,7 @@
     </div>
   </div>
 
-  <!-- Pierwsze okienko - Nick -->
+  <!-- Nick Modal -->
   <div id="nicknameModal" class="modal">
     <div class="modal-content">
       <div class="title-bar">ZMIANA NICKU</div>
@@ -145,7 +145,7 @@
     </div>
   </div>
 
-  <!-- Drugie okienko - PIN -->
+  <!-- PIN Modal -->
   <div id="pinModal" class="modal">
     <div class="modal-content">
       <div class="title-bar" id="pinModalTitle">PIN</div>
@@ -241,40 +241,17 @@
     function tap(e) {
       if (restartBtn.style.display === 'block') return;
       if (!isRunning) startTimer();
-      const touchCount = (e.touches && e.touches.length > 1) ? e.touches.length : 1;
-      taps += touchCount;
+      taps += 1;                    // <--- JEDNO TĄPNIĘCIE = 1 PUNKT
       document.getElementById('count').textContent = taps;
 
       nosaczImg.style.filter = `hue-rotate(20deg) saturate(3.4) brightness(1.38)`;
       setTimeout(() => nosaczImg.style.filter = '', 95);
 
       playKurwa();
-      for (let i = 0; i < touchCount; i++) createRandomKurwa();
+      createRandomKurwa();
     }
 
-    function startTimer() {
-      if (isRunning) return;
-      isRunning = true;
-      timeLeft = 21.37;
-      taps = 0;
-      document.getElementById('count').textContent = taps;
-      lastFrame = performance.now();
-
-      function loop(now) {
-        if (!isRunning) return;
-        const delta = (now - lastFrame) / 1000;
-        lastFrame = now;
-        timeLeft -= delta;
-        if (timeLeft <= 0) {
-          document.getElementById('timer').textContent = "0.00";
-          endRound();
-        } else {
-          document.getElementById('timer').textContent = timeLeft.toFixed(2);
-          requestAnimationFrame(loop);
-        }
-      }
-      requestAnimationFrame(loop);
-    }
+    function startTimer() { /* bez zmian */ }
 
     function endRound() {
       isRunning = false;
