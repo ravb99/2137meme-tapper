@@ -14,7 +14,6 @@
       touch-action: none; overscroll-behavior: none;
       -webkit-user-scalable: no;
     }
-
     #game { max-width:420px; margin:0 auto; padding:4px 15px 8px; height:100vh; display:flex; flex-direction:column; align-items:center; }
     h1 { font-size:54px; font-weight:900; margin:2px 0 0 0; letter-spacing:4px; line-height:0.85; }
     .subtitle { font-size:29px; font-weight:900; color:#fff; margin:-8px 0 8px 0; letter-spacing:7px; width:100%; text-align:center; }
@@ -29,7 +28,6 @@
     #restartBtn { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:#0f0; color:#000; font-size:21px; font-weight:900; padding:16px 32px; border:6px solid #000; border-radius:12px; box-shadow:0 0 25px #0f0; z-index:20; display:none; }
     #result { margin:8px 0 6px; font-size:24px; font-weight:900; display:none; text-align:center; width:100%; color:#ff0; }
 
-    /* Modale */
     .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.94); z-index:100; }
     .modal-content { max-width:380px; margin:40px auto; background:#2a2a2a; border:6px solid #777; border-radius:3px; overflow:hidden; display:flex; flex-direction:column; height:85vh; max-height:85vh; }
     .title-bar { background:#333; color:#ddd; padding:9px 12px; font-weight:900; text-align:left; border-bottom:4px solid #555; font-size:19px; }
@@ -113,7 +111,7 @@
     const SUPABASE_KEY = 'sb_publishable_dPOUiTHcX9Xk7tQQr3oOWw_0aEfDVUm';
 
     let currentPlayer = { name: "", pin: "" };
-    let currentTab = 0;
+    let currentTab = 0;        // 0 = Best Round, 1 = All Time
     let isNewNick = false;
 
     let timeLeft = 21.37;
@@ -121,31 +119,16 @@
     let isRunning = false;
     let lastFrame = 0;
 
-    // ==================== ELEMENTY DOM ====================
+    // ==================== ELEMENTY ====================
     const nosaczImg = document.getElementById('nosacz');
     const restartBtn = document.getElementById('restartBtn');
     const resultDiv = document.getElementById('result');
     const sound = document.getElementById('kurlaSound');
 
-    // ==================== INICJALIZACJA ====================
+    // ==================== POMOCNICZE ====================
     function loadPlayer() {
       const saved = localStorage.getItem('2137player');
       if (saved) currentPlayer = JSON.parse(saved);
-    }
-
-    // ==================== MULTITAP (1 dotknięcie = 1 punkt) ====================
-    function tap(e) {
-      if (restartBtn.style.display === 'block') return;
-      if (!isRunning) startTimer();
-
-      taps += 1;
-      document.getElementById('count').textContent = taps;
-
-      nosaczImg.style.filter = `hue-rotate(35deg) saturate(4.5) brightness(1.7)`;
-      setTimeout(() => nosaczImg.style.filter = '', 38);
-
-      playKurwa();
-      createRandomKurwa();
     }
 
     function playKurwa() {
@@ -161,6 +144,21 @@
       k.style.top = (Math.random() * 160 + 70) + 'px';
       document.getElementById('nosaczContainer').appendChild(k);
       setTimeout(() => k.remove(), 1100);
+    }
+
+    // ==================== MULTITAP (1:1) ====================
+    function tap(e) {
+      if (restartBtn.style.display === 'block') return;
+      if (!isRunning) startTimer();
+
+      taps += 1;
+      document.getElementById('count').textContent = taps;
+
+      nosaczImg.style.filter = `hue-rotate(35deg) saturate(4.5) brightness(1.7)`;
+      setTimeout(() => nosaczImg.style.filter = '', 38);
+
+      playKurwa();
+      createRandomKurwa();
     }
 
     // ==================== TIMER ====================
@@ -212,9 +210,8 @@
       document.getElementById('nicknameModal').style.display = 'block';
     }
 
-    function hideNicknameModal() {
-      document.getElementById('nicknameModal').style.display = 'none';
-    }
+    function hideNicknameModal() { document.getElementById('nicknameModal').style.display = 'none'; }
+    function hidePinModal() { document.getElementById('pinModal').style.display = 'none'; }
 
     async function checkNickAndContinue() {
       const name = document.getElementById('nickInput').value.trim();
@@ -236,10 +233,6 @@
       } catch (e) {
         alert("Błąd połączenia");
       }
-    }
-
-    function hidePinModal() {
-      document.getElementById('pinModal').style.display = 'none';
     }
 
     async function verifyOrSetPin() {
@@ -272,7 +265,7 @@
       }
     }
 
-    // ==================== SAVE & LEADERBOARD ====================
+    // ==================== SAVE ====================
     async function saveScore(roundScore) {
       try {
         await fetch(`${SUPABASE_URL}/rest/v1/scores`, {
@@ -292,9 +285,10 @@
       } catch (e) {}
     }
 
+    // ==================== LEADERBOARD (poprawione duplikaty) ====================
     async function updateLeaderboard() {
       try {
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/scores?select=name,pin,round_score,total_score&limit=200`, {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/scores?select=name,pin,round_score,total_score&limit=500`, {
           headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
         });
         const data = await response.json();
