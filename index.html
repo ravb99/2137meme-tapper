@@ -11,86 +11,35 @@
     html, body { 
       margin:0; padding:0; background:#0a0a0a; color:#ff0; 
       font-family:'Oswald', sans-serif; overflow:hidden; height:100vh; 
-      touch-action: none; 
-      overscroll-behavior: none;
+      touch-action: none; overscroll-behavior: none;
       -webkit-user-scalable: no;
     }
-    #game { 
-      max-width:420px; margin:0 auto; padding:4px 15px 8px; 
-      height:100vh; display:flex; flex-direction:column; align-items:center;
-    }
-    h1 { 
-      font-size:54px; 
-      font-weight:900; 
-      margin:2px 0 0 0; 
-      letter-spacing:4px; 
-      line-height:0.85;
-    }
-    .subtitle { 
-      font-size:29px; 
-      font-weight:900; 
-      color:#fff; 
-      margin:-8px 0 8px 0; 
-      letter-spacing:7px; 
-      width:100%; 
-      text-align:center;
-    }
+
+    #game { max-width:420px; margin:0 auto; padding:4px 15px 8px; height:100vh; display:flex; flex-direction:column; align-items:center; }
+    h1 { font-size:54px; font-weight:900; margin:2px 0 0 0; letter-spacing:4px; line-height:0.85; }
+    .subtitle { font-size:29px; font-weight:900; color:#fff; margin:-8px 0 8px 0; letter-spacing:7px; width:100%; text-align:center; }
     #timer { font-size:62px; font-weight:900; color:#f00; margin:4px 0 8px; }
     #nosaczContainer { position:relative; width:298px; height:298px; margin:4px auto 6px; }
     #nosacz { width:100%; height:100%; border-radius:50%; border:8px solid #ff0; box-shadow:0 0 30px #ff0; transition: filter 0.04s ease-out; }
-    .kurwa { position:absolute; color:#ff0; font-size:46px; font-weight:900; pointer-events:none; animation: kurwaAnim 0.95s forwards; text-shadow:0 0 12px #ff0; }
+    .kurwa { position:absolute; color:#ff0; font-size:46px; font-weight:900; pointer-events:none; animation:kurwaAnim 0.95s forwards; text-shadow:0 0 12px #ff0; }
     @keyframes kurwaAnim { 0%{transform:translate(-50%,-50%)scale(0.6);opacity:1} 100%{transform:translate(-50%,-210px)scale(1.35);opacity:0} }
     #tapCount { font-size:27px; margin:6px 0 8px; text-align:center; width:100%; }
 
     button { background:#ff0; color:#111; border:4px solid #000; padding:12px 20px; font-size:17px; font-weight:900; margin:5px auto; border-radius:8px; width:88%; }
+    #restartBtn { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:#0f0; color:#000; font-size:21px; font-weight:900; padding:16px 32px; border:6px solid #000; border-radius:12px; box-shadow:0 0 25px #0f0; z-index:20; display:none; }
+    #result { margin:8px 0 6px; font-size:24px; font-weight:900; display:none; text-align:center; width:100%; color:#ff0; }
 
-    #restartBtn {
-      position:absolute; top:50%; left:50%; transform:translate(-50%, -50%);
-      background:#0f0; color:#000; font-size:21px; font-weight:900;
-      padding:16px 32px; border:6px solid #000; border-radius:12px;
-      box-shadow:0 0 25px #0f0; cursor:pointer; z-index:20;
-      white-space:nowrap; display:none;
-    }
-
-    #result { 
-      margin:8px 0 6px; font-size:24px; font-weight:900; 
-      display:none; text-align:center; width:100%; color:#ff0;
-    }
-
+    /* Modale */
     .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.94); z-index:100; }
-    .modal-content { 
-      max-width:380px; margin:40px auto; 
-      background:#2a2a2a; border:6px solid #777; 
-      border-radius:3px; overflow:hidden; display:flex; flex-direction:column;
-      height:85vh; max-height:85vh;
-    }
-    .title-bar { 
-      background:#333; color:#ddd; padding:9px 12px; font-weight:900; 
-      text-align:left; border-bottom:4px solid #555; font-size:19px;
-    }
+    .modal-content { max-width:380px; margin:40px auto; background:#2a2a2a; border:6px solid #777; border-radius:3px; overflow:hidden; display:flex; flex-direction:column; height:85vh; max-height:85vh; }
+    .title-bar { background:#333; color:#ddd; padding:9px 12px; font-weight:900; text-align:left; border-bottom:4px solid #555; font-size:19px; }
     .tab-buttons { display:flex; background:#222; }
     .tab-btn { flex:1; padding:12px; background:#222; color:#ff0; border:none; font-weight:900; font-size:17px; }
     .tab-btn.active { background:#ff0; color:#111; }
-    .window-body { 
-      padding:15px; background:#2a2a2a; flex:1; 
-      display:flex; flex-direction:column; overflow:hidden;
-    }
-    #lbList { 
-      flex:1; 
-      overflow-y:auto; 
-      padding-right:10px; 
-    }
-    .lb-entry { 
-      display:flex; justify-content:space-between; 
-      padding:10px 12px; margin:6px 0; 
-      background:#1f1f1f; border:2px solid #666; 
-      color:#ff0; font-size:17px; 
-    }
-    input { 
-      width:100%; padding:14px; font-size:19px; 
-      background:#1a1a1a; color:#ff0; border:3px solid #777; 
-      font-family:'Oswald'; text-align:center; margin-bottom:15px;
-    }
+    .window-body { padding:15px; background:#2a2a2a; flex:1; display:flex; flex-direction:column; overflow:hidden; }
+    #lbList { flex:1; overflow-y:auto; padding-right:10px; }
+    .lb-entry { display:flex; justify-content:space-between; padding:10px 12px; margin:6px 0; background:#1f1f1f; border:2px solid #666; color:#ff0; font-size:17px; }
+    input { width:100%; padding:14px; font-size:19px; background:#1a1a1a; color:#ff0; border:3px solid #777; font-family:'Oswald'; text-align:center; margin-bottom:15px; }
   </style>
 </head>
 <body>
@@ -114,7 +63,7 @@
     </div>
   </div>
 
-  <!-- Leaderboard -->
+  <!-- Leaderboard Modal -->
   <div id="leaderboardModal" class="modal">
     <div class="modal-content">
       <div class="title-bar">🏆 LEADERBOARD - 2137MEME</div>
@@ -159,12 +108,7 @@
   <audio id="kurlaSound" src="https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/sounds/Kurła.m4a" preload="auto"></audio>
 
   <script>
-    document.documentElement.style.touchAction = 'none';
-    document.body.style.touchAction = 'none';
-    document.addEventListener('touchmove', function(e) {
-      if (e.touches.length > 1 || e.scale !== 1) e.preventDefault();
-    }, { passive: false });
-
+    // ==================== KONFIGURACJA ====================
     const SUPABASE_URL = 'https://gmyhsgxnpbvwgexrvpik.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_dPOUiTHcX9Xk7tQQr3oOWw_0aEfDVUm';
 
@@ -177,16 +121,92 @@
     let isRunning = false;
     let lastFrame = 0;
 
-    const sound = document.getElementById('kurlaSound');
+    // ==================== ELEMENTY DOM ====================
     const nosaczImg = document.getElementById('nosacz');
     const restartBtn = document.getElementById('restartBtn');
     const resultDiv = document.getElementById('result');
+    const sound = document.getElementById('kurlaSound');
 
+    // ==================== INICJALIZACJA ====================
     function loadPlayer() {
       const saved = localStorage.getItem('2137player');
       if (saved) currentPlayer = JSON.parse(saved);
     }
 
+    // ==================== MULTITAP (1 dotknięcie = 1 punkt) ====================
+    function tap(e) {
+      if (restartBtn.style.display === 'block') return;
+      if (!isRunning) startTimer();
+
+      taps += 1;
+      document.getElementById('count').textContent = taps;
+
+      nosaczImg.style.filter = `hue-rotate(35deg) saturate(4.5) brightness(1.7)`;
+      setTimeout(() => nosaczImg.style.filter = '', 38);
+
+      playKurwa();
+      createRandomKurwa();
+    }
+
+    function playKurwa() {
+      sound.currentTime = 0;
+      sound.play().catch(() => {});
+    }
+
+    function createRandomKurwa() {
+      const k = document.createElement('div');
+      k.className = 'kurwa';
+      k.textContent = 'Kurła!';
+      k.style.left = (Math.random() * 280 + 60) + 'px';
+      k.style.top = (Math.random() * 160 + 70) + 'px';
+      document.getElementById('nosaczContainer').appendChild(k);
+      setTimeout(() => k.remove(), 1100);
+    }
+
+    // ==================== TIMER ====================
+    function startTimer() {
+      if (isRunning) return;
+      isRunning = true;
+      timeLeft = 21.37;
+      taps = 0;
+      document.getElementById('count').textContent = taps;
+      lastFrame = performance.now();
+
+      function loop(now) {
+        if (!isRunning) return;
+        const delta = (now - lastFrame) / 1000;
+        lastFrame = now;
+        timeLeft -= delta;
+        if (timeLeft <= 0) {
+          document.getElementById('timer').textContent = "0.00";
+          endRound();
+        } else {
+          document.getElementById('timer').textContent = timeLeft.toFixed(2);
+          requestAnimationFrame(loop);
+        }
+      }
+      requestAnimationFrame(loop);
+    }
+
+    function endRound() {
+      isRunning = false;
+      document.getElementById('finalScore').innerHTML = `Koniec rundy! Twój wynik: <span style="color:#f00;">${taps}</span>`;
+      resultDiv.style.display = 'block';
+      saveScore(taps);
+      restartBtn.style.display = 'block';
+    }
+
+    function restartGame() {
+      restartBtn.style.display = 'none';
+      resultDiv.style.display = 'none';
+      timeLeft = 21.37;
+      taps = 0;
+      isRunning = false;
+      document.getElementById('count').textContent = 0;
+      document.getElementById('timer').textContent = "21.37";
+    }
+
+    // ==================== PIN SYSTEM ====================
     function showNicknameModal() {
       document.getElementById('nickInput').value = currentPlayer.name || "";
       document.getElementById('nicknameModal').style.display = 'block';
@@ -209,14 +229,8 @@
         });
         const data = await res.json();
 
-        if (data.length > 0 && data[0].pin) {
-          isNewNick = false;
-          document.getElementById('pinModalTitle').textContent = "WPISZ PIN";
-        } else {
-          isNewNick = true;
-          document.getElementById('pinModalTitle').textContent = "USTAW PIN (4 cyfry)";
-        }
-
+        isNewNick = !(data.length > 0 && data[0].pin);
+        document.getElementById('pinModalTitle').textContent = isNewNick ? "USTAW PIN (4 cyfry)" : "WPISZ PIN";
         document.getElementById('pinInput').value = "";
         document.getElementById('pinModal').style.display = 'block';
       } catch (e) {
@@ -258,70 +272,7 @@
       }
     }
 
-    function playKurwa() {
-      sound.currentTime = 0;
-      sound.play().catch(() => {});
-    }
-
-    function createRandomKurwa() {
-      const k = document.createElement('div');
-      k.className = 'kurwa';
-      k.textContent = 'Kurła!';
-      const randomX = Math.random() * 280 + 60;
-      const randomY = Math.random() * 160 + 70;
-      k.style.left = randomX + 'px';
-      k.style.top = randomY + 'px';
-      document.getElementById('nosaczContainer').appendChild(k);
-      setTimeout(() => k.remove(), 1100);
-    }
-
-    // === NAPRAWIONY MULTITAP ===
-    function tap(e) {
-      if (restartBtn.style.display === 'block') return;
-      if (!isRunning) startTimer();
-
-      taps += 1;   // dokładnie 1 punkt na jedno dotknięcie
-      document.getElementById('count').textContent = taps;
-
-      nosaczImg.style.filter = `hue-rotate(35deg) saturate(4.5) brightness(1.7)`;
-      setTimeout(() => nosaczImg.style.filter = '', 38);
-
-      playKurwa();
-      createRandomKurwa();
-    }
-
-    function startTimer() {
-      if (isRunning) return;
-      isRunning = true;
-      timeLeft = 21.37;
-      taps = 0;
-      document.getElementById('count').textContent = taps;
-      lastFrame = performance.now();
-
-      function loop(now) {
-        if (!isRunning) return;
-        const delta = (now - lastFrame) / 1000;
-        lastFrame = now;
-        timeLeft -= delta;
-        if (timeLeft <= 0) {
-          document.getElementById('timer').textContent = "0.00";
-          endRound();
-        } else {
-          document.getElementById('timer').textContent = timeLeft.toFixed(2);
-          requestAnimationFrame(loop);
-        }
-      }
-      requestAnimationFrame(loop);
-    }
-
-    function endRound() {
-      isRunning = false;
-      document.getElementById('finalScore').innerHTML = `Koniec rundy! Twój wynik: <span style="color:#f00;">${taps}</span>`;
-      resultDiv.style.display = 'block';
-      saveScore(taps);
-      restartBtn.style.display = 'block';
-    }
-
+    // ==================== SAVE & LEADERBOARD ====================
     async function saveScore(roundScore) {
       try {
         await fetch(`${SUPABASE_URL}/rest/v1/scores`, {
@@ -344,12 +295,8 @@
     async function updateLeaderboard() {
       try {
         const response = await fetch(`${SUPABASE_URL}/rest/v1/scores?select=name,pin,round_score,total_score&limit=200`, {
-          headers: { 
-            'apikey': SUPABASE_KEY, 
-            'Authorization': `Bearer ${SUPABASE_KEY}` 
-          }
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
         });
-
         const data = await response.json();
         const grouped = {};
 
@@ -401,16 +348,7 @@
       document.getElementById('leaderboardModal').style.display = 'none';
     }
 
-    function restartGame() {
-      restartBtn.style.display = 'none';
-      resultDiv.style.display = 'none';
-      timeLeft = 21.37;
-      taps = 0;
-      isRunning = false;
-      document.getElementById('count').textContent = 0;
-      document.getElementById('timer').textContent = "21.37";
-    }
-
+    // ==================== INICJALIZACJA ====================
     const container = document.getElementById('nosaczContainer');
     container.addEventListener('touchstart', tap, { passive: true });
     container.addEventListener('mousedown', tap);
