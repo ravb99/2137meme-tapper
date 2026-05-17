@@ -173,7 +173,6 @@
       currentPlayer.multiplier = currentPlayer.multiplier || 1;
     }
 
-    // Ładuje aktualne dane z bazy (All Time)
     async function loadPlayerDataFromDB() {
       if (!currentPlayer.name || !currentPlayer.pin) return;
       
@@ -337,7 +336,7 @@
             localStorage.setItem('2137player', JSON.stringify(currentPlayer));
             hidePinModal();
             alert(`Zalogowano pomyślnie!\nNick: ${currentPlayer.name}`);
-            await loadPlayerDataFromDB();   // ← KLUCZOWE – ładuje stan z bazy
+            await loadPlayerDataFromDB();
           } else alert("Błędny PIN!");
         } catch (e) { alert("Błąd walidacji"); }
       }
@@ -393,7 +392,7 @@
       document.getElementById('shopModal').style.display = 'none';
     }
 
-    // LEADERBOARD (bez zmian)
+    // LEADERBOARD
     async function updateLeaderboard() {
       try {
         const response = await fetch(`${SUPABASE_URL}/rest/v1/scores?select=name,pin,round_score,total_score&limit=500`, {
@@ -450,6 +449,12 @@
 
     loadPlayer();
     updateDisplays();
+
+    // Automatyczne ładowanie danych z bazy po odświeżeniu
+    if (currentPlayer.name && currentPlayer.pin) {
+      loadPlayerDataFromDB();
+    }
+
     Telegram.WebApp.ready();
     Telegram.WebApp.expand();
   </script>
