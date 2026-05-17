@@ -184,10 +184,18 @@
           }
         });
         const data = await res.json();
+
         if (data.length > 0) {
           currentPlayer.kurla_coins = data[0].kurla_coins || 0;
           currentPlayer.total_taps = data[0].total_taps || 0;
           currentPlayer.multiplier = data[0].multiplier || 1;
+        } else {
+          // Baza pusta → resetujemy wszystko do zera
+          currentPlayer.kurla_coins = 0;
+          currentPlayer.total_taps = 0;
+          currentPlayer.multiplier = 1;
+          // Opcjonalnie czyścimy localStorage
+          localStorage.setItem('2137player', JSON.stringify(currentPlayer));
         }
       } catch (e) {
         console.error("Błąd pobierania z bazy", e);
@@ -218,10 +226,14 @@
 
     function createRandomKurwa() {
       const k = document.createElement('div');
-      k.className = 'kurwa';
       k.textContent = 'Kurła!';
-      k.style.left = (Math.random() * 280 + 60) + 'px';
+      k.style.position = 'absolute';
+      k.style.left = (Math.random() * 260 + 60) + 'px';
       k.style.top = (Math.random() * 160 + 70) + 'px';
+      k.style.color = '#ff0';
+      k.style.fontWeight = '900';
+      k.style.fontSize = '22px';
+      k.style.pointerEvents = 'none';
       document.getElementById('nosaczContainer').appendChild(k);
       setTimeout(() => k.remove(), 1100);
     }
@@ -290,7 +302,7 @@
       } catch (e) { console.error(e); }
     }
 
-    // PIN SYSTEM
+    // PIN + modale (bez zmian)
     function showNicknameModal() {
       document.getElementById('nickInput').value = currentPlayer.name || "";
       document.getElementById('nicknameModal').style.display = 'block';
@@ -342,7 +354,6 @@
       }
     }
 
-    // SKLEP
     function showShop() {
       const container = document.getElementById('shopItems');
       container.innerHTML = `<p style="text-align:center; color:#ff0; font-size:22px;">
@@ -373,7 +384,7 @@
         if (currentPlayer.total_taps >= item.cost) {
           currentPlayer.total_taps -= item.cost;
           currentPlayer.kurla_coins += item.value;
-          saveScore(0); // zapisujemy nowy stan do bazy
+          saveScore(0);
           alert(`✅ +${item.value} Kurła Coins dodane!`);
         } else {
           alert(`Za mało total taps!\nMasz: ${currentPlayer.total_taps} / Potrzebujesz: ${item.cost}`);
@@ -394,7 +405,6 @@
       document.getElementById('shopModal').style.display = 'none';
     }
 
-    // LEADERBOARD
     async function updateLeaderboard() {
       try {
         const response = await fetch(`${SUPABASE_URL}/rest/v1/scores?select=name,pin,round_score,total_score&limit=500`, {
