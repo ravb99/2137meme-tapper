@@ -167,7 +167,13 @@
 
     function loadPlayer() {
       const saved = localStorage.getItem('2137player');
-      if (saved) currentPlayer = JSON.parse(saved);
+      if (saved) {
+        currentPlayer = JSON.parse(saved);
+      }
+      // Zapobieganie undefined / NaN
+      currentPlayer.kurla_coins = currentPlayer.kurla_coins || 0;
+      currentPlayer.total_taps = currentPlayer.total_taps || 0;
+      currentPlayer.multiplier = currentPlayer.multiplier || 1;
     }
 
     function updateDisplays() {
@@ -181,6 +187,7 @@
 
       taps += 1;
       currentPlayer.total_taps += 1;
+
       updateDisplays();
 
       nosaczImg.style.filter = `hue-rotate(35deg) saturate(4.5) brightness(1.7)`;
@@ -265,7 +272,7 @@
       } catch (e) {}
     }
 
-    // PIN SYSTEM
+    // PIN SYSTEM (bez zmian)
     function showNicknameModal() {
       document.getElementById('nickInput').value = currentPlayer.name || "";
       document.getElementById('nicknameModal').style.display = 'block';
