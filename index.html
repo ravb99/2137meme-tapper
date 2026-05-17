@@ -53,11 +53,19 @@
       background:#333; color:#ff0; padding:12px 15px; font-weight:900; 
       text-align:center; border-bottom:4px solid #ff0; font-size:20px; 
     }
-    .window-body { padding:20px; background:#1a1a1a; flex:1; }
+    .window-body { padding:20px; background:#1a1a1a; flex:1; overflow-y:auto; }
     input { 
       width:100%; padding:16px; font-size:22px; background:#111; color:#ff0; 
       border:4px solid #ff0; font-family:'Oswald'; text-align:center; 
       margin-bottom:15px; border-radius:4px;
+    }
+
+    /* SKLEP - poprawione scrollowanie */
+    #shopItems { 
+      padding:15px; 
+      overflow-y:auto; 
+      max-height:55vh; 
+      flex:1; 
     }
 
     .shop-item { 
@@ -77,6 +85,19 @@
       flex-shrink:0; 
     }
     .shop-text { flex:1; }
+
+    /* LEADERBOARD - ładne wiersze */
+    .lb-entry { 
+      display:flex; 
+      justify-content:space-between; 
+      padding:12px 15px; 
+      margin:6px 0; 
+      background:#1f1f1f; 
+      border:2px solid #ff0; 
+      border-radius:6px; 
+      font-size:19px; 
+    }
+    .lb-entry:nth-child(even) { background:#252525; }
 
     /* Retro Alert */
     #retroAlert { 
@@ -123,9 +144,9 @@
   <div id="leaderboardModal" class="modal">
     <div class="modal-content">
       <div class="title-bar">🏆 LEADERBOARD - 2137MEME</div>
-      <div class="tab-buttons">
-        <button class="tab-btn active" onclick="switchTab(0)">Best Round</button>
-        <button class="tab-btn" onclick="switchTab(1)">All Time</button>
+      <div class="tab-buttons" style="display:flex; background:#222; padding:4px;">
+        <button class="tab-btn active" onclick="switchTab(0)" style="flex:1; margin:4px;">Best Round</button>
+        <button class="tab-btn" onclick="switchTab(1)" style="flex:1; margin:4px;">All Time</button>
       </div>
       <div class="window-body">
         <div id="lbList"></div>
@@ -165,7 +186,7 @@
   <div id="shopModal" class="modal">
     <div class="modal-content">
       <div class="title-bar">🛒 SKLEP KURŁA COINS</div>
-      <div id="shopItems" style="padding:15px; overflow-y:auto; flex:1;"></div>
+      <div id="shopItems"></div>
       <button onclick="hideShop()" style="margin:12px auto; width:80%;">Wyjdź</button>
     </div>
   </div>
@@ -232,6 +253,11 @@
           currentPlayer.lifetime_taps = data[0].lifetime_taps || 0;
           currentPlayer.spendable_taps = data[0].spendable_taps || 0;
           currentPlayer.multiplier = data[0].multiplier || 1;
+        } else {
+          currentPlayer.kurla_coins = 0;
+          currentPlayer.lifetime_taps = 0;
+          currentPlayer.spendable_taps = 0;
+          currentPlayer.multiplier = 1;
         }
         localStorage.setItem('2137player', JSON.stringify(currentPlayer));
       } catch (e) { console.error(e); }
