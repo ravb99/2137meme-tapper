@@ -24,17 +24,9 @@
     #nosaczContainer { position:relative; width:290px; height:290px; margin:2px auto 4px; }
     #nosacz { width:100%; height:100%; border-radius:50%; border:8px solid #ff0; box-shadow:0 0 30px #ff0; transition: filter 0.04s ease-out; }
 
-    /* Idealne wyrównanie Taps i Kurła Coins */
     #stats { 
-      display:flex; 
-      justify-content:space-between; 
-      align-items:center;
-      width:100%; 
-      max-width:380px;
-      margin:4px 0 8px; 
-      font-size:25px; 
-      padding:0 10px;
-      height:42px;
+      display:flex; justify-content:space-between; align-items:center;
+      width:100%; max-width:380px; margin:4px 0 8px; font-size:25px; padding:0 10px; height:42px;
     }
 
     button { 
@@ -452,7 +444,7 @@
       document.getElementById('leaderboardModal').style.display = 'none';
     }
 
-    // INICJALIZACJA
+    // INICJALIZACJA - najważniejsze poprawki
     const container = document.getElementById('nosaczContainer');
     container.addEventListener('touchstart', tap, { passive: true });
     container.addEventListener('mousedown', tap);
@@ -460,6 +452,7 @@
     loadPlayer();
     updateDisplays();
 
+    // Zawsze ładujemy najnowsze dane z bazy po odświeżeniu
     if (currentPlayer.name && currentPlayer.pin) {
       loadPlayerDataFromDB();
     }
