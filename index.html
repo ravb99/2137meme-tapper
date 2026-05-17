@@ -382,7 +382,7 @@
           saveScore(0);
           alert(`✅ +${item.value} Kurła Coins dodane!`);
         } else {
-          alert(`Za mało total taps!\nMasz: ${currentPlayer.total_taps} / Potrzebujesz: ${item.cost}`);
+          alert(`Za mało total taps!\nMasz: ${currentPlayer.total_taps}`);
         }
       } else {
         if (currentPlayer.kurla_coins >= item.cost) {
@@ -449,7 +449,7 @@
       document.getElementById('leaderboardModal').style.display = 'none';
     }
 
-    // INICJALIZACJA - wzmocniona wersja
+    // INICJALIZACJA - bardzo wzmocniona
     const container = document.getElementById('nosaczContainer');
     container.addEventListener('touchstart', tap, { passive: true });
     container.addEventListener('mousedown', tap);
