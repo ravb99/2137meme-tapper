@@ -72,7 +72,7 @@
       <div>Taps: <span id="count">0</span></div>
       <div style="display:flex; align-items:center; gap:6px;">
         <img src="https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/images/coin.png" 
-             width="36" height="36" style="vertical-align:middle;">
+             width="36" style="vertical-align:middle; height:auto;">
         Kurła Coins: <span id="coins">0</span>
       </div>
     </div>
@@ -181,10 +181,7 @@
 
       taps += 1;
       currentPlayer.total_taps += 1;
-
       updateDisplays();
-
-      // AUTOMATYCZNE NALICZANIE USUNIĘTE – tylko sklep
 
       nosaczImg.style.filter = `hue-rotate(35deg) saturate(4.5) brightness(1.7)`;
       setTimeout(() => nosaczImg.style.filter = '', 38);
@@ -268,7 +265,7 @@
       } catch (e) {}
     }
 
-    // === PIN SYSTEM ===
+    // PIN SYSTEM
     function showNicknameModal() {
       document.getElementById('nickInput').value = currentPlayer.name || "";
       document.getElementById('nicknameModal').style.display = 'block';
@@ -319,10 +316,13 @@
       }
     }
 
-    // === SKLEP ===
+    // SKLEP
     function showShop() {
       const container = document.getElementById('shopItems');
-      container.innerHTML = `<p style="text-align:center; color:#ff0; font-size:22px;">Masz: <b>${currentPlayer.kurla_coins}</b> Kurła Coins</p>`;
+      container.innerHTML = `<p style="text-align:center; color:#ff0; font-size:22px;">
+        Masz: <b>${currentPlayer.kurla_coins}</b> Kurła Coins<br>
+        <small>Total taps: ${currentPlayer.total_taps}</small>
+      </p>`;
 
       shopItems.forEach((item, i) => {
         const isOwned = item.type === 'mult' && currentPlayer.multiplier >= item.value;
@@ -347,8 +347,10 @@
         if (currentPlayer.total_taps >= item.cost) {
           currentPlayer.total_taps -= item.cost;
           currentPlayer.kurla_coins += item.value;
-          alert(`+${item.value} Kurła Coins dodane!`);
-        } else alert("Za mało tapsów!");
+          alert(`✅ +${item.value} Kurła Coins dodane!`);
+        } else {
+          alert(`Za mało total taps!\nMasz: ${currentPlayer.total_taps} / Potrzebujesz: ${item.cost}`);
+        }
       } else {
         if (currentPlayer.kurla_coins >= item.cost) {
           currentPlayer.kurla_coins -= item.cost;
@@ -364,7 +366,7 @@
       document.getElementById('shopModal').style.display = 'none';
     }
 
-    // === LEADERBOARD ===
+    // LEADERBOARD
     async function updateLeaderboard() {
       try {
         const response = await fetch(`${SUPABASE_URL}/rest/v1/scores?select=name,pin,round_score,total_score&limit=500`, {
@@ -379,7 +381,7 @@
             grouped[key] = { name: row.name, best: Number(row.round_score) || 0, total: Number(row.total_score) || 0 };
           } else {
             grouped[key].best = Math.max(grouped[key].best, Number(row.round_score) || 0);
-            grouped[key].total += Number(row.round_score) || 0;
+            grouped[key].total += Number(row.total_score) || 0;
           }
         });
 
