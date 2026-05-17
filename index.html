@@ -449,7 +449,7 @@
       document.getElementById('leaderboardModal').style.display = 'none';
     }
 
-    // INICJALIZACJA - bardzo wzmocniona
+    // INICJALIZACJA
     const container = document.getElementById('nosaczContainer');
     container.addEventListener('touchstart', tap, { passive: true });
     container.addEventListener('mousedown', tap);
@@ -457,7 +457,6 @@
     loadPlayer();
     updateDisplays();
 
-    // Najsilniejsze ładowanie po odświeżeniu
     if (currentPlayer.name && currentPlayer.pin) {
       loadPlayerDataFromDB();
     }
