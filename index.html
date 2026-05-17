@@ -53,8 +53,24 @@
     .window-body { padding:15px; background:#2a2a2a; flex:1; display:flex; flex-direction:column; overflow:hidden; }
     #lbList { flex:1; overflow-y:auto; padding-right:10px; }
     .lb-entry { display:flex; justify-content:space-between; padding:10px 12px; margin:6px 0; background:#1f1f1f; border:2px solid #666; color:#ff0; font-size:17px; }
-    .shop-item { background:#1f1f1f; border:3px solid #ff0; padding:14px; margin:12px 0; border-radius:8px; text-align:center; }
-    input { width:100%; padding:14px; font-size:19px; background:#1a1a1a; color:#ff0; border:3px solid #777; font-family:'Oswald'; text-align:center; margin-bottom:15px; }
+
+    .shop-item { 
+      background:#1f1f1f; 
+      border:3px solid #ff0; 
+      padding:12px; 
+      margin:12px 0; 
+      border-radius:8px; 
+      display:flex; 
+      align-items:center; 
+      gap:15px;
+    }
+    .shop-item img { 
+      width:110px; 
+      height:110px; 
+      object-fit:contain; 
+      flex-shrink:0; 
+    }
+    .shop-text { flex:1; }
   </style>
 </head>
 <body>
@@ -166,10 +182,10 @@
     const sound = document.getElementById('kurlaSound');
 
     const shopItems = [
-      { name: "100 Kurła Coins", cost: 2137, type: "coins", value: 100 },
-      { name: "Golf 3 Szrot", cost: 5000, type: "mult", value: 2 },
-      { name: "Mercedes w124", cost: 15000, type: "mult", value: 3 },
-      { name: "Passat B5 1.9 TDI", cost: 45000, type: "mult", value: 4 }
+      { name: "100 Kurła Coins", cost: 2137, type: "coins", value: 100, img: "" },
+      { name: "Golf 3 Szrot", cost: 5000, type: "mult", value: 2, img: "https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/images/golf.png" },
+      { name: "Mercedes w124", cost: 15000, type: "mult", value: 3, img: "https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/images/mercedes.png" },
+      { name: "Passat B5 1.9 TDI", cost: 45000, type: "mult", value: 4, img: "https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/images/passat.png" }
     ];
 
     function loadPlayer() {
@@ -366,10 +382,13 @@
         const div = document.createElement('div');
         div.className = 'shop-item';
         div.innerHTML = `
-          <strong>${item.name}</strong><br>
-          ${item.type === 'coins' ? `+${item.value} Kurła Coins` : `×${item.value} taps`}<br>
-          Koszt: ${item.cost} ${item.type === 'coins' ? 'Kurła Punkty' : 'KC'}
-          <button onclick="buyItem(${i})" style="margin-top:10px; width:100%; ${isOwned ? 'background:#555; color:#666;' : ''}" ${isOwned ? 'disabled' : ''}>
+          <div class="shop-text">
+            <strong>${item.name}</strong><br>
+            ${item.type === 'coins' ? `+${item.value} Kurła Coins` : `×${item.value} taps`}<br>
+            Koszt: ${item.cost} ${item.type === 'coins' ? 'Kurła Punkty' : 'KC'}
+          </div>
+          ${item.img ? `<img src="${item.img}" alt="${item.name}">` : ''}
+          <button onclick="buyItem(${i})" style="min-width:90px; ${isOwned ? 'background:#555; color:#666;' : ''}" ${isOwned ? 'disabled' : ''}>
             ${isOwned ? 'POSIADASZ' : 'KUP'}
           </button>
         `;
