@@ -24,9 +24,17 @@
     #nosaczContainer { position:relative; width:290px; height:290px; margin:2px auto 4px; }
     #nosacz { width:100%; height:100%; border-radius:50%; border:8px solid #ff0; box-shadow:0 0 30px #ff0; transition: filter 0.04s ease-out; }
 
+    /* Idealne wyrównanie Taps i Kurła Coins */
     #stats { 
-      display:flex; justify-content:space-between; width:100%; max-width:380px;
-      margin:2px 0 6px; font-size:25px; padding:0 10px;
+      display:flex; 
+      justify-content:space-between; 
+      align-items:center;
+      width:100%; 
+      max-width:380px;
+      margin:4px 0 8px; 
+      font-size:25px; 
+      padding:0 10px;
+      height:42px;
     }
 
     button { 
@@ -178,28 +186,19 @@
       
       try {
         const res = await fetch(`${SUPABASE_URL}/rest/v1/scores?select=kurla_coins,total_taps,multiplier&name=eq.${encodeURIComponent(currentPlayer.name)}&pin=eq.${currentPlayer.pin}&order=total_taps.desc&limit=1`, {
-          headers: { 
-            'apikey': SUPABASE_KEY, 
-            'Authorization': `Bearer ${SUPABASE_KEY}` 
-          }
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
         });
         const data = await res.json();
-
         if (data.length > 0) {
           currentPlayer.kurla_coins = data[0].kurla_coins || 0;
           currentPlayer.total_taps = data[0].total_taps || 0;
           currentPlayer.multiplier = data[0].multiplier || 1;
         } else {
-          // Baza pusta → resetujemy wszystko do zera
           currentPlayer.kurla_coins = 0;
           currentPlayer.total_taps = 0;
           currentPlayer.multiplier = 1;
-          // Opcjonalnie czyścimy localStorage
-          localStorage.setItem('2137player', JSON.stringify(currentPlayer));
         }
-      } catch (e) {
-        console.error("Błąd pobierania z bazy", e);
-      }
+      } catch (e) { console.error("Błąd pobierania z bazy", e); }
       updateDisplays();
     }
 
@@ -302,7 +301,6 @@
       } catch (e) { console.error(e); }
     }
 
-    // PIN + modale (bez zmian)
     function showNicknameModal() {
       document.getElementById('nickInput').value = currentPlayer.name || "";
       document.getElementById('nicknameModal').style.display = 'block';
@@ -419,7 +417,7 @@
             grouped[key] = { name: row.name, best: Number(row.round_score) || 0, total: Number(row.total_score) || 0 };
           } else {
             grouped[key].best = Math.max(grouped[key].best, Number(row.round_score) || 0);
-            grouped[key].total += Number(row.total_score) || 0;
+            grouped[key].total = Math.max(grouped[key].total, Number(row.total_score) || 0);
           }
         });
 
