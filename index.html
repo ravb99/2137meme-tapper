@@ -181,6 +181,7 @@
           headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
         });
         const data = await res.json();
+
         if (data.length > 0) {
           currentPlayer.kurla_coins = data[0].kurla_coins || 0;
           currentPlayer.total_taps = data[0].total_taps || 0;
@@ -190,7 +191,11 @@
           currentPlayer.total_taps = 0;
           currentPlayer.multiplier = 1;
         }
-      } catch (e) { console.error("Błąd pobierania z bazy", e); }
+        // Zapisujemy aktualny stan do localStorage
+        localStorage.setItem('2137player', JSON.stringify(currentPlayer));
+      } catch (e) { 
+        console.error("Błąd pobierania z bazy", e); 
+      }
       updateDisplays();
     }
 
@@ -290,9 +295,12 @@
             multiplier: currentPlayer.multiplier
           }])
         });
+        // Po zapisie aktualizujemy localStorage
+        localStorage.setItem('2137player', JSON.stringify(currentPlayer));
       } catch (e) { console.error(e); }
     }
 
+    // PIN functions (bez zmian)
     function showNicknameModal() {
       document.getElementById('nickInput').value = currentPlayer.name || "";
       document.getElementById('nicknameModal').style.display = 'block';
@@ -444,7 +452,7 @@
       document.getElementById('leaderboardModal').style.display = 'none';
     }
 
-    // INICJALIZACJA - najważniejsze poprawki
+    // INICJALIZACJA
     const container = document.getElementById('nosaczContainer');
     container.addEventListener('touchstart', tap, { passive: true });
     container.addEventListener('mousedown', tap);
@@ -452,7 +460,7 @@
     loadPlayer();
     updateDisplays();
 
-    // Zawsze ładujemy najnowsze dane z bazy po odświeżeniu
+    // Kluczowe: zawsze ładujemy najnowsze dane po odświeżeniu
     if (currentPlayer.name && currentPlayer.pin) {
       loadPlayerDataFromDB();
     }
