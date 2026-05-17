@@ -188,11 +188,11 @@
           currentPlayer.kurla_coins = data[0].kurla_coins || 0;
           currentPlayer.total_taps = data[0].total_taps || 0;
           currentPlayer.multiplier = data[0].multiplier || 1;
+          updateDisplays();
         }
       } catch (e) {
         console.error("Błąd pobierania z bazy", e);
       }
-      updateDisplays();
     }
 
     function updateDisplays() {
@@ -281,7 +281,7 @@
             name: currentPlayer.name,
             pin: currentPlayer.pin,
             round_score: roundScore,
-            total_score: currentPlayer.total_taps,   // <--- NAPRAWIONE: zapisujemy pełny total
+            total_score: currentPlayer.total_taps,   // ważne
             kurla_coins: currentPlayer.kurla_coins,
             total_taps: currentPlayer.total_taps,
             multiplier: currentPlayer.multiplier
@@ -290,7 +290,7 @@
       } catch (e) { console.error(e); }
     }
 
-    // PIN SYSTEM (z automatycznym ładowaniem po zalogowaniu)
+    // PIN SYSTEM
     function showNicknameModal() {
       document.getElementById('nickInput').value = currentPlayer.name || "";
       document.getElementById('nicknameModal').style.display = 'block';
@@ -450,6 +450,7 @@
     loadPlayer();
     updateDisplays();
 
+    // Automatyczne ładowanie z bazy po odświeżeniu
     if (currentPlayer.name && currentPlayer.pin) {
       loadPlayerDataFromDB();
     }
