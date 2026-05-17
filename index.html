@@ -191,7 +191,6 @@
           currentPlayer.total_taps = 0;
           currentPlayer.multiplier = 1;
         }
-        // Zapisujemy aktualny stan do localStorage
         localStorage.setItem('2137player', JSON.stringify(currentPlayer));
       } catch (e) { 
         console.error("Błąd pobierania z bazy", e); 
@@ -295,12 +294,10 @@
             multiplier: currentPlayer.multiplier
           }])
         });
-        // Po zapisie aktualizujemy localStorage
         localStorage.setItem('2137player', JSON.stringify(currentPlayer));
       } catch (e) { console.error(e); }
     }
 
-    // PIN functions (bez zmian)
     function showNicknameModal() {
       document.getElementById('nickInput').value = currentPlayer.name || "";
       document.getElementById('nicknameModal').style.display = 'block';
@@ -452,7 +449,7 @@
       document.getElementById('leaderboardModal').style.display = 'none';
     }
 
-    // INICJALIZACJA
+    // INICJALIZACJA - wzmocniona wersja
     const container = document.getElementById('nosaczContainer');
     container.addEventListener('touchstart', tap, { passive: true });
     container.addEventListener('mousedown', tap);
@@ -460,7 +457,7 @@
     loadPlayer();
     updateDisplays();
 
-    // Kluczowe: zawsze ładujemy najnowsze dane po odświeżeniu
+    // Najsilniejsze ładowanie po odświeżeniu
     if (currentPlayer.name && currentPlayer.pin) {
       loadPlayerDataFromDB();
     }
