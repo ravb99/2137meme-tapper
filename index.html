@@ -177,7 +177,7 @@
       if (!currentPlayer.name || !currentPlayer.pin) return;
       
       try {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/scores?select=kurla_coins,total_taps,multiplier&name=eq.${encodeURIComponent(currentPlayer.name)}&pin=eq.${currentPlayer.pin}&limit=1`, {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/scores?select=kurla_coins,total_taps,multiplier&name=eq.${encodeURIComponent(currentPlayer.name)}&pin=eq.${currentPlayer.pin}&order=total_taps.desc&limit=1`, {
           headers: { 
             'apikey': SUPABASE_KEY, 
             'Authorization': `Bearer ${SUPABASE_KEY}` 
@@ -188,11 +188,11 @@
           currentPlayer.kurla_coins = data[0].kurla_coins || 0;
           currentPlayer.total_taps = data[0].total_taps || 0;
           currentPlayer.multiplier = data[0].multiplier || 1;
-          updateDisplays();
         }
       } catch (e) {
         console.error("Błąd pobierania z bazy", e);
       }
+      updateDisplays();
     }
 
     function updateDisplays() {
@@ -281,7 +281,7 @@
             name: currentPlayer.name,
             pin: currentPlayer.pin,
             round_score: roundScore,
-            total_score: currentPlayer.total_taps,   // ważne
+            total_score: currentPlayer.total_taps,
             kurla_coins: currentPlayer.kurla_coins,
             total_taps: currentPlayer.total_taps,
             multiplier: currentPlayer.multiplier
@@ -373,6 +373,7 @@
         if (currentPlayer.total_taps >= item.cost) {
           currentPlayer.total_taps -= item.cost;
           currentPlayer.kurla_coins += item.value;
+          saveScore(0); // zapisujemy nowy stan do bazy
           alert(`✅ +${item.value} Kurła Coins dodane!`);
         } else {
           alert(`Za mało total taps!\nMasz: ${currentPlayer.total_taps} / Potrzebujesz: ${item.cost}`);
@@ -381,6 +382,7 @@
         if (currentPlayer.kurla_coins >= item.cost) {
           currentPlayer.kurla_coins -= item.cost;
           currentPlayer.multiplier = Math.max(currentPlayer.multiplier, item.value);
+          saveScore(0);
           alert(`Kupiłeś ${item.name}!\nNowy multiplier: ×${currentPlayer.multiplier}`);
         } else alert("Za mało Kurła Coins!");
       }
@@ -450,7 +452,6 @@
     loadPlayer();
     updateDisplays();
 
-    // Automatyczne ładowanie z bazy po odświeżeniu
     if (currentPlayer.name && currentPlayer.pin) {
       loadPlayerDataFromDB();
     }
