@@ -22,7 +22,10 @@
     #nosacz { width:100%; height:100%; border-radius:50%; border:8px solid #ff0; box-shadow:0 0 30px #ff0; transition: filter 0.04s ease-out; }
     .kurwa { position:absolute; color:#ff0; font-size:46px; font-weight:900; pointer-events:none; animation:kurwaAnim 0.95s forwards; text-shadow:0 0 12px #ff0; }
     @keyframes kurwaAnim { 0%{transform:translate(-50%,-50%)scale(0.6);opacity:1} 100%{transform:translate(-50%,-210px)scale(1.35);opacity:0} }
-    #tapCount { font-size:27px; margin:6px 0 8px; text-align:center; width:100%; }
+
+    #stats { display:flex; justify-content:center; gap:25px; width:100%; margin:8px 0 12px; font-size:26px; }
+    .progress { width:100%; height:14px; background:#333; margin:8px 0; border:2px solid #ff0; }
+    .progress-bar { height:100%; background:#ff0; transition:width 0.4s; }
 
     button { background:#ff0; color:#111; border:4px solid #000; padding:12px 20px; font-size:17px; font-weight:900; margin:5px auto; border-radius:8px; width:88%; }
     #restartBtn { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:#0f0; color:#000; font-size:21px; font-weight:900; padding:16px 32px; border:6px solid #000; border-radius:12px; box-shadow:0 0 25px #0f0; z-index:20; display:none; }
@@ -37,6 +40,7 @@
     .window-body { padding:15px; background:#2a2a2a; flex:1; display:flex; flex-direction:column; overflow:hidden; }
     #lbList { flex:1; overflow-y:auto; padding-right:10px; }
     .lb-entry { display:flex; justify-content:space-between; padding:10px 12px; margin:6px 0; background:#1f1f1f; border:2px solid #666; color:#ff0; font-size:17px; }
+    .shop-item { background:#1f1f1f; border:3px solid #ff0; padding:14px; margin:12px 0; border-radius:8px; text-align:center; }
     input { width:100%; padding:14px; font-size:19px; background:#1a1a1a; color:#ff0; border:3px solid #777; font-family:'Oswald'; text-align:center; margin-bottom:15px; }
   </style>
 </head>
@@ -51,9 +55,20 @@
       <button id="restartBtn" onclick="restartGame()">Na Drugą Nóżkę!</button>
     </div>
 
-    <div id="tapCount">Taps: <span id="count">0</span></div>
+    <!-- NOWE STATYSTYKI -->
+    <div id="stats">
+      <div>Taps: <span id="count">0</span></div>
+      <div style="display:flex; align-items:center; gap:6px;">
+        <img src="https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/images/coin.JPG" width="32" height="32" style="vertical-align:middle;">
+        Kurła Coins: <span id="coins">0</span>
+      </div>
+    </div>
+
+    <div style="width:100%; text-align:center; font-size:18px;">Do +100 Kurła Coins: <span id="progressText">0/2137</span></div>
+    <div class="progress"><div id="progressBar" class="progress-bar"></div></div>
     
     <button onclick="showNicknameModal()">Zmień nick + PIN</button>
+    <button onclick="showShop()">🛒 SKLEP KURŁA COINS</button>
     <button onclick="showLeaderboard()">TOP 21 LEADERBOARD</button>
 
     <div id="result">
@@ -103,13 +118,22 @@
     </div>
   </div>
 
+  <!-- SKLEP MODAL -->
+  <div id="shopModal" class="modal">
+    <div class="modal-content">
+      <div class="title-bar">🛒 SKLEP KURŁA COINS</div>
+      <div id="shopItems" style="padding:15px; overflow-y:auto; flex:1;"></div>
+      <button onclick="hideShop()" style="margin:12px auto; width:80%;">Wyjdź</button>
+    </div>
+  </div>
+
   <audio id="kurlaSound" src="https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/sounds/Kurła.m4a" preload="auto"></audio>
 
   <script>
     const SUPABASE_URL = 'https://gmyhsgxnpbvwgexrvpik.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_dPOUiTHcX9Xk7tQQr3oOWw_0aEfDVUm';
 
-    let currentPlayer = { name: "", pin: "" };
+    let currentPlayer = { name: "", pin: "", kurla_coins: 0, total_taps: 0, multiplier: 1 };
     let currentTab = 0;
     let isNewNick = false;
 
@@ -123,9 +147,24 @@
     const resultDiv = document.getElementById('result');
     const sound = document.getElementById('kurlaSound');
 
+    const shopItems = [
+      { name: "100 Kurła Coins", cost: 2137, type: "coins", value: 100 },
+      { name: "Golf 3 Szrot", cost: 5000, type: "mult", value: 2 },
+      { name: "Mercedes w124", cost: 15000, type: "mult", value: 3 },
+      { name: "Passat B5 1.9 TDI", cost: 45000, type: "mult", value: 4 }
+    ];
+
     function loadPlayer() {
       const saved = localStorage.getItem('2137player');
       if (saved) currentPlayer = JSON.parse(saved);
+    }
+
+    function updateDisplays() {
+      document.getElementById('count').textContent = taps;
+      document.getElementById('coins').textContent = currentPlayer.kurla_coins;
+      const progress = currentPlayer.total_taps % 2137;
+      document.getElementById('progressText').textContent = `${progress}/2137`;
+      document.getElementById('progressBar').style.width = `${(progress / 2137) * 100}%`;
     }
 
     function tap(e) {
@@ -133,7 +172,14 @@
       if (!isRunning) startTimer();
 
       taps += 1;
-      document.getElementById('count').textContent = taps;
+      currentPlayer.total_taps += 1;
+
+      updateDisplays();
+
+      if (currentPlayer.total_taps % 2137 === 0) {
+        currentPlayer.kurla_coins += 100;
+        updateDisplays();
+      }
 
       nosaczImg.style.filter = `hue-rotate(35deg) saturate(4.5) brightness(1.7)`;
       setTimeout(() => nosaczImg.style.filter = '', 38);
@@ -208,13 +254,16 @@
             name: currentPlayer.name,
             pin: currentPlayer.pin,
             round_score: roundScore,
-            total_score: roundScore
+            total_score: roundScore,
+            kurla_coins: currentPlayer.kurla_coins,
+            total_taps: currentPlayer.total_taps,
+            multiplier: currentPlayer.multiplier
           }])
         });
       } catch (e) {}
     }
 
-    // ==================== PIN SYSTEM ====================
+    // ==================== PIN SYSTEM (bez zmian) ====================
     function showNicknameModal() {
       document.getElementById('nickInput').value = currentPlayer.name || "";
       document.getElementById('nicknameModal').style.display = 'block';
@@ -275,7 +324,52 @@
       }
     }
 
-    // ==================== LEADERBOARD (poprawione duplikaty) ====================
+    // ==================== SKLEP ====================
+    function showShop() {
+      const container = document.getElementById('shopItems');
+      container.innerHTML = `<p style="text-align:center; color:#ff0; font-size:22px;">Masz: <b>${currentPlayer.kurla_coins}</b> Kurła Coins</p>`;
+
+      shopItems.forEach((item, i) => {
+        const isOwned = item.type === 'mult' && currentPlayer.multiplier >= item.value;
+        const div = document.createElement('div');
+        div.className = 'shop-item';
+        div.innerHTML = `
+          <strong>${item.name}</strong><br>
+          ${item.type === 'coins' ? `+${item.value} Kurła Coins` : `×${item.value} taps`}<br>
+          Koszt: ${item.cost} ${item.type === 'coins' ? 'taps' : 'KC'}
+          <button onclick="buyItem(${i})" style="margin-top:10px; width:100%; ${isOwned ? 'background:#555; color:#666;' : ''}" ${isOwned ? 'disabled' : ''}>
+            ${isOwned ? 'POSIADASZ' : 'KUP'}
+          </button>
+        `;
+        container.appendChild(div);
+      });
+      document.getElementById('shopModal').style.display = 'block';
+    }
+
+    function buyItem(i) {
+      const item = shopItems[i];
+      if (item.type === 'coins') {
+        if (currentPlayer.total_taps >= item.cost) {
+          currentPlayer.total_taps -= item.cost;
+          currentPlayer.kurla_coins += item.value;
+          alert(`+${item.value} Kurła Coins dodane!`);
+        } else alert("Za mało tapsów!");
+      } else {
+        if (currentPlayer.kurla_coins >= item.cost) {
+          currentPlayer.kurla_coins -= item.cost;
+          currentPlayer.multiplier = Math.max(currentPlayer.multiplier, item.value);
+          alert(`Kupiłeś ${item.name}!\nNowy multiplier: ×${currentPlayer.multiplier}`);
+        } else alert("Za mało Kurła Coins!");
+      }
+      updateDisplays();
+      showShop();
+    }
+
+    function hideShop() {
+      document.getElementById('shopModal').style.display = 'none';
+    }
+
+    // ==================== LEADERBOARD (bez zmian) ====================
     async function updateLeaderboard() {
       try {
         const response = await fetch(`${SUPABASE_URL}/rest/v1/scores?select=name,pin,round_score,total_score&limit=500`, {
@@ -287,11 +381,7 @@
         data.forEach(row => {
           const key = `${row.name}|${row.pin || ''}`;
           if (!grouped[key]) {
-            grouped[key] = { 
-              name: row.name, 
-              best: Number(row.round_score) || 0, 
-              total: Number(row.total_score) || 0 
-            };
+            grouped[key] = { name: row.name, best: Number(row.round_score) || 0, total: Number(row.total_score) || 0 };
           } else {
             grouped[key].best = Math.max(grouped[key].best, Number(row.round_score) || 0);
             grouped[key].total += Number(row.round_score) || 0;
@@ -342,6 +432,7 @@
     container.addEventListener('mousedown', tap);
 
     loadPlayer();
+    updateDisplays();
     Telegram.WebApp.ready();
     Telegram.WebApp.expand();
   </script>
