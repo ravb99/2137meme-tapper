@@ -144,7 +144,15 @@
     const SUPABASE_URL = 'https://gmyhsgxnpbvwgexrvpik.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_dPOUiTHcX9Xk7tQQr3oOWw_0aEfDVUm';
 
-    let currentPlayer = { name: "", pin: "", kurla_coins: 0, total_taps: 0, multiplier: 1 };
+    let currentPlayer = { 
+      name: "", 
+      pin: "", 
+      kurla_coins: 0, 
+      lifetime_taps: 0, 
+      spendable_taps: 0, 
+      multiplier: 1 
+    };
+
     let currentTab = 0;
     let isNewNick = false;
 
@@ -169,7 +177,8 @@
       const saved = localStorage.getItem('2137player');
       if (saved) currentPlayer = JSON.parse(saved);
       currentPlayer.kurla_coins = currentPlayer.kurla_coins || 0;
-      currentPlayer.total_taps = currentPlayer.total_taps || 0;
+      currentPlayer.lifetime_taps = currentPlayer.lifetime_taps || 0;
+      currentPlayer.spendable_taps = currentPlayer.spendable_taps || 0;
       currentPlayer.multiplier = currentPlayer.multiplier || 1;
     }
 
@@ -177,18 +186,20 @@
       if (!currentPlayer.name || !currentPlayer.pin) return;
       
       try {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/scores?select=kurla_coins,total_taps,multiplier&name=eq.${encodeURIComponent(currentPlayer.name)}&pin=eq.${currentPlayer.pin}&order=created_at.desc&limit=1`, {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/scores?select=kurla_coins,lifetime_taps,spendable_taps,multiplier&name=eq.${encodeURIComponent(currentPlayer.name)}&pin=eq.${currentPlayer.pin}&order=created_at.desc&limit=1`, {
           headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
         });
         const data = await res.json();
 
         if (data.length > 0) {
           currentPlayer.kurla_coins = data[0].kurla_coins || 0;
-          currentPlayer.total_taps = data[0].total_taps || 0;
+          currentPlayer.lifetime_taps = data[0].lifetime_taps || 0;
+          currentPlayer.spendable_taps = data[0].spendable_taps || 0;
           currentPlayer.multiplier = data[0].multiplier || 1;
         } else {
           currentPlayer.kurla_coins = 0;
-          currentPlayer.total_taps = 0;
+          currentPlayer.lifetime_taps = 0;
+          currentPlayer.spendable_taps = 0;
           currentPlayer.multiplier = 1;
         }
         localStorage.setItem('2137player', JSON.stringify(currentPlayer));
@@ -208,7 +219,8 @@
       if (!isRunning) startTimer();
 
       taps += 1;
-      currentPlayer.total_taps += 1;
+      currentPlayer.lifetime_taps += 1;
+      currentPlayer.spendable_taps += 1;
       updateDisplays();
 
       nosaczImg.style.filter = `hue-rotate(35deg) saturate(4.5) brightness(1.7)`;
@@ -288,9 +300,10 @@
             name: currentPlayer.name,
             pin: currentPlayer.pin,
             round_score: roundScore,
-            total_score: currentPlayer.total_taps,
+            total_score: currentPlayer.lifetime_taps,
             kurla_coins: currentPlayer.kurla_coins,
-            total_taps: currentPlayer.total_taps,
+            lifetime_taps: currentPlayer.lifetime_taps,
+            spendable_taps: currentPlayer.spendable_taps,
             multiplier: currentPlayer.multiplier
           }])
         });
@@ -353,7 +366,7 @@
       const container = document.getElementById('shopItems');
       container.innerHTML = `<p style="text-align:center; color:#ff0; font-size:22px;">
         Masz: <b>${currentPlayer.kurla_coins}</b> Kurła Coins<br>
-        <small>Total taps: ${currentPlayer.total_taps}</small>
+        <small>Spendable: ${currentPlayer.spendable_taps} | All Time: ${currentPlayer.lifetime_taps}</small>
       </p>`;
 
       shopItems.forEach((item, i) => {
@@ -376,13 +389,13 @@
     function buyItem(i) {
       const item = shopItems[i];
       if (item.type === 'coins') {
-        if (currentPlayer.total_taps >= item.cost) {
-          currentPlayer.total_taps -= item.cost;
+        if (currentPlayer.spendable_taps >= item.cost) {
+          currentPlayer.spendable_taps -= item.cost;
           currentPlayer.kurla_coins += item.value;
           saveScore(0);
           alert(`✅ +${item.value} Kurła Coins dodane!`);
         } else {
-          alert(`Za mało total taps!\nMasz: ${currentPlayer.total_taps}`);
+          alert(`Za mało spendable taps!\nMasz: ${currentPlayer.spendable_taps}`);
         }
       } else {
         if (currentPlayer.kurla_coins >= item.cost) {
