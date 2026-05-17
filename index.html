@@ -155,7 +155,6 @@
 
     let currentTab = 0;
     let isNewNick = false;
-
     let timeLeft = 21.37;
     let taps = 0;
     let isRunning = false;
@@ -196,16 +195,9 @@
           currentPlayer.lifetime_taps = data[0].lifetime_taps || 0;
           currentPlayer.spendable_taps = data[0].spendable_taps || 0;
           currentPlayer.multiplier = data[0].multiplier || 1;
-        } else {
-          currentPlayer.kurla_coins = 0;
-          currentPlayer.lifetime_taps = 0;
-          currentPlayer.spendable_taps = 0;
-          currentPlayer.multiplier = 1;
         }
         localStorage.setItem('2137player', JSON.stringify(currentPlayer));
-      } catch (e) { 
-        console.error("Błąd pobierania z bazy", e); 
-      }
+      } catch (e) { console.error(e); }
       updateDisplays();
     }
 
@@ -366,7 +358,7 @@
       const container = document.getElementById('shopItems');
       container.innerHTML = `<p style="text-align:center; color:#ff0; font-size:22px;">
         Masz: <b>${currentPlayer.kurla_coins}</b> Kurła Coins<br>
-        <small>Spendable: ${currentPlayer.spendable_taps} | All Time: ${currentPlayer.lifetime_taps}</small>
+        Kurła Punkty: <b>${currentPlayer.spendable_taps}</b>
       </p>`;
 
       shopItems.forEach((item, i) => {
@@ -376,7 +368,7 @@
         div.innerHTML = `
           <strong>${item.name}</strong><br>
           ${item.type === 'coins' ? `+${item.value} Kurła Coins` : `×${item.value} taps`}<br>
-          Koszt: ${item.cost} ${item.type === 'coins' ? 'taps' : 'KC'}
+          Koszt: ${item.cost} ${item.type === 'coins' ? 'Kurła Punkty' : 'KC'}
           <button onclick="buyItem(${i})" style="margin-top:10px; width:100%; ${isOwned ? 'background:#555; color:#666;' : ''}" ${isOwned ? 'disabled' : ''}>
             ${isOwned ? 'POSIADASZ' : 'KUP'}
           </button>
@@ -395,7 +387,7 @@
           saveScore(0);
           alert(`✅ +${item.value} Kurła Coins dodane!`);
         } else {
-          alert(`Za mało spendable taps!\nMasz: ${currentPlayer.spendable_taps}`);
+          alert(`Za mało Kurła Punktów!\nMasz: ${currentPlayer.spendable_taps}`);
         }
       } else {
         if (currentPlayer.kurla_coins >= item.cost) {
