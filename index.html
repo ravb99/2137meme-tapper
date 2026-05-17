@@ -45,14 +45,20 @@
     #result { margin:6px 0 4px; font-size:23px; font-weight:900; display:none; text-align:center; width:100%; color:#ff0; }
 
     .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.94); z-index:100; }
-    .modal-content { max-width:380px; margin:35px auto; background:#2a2a2a; border:6px solid #777; border-radius:3px; overflow:hidden; display:flex; flex-direction:column; height:82vh; }
-    .title-bar { background:#333; color:#ddd; padding:9px 12px; font-weight:900; text-align:left; border-bottom:4px solid #555; font-size:19px; }
-    .tab-buttons { display:flex; background:#222; }
-    .tab-btn { flex:1; padding:12px; background:#222; color:#ff0; border:none; font-weight:900; font-size:17px; }
-    .tab-btn.active { background:#ff0; color:#111; }
-    .window-body { padding:15px; background:#2a2a2a; flex:1; display:flex; flex-direction:column; overflow:hidden; }
-    #lbList { flex:1; overflow-y:auto; padding-right:10px; }
-    .lb-entry { display:flex; justify-content:space-between; padding:10px 12px; margin:6px 0; background:#1f1f1f; border:2px solid #666; color:#ff0; font-size:17px; }
+    .modal-content { 
+      max-width:380px; margin:40px auto; background:#1a1a1a; border:6px solid #ff0; 
+      border-radius:4px; overflow:hidden; display:flex; flex-direction:column; 
+    }
+    .title-bar { 
+      background:#333; color:#ff0; padding:12px 15px; font-weight:900; 
+      text-align:center; border-bottom:4px solid #ff0; font-size:20px; 
+    }
+    .window-body { padding:20px; background:#1a1a1a; flex:1; }
+    input { 
+      width:100%; padding:16px; font-size:22px; background:#111; color:#ff0; 
+      border:4px solid #ff0; font-family:'Oswald'; text-align:center; 
+      margin-bottom:15px; border-radius:4px;
+    }
 
     .shop-item { 
       background:#1f1f1f; 
@@ -71,6 +77,16 @@
       flex-shrink:0; 
     }
     .shop-text { flex:1; }
+
+    /* Retro Alert */
+    #retroAlert { 
+      display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); 
+      z-index:200; align-items:center; justify-content:center;
+    }
+    #retroAlert .alert-box { 
+      background:#1a1a1a; border:6px solid #ff0; padding:25px 20px; 
+      max-width:340px; text-align:center; color:#ff0; font-size:19px; border-radius:4px;
+    }
   </style>
 </head>
 <body>
@@ -123,9 +139,9 @@
     <div class="modal-content">
       <div class="title-bar">ZMIANA NICKU</div>
       <div class="window-body">
-        <p style="margin:10px 0 15px; color:#ccc;">Wpisz nick:</p>
+        <p style="margin:10px 0 15px; color:#ccc; text-align:center;">Wpisz nick:</p>
         <input type="text" id="nickInput" maxlength="20" placeholder="Janusz420">
-        <div style="display:flex; justify-content:center; gap:12px; margin-top:15px; width:100%;">
+        <div style="display:flex; justify-content:center; gap:12px; margin-top:20px;">
           <button onclick="checkNickAndContinue()" style="width:48%;">Dalej</button>
           <button onclick="hideNicknameModal()" style="width:48%; background:#555; color:#ff0;">Anuluj</button>
         </div>
@@ -152,6 +168,11 @@
       <div id="shopItems" style="padding:15px; overflow-y:auto; flex:1;"></div>
       <button onclick="hideShop()" style="margin:12px auto; width:80%;">Wyjdź</button>
     </div>
+  </div>
+
+  <!-- Retro Alert -->
+  <div id="retroAlert" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:200; align-items:center; justify-content:center;">
+    <div class="alert-box" id="alertContent" style="background:#1a1a1a; border:6px solid #ff0; padding:25px; max-width:340px; text-align:center; color:#ff0; font-size:19px; border-radius:4px;"></div>
   </div>
 
   <audio id="kurlaSound" src="https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/sounds/Kurła.m4a" preload="auto"></audio>
@@ -319,6 +340,15 @@
       } catch (e) { console.error(e); }
     }
 
+    function showRetroAlert(message) {
+      document.getElementById('alertContent').innerHTML = message + '<br><br><button onclick="hideRetroAlert()" style="background:#ff0; color:#000; padding:12px 30px; font-size:18px; border:3px solid #000; border-radius:4px;">OK</button>';
+      document.getElementById('retroAlert').style.display = 'flex';
+    }
+
+    function hideRetroAlert() {
+      document.getElementById('retroAlert').style.display = 'none';
+    }
+
     function showNicknameModal() {
       document.getElementById('nickInput').value = currentPlayer.name || "";
       document.getElementById('nicknameModal').style.display = 'block';
@@ -352,7 +382,7 @@
         currentPlayer.pin = pin;
         localStorage.setItem('2137player', JSON.stringify(currentPlayer));
         hidePinModal();
-        alert(`Nowy nick zapisany!\nNick: ${currentPlayer.name}\nPIN: ${pin}`);
+        showRetroAlert(`Nowy nick zapisany!<br>Nick: <b>${currentPlayer.name}</b><br>PIN: <b>${pin}</b>`);
       } else {
         try {
           const res = await fetch(`${SUPABASE_URL}/rest/v1/scores?select=pin&name=eq.${encodeURIComponent(currentPlayer.name)}&pin=eq.${pin}&limit=1`, {
@@ -363,10 +393,10 @@
             currentPlayer.pin = pin;
             localStorage.setItem('2137player', JSON.stringify(currentPlayer));
             hidePinModal();
-            alert(`Zalogowano pomyślnie!\nNick: ${currentPlayer.name}`);
+            showRetroAlert(`Zalogowano pomyślnie!<br>Nick: <b>${currentPlayer.name}</b>`);
             await loadPlayerDataFromDB();
-          } else alert("Błędny PIN!");
-        } catch (e) { alert("Błąd walidacji"); }
+          } else showRetroAlert("Błędny PIN!");
+        } catch (e) { showRetroAlert("Błąd walidacji"); }
       }
     }
 
@@ -404,17 +434,17 @@
           currentPlayer.spendable_taps -= item.cost;
           currentPlayer.kurla_coins += item.value;
           saveScore(0);
-          alert(`✅ +${item.value} Kurła Coins dodane!`);
+          showRetroAlert(`✅ Dodano <b>+${item.value}</b> Kurła Coins!`);
         } else {
-          alert(`Za mało Kurła Punktów!\nMasz: ${currentPlayer.spendable_taps}`);
+          showRetroAlert(`Za mało Kurła Punktów!<br>Masz: <b>${currentPlayer.spendable_taps}</b>`);
         }
       } else {
         if (currentPlayer.kurla_coins >= item.cost) {
           currentPlayer.kurla_coins -= item.cost;
           currentPlayer.multiplier = Math.max(currentPlayer.multiplier, item.value);
           saveScore(0);
-          alert(`Kupiłeś ${item.name}!\nNowy multiplier: ×${currentPlayer.multiplier}`);
-        } else alert("Za mało Kurła Coins!");
+          showRetroAlert(`Kupiłeś <b>${item.name}</b>!<br>Nowy multiplier: ×${currentPlayer.multiplier}`);
+        } else showRetroAlert("Za mało Kurła Coins!");
       }
       updateDisplays();
       showShop();
