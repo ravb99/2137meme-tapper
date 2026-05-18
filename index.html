@@ -53,16 +53,16 @@
 
     /* DUŻY OKRĄGŁY PRZYCISK TOKENA */
     .token-btn {
-      width: 82px;
-      height: 82px;
+      width: 95px;
+      height: 95px;
       background: #ff0;
       color: #111;
-      border: 5px solid #000;
+      border: 6px solid #000;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 15px;
+      font-size: 16px;
       font-weight: 900;
       box-shadow: 0 6px 0 #000;
       text-decoration: none;
@@ -78,8 +78,8 @@
     .bottom-panel {
       display: flex;
       width: 100%;
-      gap: 4px;           /* bardzo mały odstęp */
-      margin: 8px 0 12px;
+      gap: 4px;
+      margin: 8px 0 6px;   /* zmniejszona odległość do TOP 21 */
       align-items: center;
       justify-content: center;
     }
@@ -161,7 +161,7 @@
       <button class="main-btn main-btn-right" onclick="showShop()">KURŁA SKLEP</button>
     </div>
 
-    <button onclick="showLeaderboard()" style="width:100%;">TOP 21 LEADERBOARD</button>
+    <button onclick="showLeaderboard()" style="width:100%; margin-top:6px;">TOP 21 LEADERBOARD</button>
 
     <div id="result"><span id="finalScore"></span></div>
   </div>
