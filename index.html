@@ -43,7 +43,6 @@
       width:100%; max-width:380px; margin:4px 0 8px; font-size:25px; padding:0 10px; height:42px;
     }
 
-    /* WSZYSTKIE PRZYCISKI - MOCNE ZAOKRĄGLENIE */
     button, .token-btn { 
       background:#ff0; 
       color:#111; 
@@ -52,7 +51,7 @@
       font-size:17.5px; 
       font-weight:900; 
       margin:0; 
-      border-radius: 14px;           /* Mocne zaokrąglenie wszystkich rogów */
+      border-radius: 14px; 
       height: 58px;
       display: flex;
       align-items: center;
@@ -60,7 +59,6 @@
     }
     .main-btn { flex:1; }
 
-    /* Prostokątny przycisk $2137 */
     .token-btn {
       min-width: 110px;
       flex-shrink: 0;
@@ -83,13 +81,36 @@
       justify-content: center;
     }
 
+    /* Poprawiony przycisk "Na Drugą Nóżkę!" */
     #restartBtn { 
-      position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); 
-      background:#0f0; color:#000; font-size:21px; font-weight:900; 
-      padding:16px 32px; border:6px solid #000; border-radius:14px; 
-      box-shadow:0 0 25px #0f0; z-index:20; display:none; 
+      position:absolute; 
+      top:52%; 
+      left:50%; 
+      transform:translate(-50%,-50%); 
+      background:#0f0; 
+      color:#000; 
+      font-size:18px; 
+      font-weight:900; 
+      padding:14px 32px; 
+      border:6px solid #000; 
+      border-radius:14px; 
+      box-shadow:0 0 25px #0f0; 
+      z-index:20; 
+      display:none; 
+      white-space: nowrap;
+      min-width: 280px;
+      max-width: 320px;
     }
-    #result { margin:6px 0 4px; font-size:23px; font-weight:900; display:none; text-align:center; width:100%; color:#ff0; }
+
+    #result { 
+      margin:6px 0 4px; 
+      font-size:23px; 
+      font-weight:900; 
+      display:none; 
+      text-align:center; 
+      width:100%; 
+      color:#ff0; 
+    }
 
     .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.94); z-index:100; }
     .modal-content { 
