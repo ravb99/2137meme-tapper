@@ -289,7 +289,7 @@
     async function loadPlayerDataFromDB() {
       if (!currentPlayer.name || !currentPlayer.pin) return;
       
-      resetPlayerData(); // Pełny reset przy każdym załadowaniu nicku
+      resetPlayerData();
 
       try {
         const res = await fetch(`${SUPABASE_URL}/rest/v1/scores?select=kurla_coins,lifetime_taps,spendable_taps,multiplier&name=eq.${encodeURIComponent(currentPlayer.name)}&pin=eq.${currentPlayer.pin}&order=created_at.desc&limit=1`, {
@@ -455,18 +455,36 @@
 
     async function verifyOrSetPin() {
       const pin = document.getElementById('pinInput').value.trim();
-      if (pin.length !== 4) return alert("PIN musi mieć dokładnie 4 cyfry!");
-
-      currentPlayer.pin = pin;
-      localStorage.setItem('2137player', JSON.stringify(currentPlayer));
-      hidePinModal();
+      if (pin.length !== 4) return showRetroAlert("PIN musi mieć dokładnie 4 cyfry!");
 
       if (isNewNick) {
+        currentPlayer.pin = pin;
+        localStorage.setItem('2137player', JSON.stringify(currentPlayer));
+        hidePinModal();
         showRetroAlert(`Nowy nick zapisany!<br>Nick: <b>${currentPlayer.name}</b><br>PIN: <b>${pin}</b>`);
+        await loadPlayerDataFromDB();
       } else {
-        showRetroAlert(`Zalogowano pomyślnie!<br>Nick: <b>${currentPlayer.name}</b>`);
+        // ŚCIŚLE sprawdzamy PIN dla istniejącego nicku
+        try {
+          const res = await fetch(`${SUPABASE_URL}/rest/v1/scores?select=pin&name=eq.${encodeURIComponent(currentPlayer.name)}&pin=eq.${pin}&limit=1`, {
+            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+          });
+          const data = await res.json();
+
+          if (data.length > 0) {
+            currentPlayer.pin = pin;
+            localStorage.setItem('2137player', JSON.stringify(currentPlayer));
+            hidePinModal();
+            showRetroAlert(`Zalogowano pomyślnie!<br>Nick: <b>${currentPlayer.name}</b>`);
+            await loadPlayerDataFromDB();
+          } else {
+            showRetroAlert("Zły pin prywaciarzu");
+            document.getElementById('pinInput').value = "";
+          }
+        } catch (e) {
+          showRetroAlert("Błąd połączenia");
+        }
       }
-      await loadPlayerDataFromDB();
     }
 
     function showShop() {
