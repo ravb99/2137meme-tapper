@@ -21,8 +21,37 @@
     .subtitle { font-size:27px; font-weight:900; color:#fff; margin:-6px 0 4px 0; letter-spacing:6px; width:100%; text-align:center; }
     #timer { font-size:58px; font-weight:900; color:#f00; margin:2px 0 6px; }
 
-    #nosaczContainer { position:relative; width:290px; height:290px; margin:2px auto 4px; }
-    #nosacz { width:100%; height:100%; border-radius:50%; border:8px solid #ff0; box-shadow:0 0 30px #ff0; transition: filter 0.04s ease-out; }
+    #nosaczContainer { 
+      position:relative; 
+      width:290px; 
+      height:290px; 
+      margin:2px auto 4px; 
+    }
+    #nosacz { 
+      width:100%; 
+      height:100%; 
+      border-radius:50%; 
+      border:8px solid #ff0; 
+      box-shadow:0 0 30px #ff0; 
+      transition: transform 0.045s ease-out, filter 0.06s ease-out;
+      will-change: transform, filter;
+    }
+
+    /* Płynniejsze Kurła! */
+    .kurwa { 
+      position:absolute; 
+      color:#ff0; 
+      font-weight:900; 
+      font-size:26px; 
+      text-shadow: 0 0 15px #ff0;
+      pointer-events:none; 
+      animation: kurwaPop 850ms forwards;
+      will-change: transform, opacity;
+    }
+    @keyframes kurwaPop {
+      0%   { transform: translateY(0) scale(0.6); opacity:1; }
+      100% { transform: translateY(-135px) scale(1.12); opacity:0; }
+    }
 
     #stats { 
       display:flex; justify-content:space-between; align-items:center;
@@ -60,46 +89,21 @@
       margin-bottom:15px; border-radius:4px;
     }
 
-    /* SKLEP - poprawione scrollowanie */
-    #shopItems { 
-      padding:15px; 
-      overflow-y:auto; 
-      max-height:55vh; 
-      flex:1; 
-    }
+    #shopItems { padding:15px; overflow-y:auto; max-height:55vh; flex:1; }
 
     .shop-item { 
-      background:#1f1f1f; 
-      border:3px solid #ff0; 
-      padding:12px; 
-      margin:12px 0; 
-      border-radius:8px; 
-      display:flex; 
-      align-items:center; 
-      gap:15px;
+      background:#1f1f1f; border:3px solid #ff0; padding:12px; margin:12px 0; 
+      border-radius:8px; display:flex; align-items:center; gap:15px;
     }
-    .shop-item img { 
-      width:110px; 
-      height:110px; 
-      object-fit:contain; 
-      flex-shrink:0; 
-    }
+    .shop-item img { width:110px; height:110px; object-fit:contain; flex-shrink:0; }
     .shop-text { flex:1; }
 
-    /* LEADERBOARD - ładne wiersze */
     .lb-entry { 
-      display:flex; 
-      justify-content:space-between; 
-      padding:12px 15px; 
-      margin:6px 0; 
-      background:#1f1f1f; 
-      border:2px solid #ff0; 
-      border-radius:6px; 
-      font-size:19px; 
+      display:flex; justify-content:space-between; padding:12px 15px; margin:6px 0; 
+      background:#1f1f1f; border:2px solid #ff0; border-radius:6px; font-size:19px; 
     }
     .lb-entry:nth-child(even) { background:#252525; }
 
-    /* Retro Alert */
     #retroAlert { 
       display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); 
       z-index:200; align-items:center; justify-content:center;
@@ -278,26 +282,32 @@
       currentPlayer.spendable_taps += 1;
       updateDisplays();
 
-      nosaczImg.style.filter = `hue-rotate(35deg) saturate(4.5) brightness(1.7)`;
-      setTimeout(() => nosaczImg.style.filter = '', 38);
+      // Płynniejszy efekt Nosacza
+      nosaczImg.style.transform = 'scale(1.13)';
+      nosaczImg.style.filter = `hue-rotate(45deg) saturate(5) brightness(1.95)`;
+
+      setTimeout(() => {
+        nosaczImg.style.transform = 'scale(1)';
+        nosaczImg.style.filter = '';
+      }, 48);
 
       sound.currentTime = 0;
       sound.play().catch(() => {});
-      createRandomKurwa();
+
+      createKurwa();
     }
 
-    function createRandomKurwa() {
+    function createKurwa() {
       const k = document.createElement('div');
+      k.className = 'kurwa';
       k.textContent = 'Kurła!';
-      k.style.position = 'absolute';
-      k.style.left = (Math.random() * 260 + 60) + 'px';
-      k.style.top = (Math.random() * 160 + 70) + 'px';
-      k.style.color = '#ff0';
-      k.style.fontWeight = '900';
-      k.style.fontSize = '22px';
-      k.style.pointerEvents = 'none';
-      document.getElementById('nosaczContainer').appendChild(k);
-      setTimeout(() => k.remove(), 1100);
+
+      const container = document.getElementById('nosaczContainer');
+      k.style.left = (Math.random() * 200 + 45) + 'px';
+      k.style.top = (Math.random() * 140 + 75) + 'px';
+
+      container.appendChild(k);
+      setTimeout(() => k.remove(), 880);
     }
 
     function startTimer() {
