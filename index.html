@@ -81,7 +81,6 @@
       justify-content: center;
     }
 
-    /* Poprawiony przycisk "Na Drugą Nóżkę!" */
     #restartBtn { 
       position:absolute; 
       top:52%; 
@@ -99,7 +98,6 @@
       display:none; 
       white-space: nowrap;
       min-width: 280px;
-      max-width: 320px;
     }
 
     #result { 
@@ -234,7 +232,7 @@
 
   <!-- Retro Alert -->
   <div id="retroAlert" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:200; align-items:center; justify-content:center;">
-    <div class="alert-box" id="alertContent" style="background:#1a1a1a; border:6px solid #ff0; padding:25px; max-width:340px; text-align:center; color:#ff0; font-size:19px; border-radius:4px;"></div>
+    <div id="alertContent" style="background:#1a1a1a; border:6px solid #ff0; padding:25px; max-width:340px; text-align:center; color:#ff0; font-size:19px; border-radius:4px;"></div>
   </div>
 
   <audio id="kurlaSound" src="https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/sounds/Kurła.m4a" preload="auto"></audio>
@@ -271,18 +269,28 @@
       { name: "Passat B5 1.9 TDI", cost: 45000, type: "mult", value: 4, img: "https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/images/passat.png" }
     ];
 
+    function resetPlayerData() {
+      currentPlayer.kurla_coins = 0;
+      currentPlayer.lifetime_taps = 0;
+      currentPlayer.spendable_taps = 0;
+      currentPlayer.multiplier = 1;
+      taps = 0;
+    }
+
     function loadPlayer() {
       const saved = localStorage.getItem('2137player');
-      if (saved) currentPlayer = JSON.parse(saved);
-      currentPlayer.kurla_coins = currentPlayer.kurla_coins || 0;
-      currentPlayer.lifetime_taps = currentPlayer.lifetime_taps || 0;
-      currentPlayer.spendable_taps = currentPlayer.spendable_taps || 0;
-      currentPlayer.multiplier = currentPlayer.multiplier || 1;
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        currentPlayer.name = parsed.name || "";
+        currentPlayer.pin = parsed.pin || "";
+      }
     }
 
     async function loadPlayerDataFromDB() {
       if (!currentPlayer.name || !currentPlayer.pin) return;
       
+      resetPlayerData(); // Pełny reset przy każdym załadowaniu nicku
+
       try {
         const res = await fetch(`${SUPABASE_URL}/rest/v1/scores?select=kurla_coins,lifetime_taps,spendable_taps,multiplier&name=eq.${encodeURIComponent(currentPlayer.name)}&pin=eq.${currentPlayer.pin}&order=created_at.desc&limit=1`, {
           headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
@@ -294,11 +302,6 @@
           currentPlayer.lifetime_taps = data[0].lifetime_taps || 0;
           currentPlayer.spendable_taps = data[0].spendable_taps || 0;
           currentPlayer.multiplier = data[0].multiplier || 1;
-        } else {
-          currentPlayer.kurla_coins = 0;
-          currentPlayer.lifetime_taps = 0;
-          currentPlayer.spendable_taps = 0;
-          currentPlayer.multiplier = 1;
         }
         localStorage.setItem('2137player', JSON.stringify(currentPlayer));
       } catch (e) { console.error(e); }
@@ -431,7 +434,11 @@
     async function checkNickAndContinue() {
       const name = document.getElementById('nickInput').value.trim();
       if (!name) return alert("Wpisz nick!");
+
       currentPlayer.name = name;
+      resetPlayerData();
+      localStorage.setItem('2137player', JSON.stringify(currentPlayer));
+
       hideNicknameModal();
 
       try {
@@ -450,33 +457,24 @@
       const pin = document.getElementById('pinInput').value.trim();
       if (pin.length !== 4) return alert("PIN musi mieć dokładnie 4 cyfry!");
 
+      currentPlayer.pin = pin;
+      localStorage.setItem('2137player', JSON.stringify(currentPlayer));
+      hidePinModal();
+
       if (isNewNick) {
-        currentPlayer.pin = pin;
-        localStorage.setItem('2137player', JSON.stringify(currentPlayer));
-        hidePinModal();
         showRetroAlert(`Nowy nick zapisany!<br>Nick: <b>${currentPlayer.name}</b><br>PIN: <b>${pin}</b>`);
       } else {
-        try {
-          const res = await fetch(`${SUPABASE_URL}/rest/v1/scores?select=pin&name=eq.${encodeURIComponent(currentPlayer.name)}&pin=eq.${pin}&limit=1`, {
-            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-          });
-          const data = await res.json();
-          if (data.length > 0) {
-            currentPlayer.pin = pin;
-            localStorage.setItem('2137player', JSON.stringify(currentPlayer));
-            hidePinModal();
-            showRetroAlert(`Zalogowano pomyślnie!<br>Nick: <b>${currentPlayer.name}</b>`);
-            await loadPlayerDataFromDB();
-          } else showRetroAlert("Błędny PIN!");
-        } catch (e) { showRetroAlert("Błąd walidacji"); }
+        showRetroAlert(`Zalogowano pomyślnie!<br>Nick: <b>${currentPlayer.name}</b>`);
       }
+      await loadPlayerDataFromDB();
     }
 
     function showShop() {
       const container = document.getElementById('shopItems');
       container.innerHTML = `<p style="text-align:center; color:#ff0; font-size:22px;">
         Masz: <b>${currentPlayer.kurla_coins}</b> Kurła Coins<br>
-        Kurła Punkty: <b>${currentPlayer.spendable_taps}</b>
+        Kurła Punkty: <b>${currentPlayer.spendable_taps}</b><br>
+        Multiplier: <b>×${currentPlayer.multiplier}</b>
       </p>`;
 
       shopItems.forEach((item, i) => {
