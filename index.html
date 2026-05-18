@@ -43,7 +43,7 @@
       width:100%; max-width:380px; margin:4px 0 8px; font-size:25px; padding:0 10px; height:42px;
     }
 
-    /* WSZYSTKIE PRZYCISKI TEJ SAMEJ WYSOKOŚCI */
+    /* WSZYSTKIE PRZYCISKI - MOCNE ZAOKRĄGLENIE */
     button, .token-btn { 
       background:#ff0; 
       color:#111; 
@@ -52,8 +52,8 @@
       font-size:17.5px; 
       font-weight:900; 
       margin:0; 
-      border-radius:8px; 
-      height: 58px;                    /* <-- dokładnie taka sama wysokość jak TOP 21 */
+      border-radius: 14px;           /* Mocne zaokrąglenie wszystkich rogów */
+      height: 58px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -83,20 +83,10 @@
       justify-content: center;
     }
 
-    .main-btn-left { border-top-right-radius: 6px; border-bottom-right-radius: 6px; }
-    .main-btn-right { border-top-left-radius: 6px; border-bottom-left-radius: 6px; }
-
-    /* TOP 21 - równa odległość */
-    button[onclick="showLeaderboard()"] {
-      width:100%;
-      margin-top: 4px;
-      height: 58px;
-    }
-
     #restartBtn { 
       position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); 
       background:#0f0; color:#000; font-size:21px; font-weight:900; 
-      padding:16px 32px; border:6px solid #000; border-radius:12px; 
+      padding:16px 32px; border:6px solid #000; border-radius:14px; 
       box-shadow:0 0 25px #0f0; z-index:20; display:none; 
     }
     #result { margin:6px 0 4px; font-size:23px; font-weight:900; display:none; text-align:center; width:100%; color:#ff0; }
@@ -114,7 +104,7 @@
     input { 
       width:100%; padding:16px; font-size:22px; background:#111; color:#ff0; 
       border:4px solid #ff0; font-family:'Oswald'; text-align:center; 
-      margin-bottom:15px; border-radius:4px;
+      margin-bottom:15px; border-radius:8px;
     }
 
     #shopItems { padding:15px; overflow-y:auto; max-height:55vh; flex:1; }
@@ -128,7 +118,7 @@
 
     .lb-entry { 
       display:flex; justify-content:space-between; padding:12px 15px; margin:6px 0; 
-      background:#1f1f1f; border:2px solid #ff0; border-radius:6px; font-size:19px; 
+      background:#1f1f1f; border:2px solid #ff0; border-radius:8px; font-size:19px; 
     }
     .lb-entry:nth-child(even) { background:#252525; }
   </style>
