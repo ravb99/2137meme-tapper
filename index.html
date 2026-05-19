@@ -203,16 +203,13 @@
   <div id="leaderboardModal" class="modal">
     <div class="modal-content">
       <div class="title-bar">🏆 LEADERBOARD - 2137MEME</div>
-      
       <div class="tab-buttons" style="display:flex; background:#222; padding:4px;">
         <button class="tab-btn active" onclick="switchTab(0)" style="flex:1; margin:4px;">Best Round</button>
         <button class="tab-btn" onclick="switchTab(1)" style="flex:1; margin:4px;">All Time</button>
       </div>
-
-      <div class="window-body" id="lbContainer">
+      <div class="window-body">
         <div id="lbList"></div>
       </div>
-
       <button onclick="hideLeaderboard()" style="margin:12px auto 20px; width:85%; height:58px; font-size:19px; background:#0f0; color:#000; border:5px solid #000;">
         Dawaj Janusza!
       </button>
@@ -272,7 +269,8 @@
       kurla_coins: 0, 
       lifetime_taps: 0, 
       spendable_taps: 0, 
-      multiplier: 1 
+      multiplier: 1,
+      tempMultiplier: 1
     };
 
     let currentTab = 0;
@@ -289,6 +287,7 @@
 
     const shopItems = [
       { name: "100 Kurła Coins", cost: 2137, type: "coins", value: 100, img: "" },
+      { name: "Kiełbasa Grillowa ×2", cost: 200, type: "temp_mult", value: 2, img: "https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/images/kiełbasa.png" },
       { name: "Golf 3 Szrot", cost: 5000, type: "mult", value: 2, img: "https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/images/golf.png" },
       { name: "Mercedes w124", cost: 15000, type: "mult", value: 3, img: "https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/images/mercedes.png" },
       { name: "Passat B5 1.9 TDI", cost: 45000, type: "mult", value: 4, img: "https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/images/passat.png" }
@@ -299,6 +298,7 @@
       currentPlayer.lifetime_taps = 0;
       currentPlayer.spendable_taps = 0;
       currentPlayer.multiplier = 1;
+      currentPlayer.tempMultiplier = 1;
       taps = 0;
     }
 
@@ -342,7 +342,8 @@
       if (!isRunning) startTimer();
 
       const touches = e.touches ? e.touches.length : 1;
-      const added = currentPlayer.multiplier * touches;
+      const currentMult = currentPlayer.multiplier * currentPlayer.tempMultiplier;
+      const added = currentMult * touches;
 
       taps += added;
       currentPlayer.lifetime_taps += added;
@@ -404,10 +405,16 @@
     function endRound() {
       isRunning = false;
       const finalScore = Math.floor(taps);
+      const totalMult = currentPlayer.multiplier * currentPlayer.tempMultiplier;
+      
       document.getElementById('finalScore').innerHTML = 
-        `Koniec rundy! Twój wynik: <span style="color:#f00;">${finalScore}</span> <span style="font-size:20px;">(×${currentPlayer.multiplier})</span>`;
+        `Koniec rundy! Twój wynik: <span style="color:#f00;">${finalScore}</span> <span style="font-size:20px;">(×${totalMult})</span>`;
       resultDiv.style.display = 'block';
       saveScore(finalScore);
+
+      // Reset kiełbasy po rundzie
+      currentPlayer.tempMultiplier = 1;
+
       restartBtn.style.display = 'block';
     }
 
@@ -525,19 +532,16 @@
       </p>`;
 
       shopItems.forEach((item, i) => {
-        const isOwned = item.type === 'mult' && currentPlayer.multiplier >= item.value;
         const div = document.createElement('div');
         div.className = 'shop-item';
         div.innerHTML = `
           <div class="shop-text">
             <strong>${item.name}</strong><br>
-            ${item.type === 'coins' ? `+${item.value} Kurła Coins` : `×${item.value} taps`}<br>
-            Koszt: ${item.cost} ${item.type === 'coins' ? 'Kurła Punkty' : 'KC'}
+            ${item.type === 'coins' ? `+${item.value} Kurła Coins` : `×${item.value} na 1 rundę`}<br>
+            Koszt: ${item.cost} KC
           </div>
           ${item.img ? `<img src="${item.img}" alt="${item.name}">` : ''}
-          <button onclick="buyItem(${i})" style="min-width:90px; ${isOwned ? 'background:#555; color:#666;' : ''}" ${isOwned ? 'disabled' : ''}>
-            ${isOwned ? 'POSIADASZ' : 'KUP'}
-          </button>
+          <button onclick="buyItem(${i})" style="min-width:90px;">KUP</button>
         `;
         container.appendChild(div);
       });
@@ -546,23 +550,22 @@
 
     function buyItem(i) {
       const item = shopItems[i];
-      if (item.type === 'coins') {
-        if (currentPlayer.spendable_taps >= item.cost) {
-          currentPlayer.spendable_taps -= item.cost;
-          currentPlayer.kurla_coins += item.value;
-          saveScore(0);
-          showRetroAlert(`✅ Dodano <b>+${item.value}</b> Kurła Coins!`);
-        } else {
-          showRetroAlert(`Za mało Kurła Punktów!<br>Masz: <b>${currentPlayer.spendable_taps}</b>`);
-        }
-      } else {
-        if (currentPlayer.kurla_coins >= item.cost) {
-          currentPlayer.kurla_coins -= item.cost;
-          currentPlayer.multiplier = Math.max(currentPlayer.multiplier, item.value);
-          saveScore(0);
-          showRetroAlert(`Kupiłeś <b>${item.name}</b>!<br>Nowy multiplier: ×${currentPlayer.multiplier}`);
-        } else showRetroAlert("Za mało Kurła Coins!");
+      if (currentPlayer.kurla_coins < item.cost) {
+        showRetroAlert("Za mało Kurła Coins!");
+        return;
       }
+
+      currentPlayer.kurla_coins -= item.cost;
+
+      if (item.type === "temp_mult") {
+        currentPlayer.tempMultiplier = item.value;
+        showRetroAlert(`🍖 Kiełbasa Grillowa aktywowana!<br>×2 taps na najbliższą rundę!`);
+      } else {
+        currentPlayer.multiplier = Math.max(currentPlayer.multiplier, item.value);
+        showRetroAlert(`Kupiłeś <b>${item.name}</b>!<br>Nowy multiplier: ×${currentPlayer.multiplier}`);
+      }
+
+      saveScore(0);
       updateDisplays();
       showShop();
     }
