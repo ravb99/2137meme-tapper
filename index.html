@@ -167,7 +167,11 @@
       margin-bottom:15px; border-radius:8px;
     }
 
-    #shopItems { padding:15px; overflow-y:auto; max-height:55vh; flex:1; }
+    #shopItems { 
+      padding:15px; 
+      overflow-y:auto; 
+      flex:1; 
+    }
 
     .shop-item { 
       background:#1f1f1f; border:3px solid #ff0; padding:12px; margin:12px 0; 
@@ -260,7 +264,11 @@
     <div class="modal-content">
       <div class="title-bar">🛒 SKLEP KURŁA COINS</div>
       <div id="shopItems"></div>
-      <button onclick="hideShop()" style="margin:12px auto; width:80%;">Wyjdź</button>
+      
+      <!-- Przycisk Wyjdź zawsze na dole -->
+      <button onclick="hideShop()" style="margin:15px auto 20px; width:85%; height:58px; font-size:19px; background:#ff0; color:#000; border:5px solid #000;">
+        Wyjdź
+      </button>
     </div>
   </div>
 
@@ -554,13 +562,9 @@
         div.className = 'shop-item';
         
         let description = '';
-        if (item.type === 'coins') {
-          description = `+${item.value} Kurła Coins`;
-        } else if (item.type === 'temp_mult') {
-          description = `×${item.value} na 1 rundę`;
-        } else {
-          description = `Stały ×${item.value}`;
-        }
+        if (item.type === 'coins') description = `+${item.value} Kurła Coins`;
+        else if (item.type === 'temp_mult') description = `×${item.value} na 1 rundę`;
+        else description = `Stały ×${item.value}`;
 
         div.innerHTML = `
           <div class="shop-text">
