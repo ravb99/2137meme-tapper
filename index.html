@@ -45,7 +45,7 @@
       box-shadow:0 0 30px #ff0; 
       image-rendering: crisp-edges;
       will-change: transform, filter;
-      transition: transform 0.035s linear, filter 0.035s linear;
+      transition: transform 0.06s ease-out, filter 0.06s ease-out;
       transform: translateZ(0);
     }
 
@@ -374,13 +374,13 @@
 
       updateDisplays();
 
-      // ULTRA HIPER SMOOTH
+      // DELIKATNA I PŁYNA ANIMACJA - SCALE 1.10
       nosaczImg.style.transition = 'none';
-      nosaczImg.style.transform = 'scale(1.17) translateZ(0)';
-      nosaczImg.style.filter = 'hue-rotate(48deg) saturate(3.6) brightness(1.8)';
+      nosaczImg.style.transform = 'scale(1.10) translateZ(0)';
+      nosaczImg.style.filter = 'hue-rotate(35deg) saturate(2.8) brightness(1.55)';
 
       requestAnimationFrame(() => {
-        nosaczImg.style.transition = 'transform 0.035s linear, filter 0.035s linear';
+        nosaczImg.style.transition = 'transform 0.06s ease-out, filter 0.06s ease-out';
         nosaczImg.style.transform = 'scale(1) translateZ(0)';
         nosaczImg.style.filter = '';
       });
@@ -586,7 +586,6 @@
       const item = shopItems[i];
 
       if (item.type === "coins") {
-        // Specjalna logika dla Kurła Coins
         if (currentPlayer.spendable_taps < item.cost) {
           showRetroAlert("Za mało Kurła Punktów!");
           return;
