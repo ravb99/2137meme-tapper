@@ -21,21 +21,27 @@
     .subtitle { font-size:27px; font-weight:900; color:#fff; margin:-6px 0 4px 0; letter-spacing:6px; width:100%; text-align:center; }
     #timer { font-size:58px; font-weight:900; color:#f00; margin:2px 0 6px; }
 
-    #nosaczContainer { position:relative; width:290px; height:290px; margin:2px auto 4px; }
+    #nosaczContainer { 
+      position:relative; width:290px; height:290px; margin:2px auto 4px; 
+      touch-action: none; 
+    }
     #nosacz { 
       width:100%; height:100%; border-radius:50%; border:8px solid #ff0; 
-      box-shadow:0 0 30px #ff0; transition: transform 0.045s ease-out, filter 0.06s ease-out;
+      box-shadow:0 0 30px #ff0; 
+      transition: transform 0.035s ease-out, filter 0.04s ease-out;
       will-change: transform, filter;
+      image-rendering: crisp-edges;
     }
 
     .kurwa { 
       position:absolute; color:#ff0; font-weight:900; font-size:26px; 
       text-shadow: 0 0 15px #ff0; pointer-events:none; 
-      animation: kurwaPop 850ms forwards; will-change: transform, opacity;
+      animation: kurwaPop 780ms forwards; 
+      will-change: transform, opacity;
     }
     @keyframes kurwaPop {
-      0%   { transform: translateY(0) scale(0.6); opacity:1; }
-      100% { transform: translateY(-135px) scale(1.12); opacity:0; }
+      0%   { transform: translateY(0) scale(0.65); opacity:1; }
+      100% { transform: translateY(-145px) scale(1.18); opacity:0; }
     }
 
     #stats { 
@@ -253,7 +259,7 @@
     let currentTab = 0;
     let isNewNick = false;
     let timeLeft = 21.37;
-    let taps = 0;                    // pomnożony wynik (widoczny licznik)
+    let taps = 0;
     let isRunning = false;
     let lastFrame = 0;
 
@@ -309,7 +315,7 @@
     }
 
     function updateDisplays() {
-      document.getElementById('count').textContent = taps;
+      document.getElementById('count').textContent = Math.floor(taps);
       document.getElementById('coins').textContent = currentPlayer.kurla_coins;
     }
 
@@ -317,21 +323,23 @@
       if (restartBtn.style.display === 'block') return;
       if (!isRunning) startTimer();
 
-      // Dodajemy pomnożoną wartość
-      const added = currentPlayer.multiplier;
+      const touches = e.touches ? e.touches.length : 1;
+      const added = currentPlayer.multiplier * touches;
+
       taps += added;
       currentPlayer.lifetime_taps += added;
       currentPlayer.spendable_taps += added;
 
       updateDisplays();
 
-      nosaczImg.style.transform = 'scale(1.13)';
-      nosaczImg.style.filter = `hue-rotate(45deg) saturate(5) brightness(1.95)`;
+      // Lżejszy i szybszy feedback
+      nosaczImg.style.transform = 'scale(1.12)';
+      nosaczImg.style.filter = 'hue-rotate(50deg) saturate(4) brightness(1.8)';
 
       setTimeout(() => {
         nosaczImg.style.transform = 'scale(1)';
         nosaczImg.style.filter = '';
-      }, 48);
+      }, 35);
 
       sound.currentTime = 0;
       sound.play().catch(() => {});
@@ -345,11 +353,11 @@
       k.textContent = 'Kurła!';
 
       const container = document.getElementById('nosaczContainer');
-      k.style.left = (Math.random() * 200 + 45) + 'px';
-      k.style.top = (Math.random() * 140 + 75) + 'px';
+      k.style.left = (Math.random() * 190 + 50) + 'px';
+      k.style.top = (Math.random() * 130 + 80) + 'px';
 
       container.appendChild(k);
-      setTimeout(() => k.remove(), 880);
+      setTimeout(() => k.remove(), 780);
     }
 
     function startTimer() {
@@ -357,7 +365,7 @@
       isRunning = true;
       timeLeft = 21.37;
       taps = 0;
-      document.getElementById('count').textContent = taps;
+      document.getElementById('count').textContent = 0;
       lastFrame = performance.now();
 
       function loop(now) {
@@ -365,6 +373,7 @@
         const delta = (now - lastFrame) / 1000;
         lastFrame = now;
         timeLeft -= delta;
+
         if (timeLeft <= 0) {
           document.getElementById('timer').textContent = "0.00";
           endRound();
@@ -384,7 +393,7 @@
         `Koniec rundy! Twój wynik: <span style="color:#f00;">${finalScore}</span> <span style="font-size:20px;">(×${currentPlayer.multiplier})</span>`;
       
       resultDiv.style.display = 'block';
-      saveScore(finalScore);        // zapisujemy pomnożony wynik
+      saveScore(finalScore);
       restartBtn.style.display = 'block';
     }
 
@@ -597,7 +606,7 @@
       document.getElementById('leaderboardModal').style.display = 'none';
     }
 
-    // INICJALIZACJA
+    // INICJALIZACJA - zoptymalizowana
     const container = document.getElementById('nosaczContainer');
     container.addEventListener('touchstart', tap, { passive: true });
     container.addEventListener('mousedown', tap);
