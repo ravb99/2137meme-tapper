@@ -43,20 +43,20 @@
     #nosacz { 
       width:100%; height:100%; border-radius:50%; border:8px solid #ff0; 
       box-shadow:0 0 30px #ff0; 
-      transition: transform 0.09s ease-out, filter 0.14s ease-out;
-      will-change: transform, filter;
       image-rendering: crisp-edges;
+      will-change: transform, filter;
+      transition: transform 0.045s linear, filter 0.045s linear;
     }
 
     .kurwa { 
       position:absolute; color:#ff0; font-weight:900; font-size:26px; 
       text-shadow: 0 0 15px #ff0; pointer-events:none; 
-      animation: kurwaPop 760ms forwards; 
+      animation: kurwaPop 620ms forwards; 
       will-change: transform, opacity;
     }
     @keyframes kurwaPop {
-      0%   { transform: translateY(0) scale(0.6); opacity:1; }
-      100% { transform: translateY(-145px) scale(1.14); opacity:0; }
+      0%   { transform: translateY(0) scale(0.7); opacity:1; }
+      100% { transform: translateY(-160px) scale(1.2); opacity:0; }
     }
 
     #stats { 
@@ -288,7 +288,6 @@
       lifetime_taps: 0, 
       spendable_taps: 0, 
       multiplier: 1,
-      tempMultiplier: 1,
       kielbasaCount: 0
     };
 
@@ -318,7 +317,6 @@
       currentPlayer.lifetime_taps = 0;
       currentPlayer.spendable_taps = 0;
       currentPlayer.multiplier = 1;
-      currentPlayer.tempMultiplier = 1;
       currentPlayer.kielbasaCount = 0;
       taps = 0;
     }
@@ -373,8 +371,9 @@
       if (!isRunning) startTimer();
 
       const touches = e.touches ? e.touches.length : 1;
-      const currentMult = currentPlayer.multiplier * currentPlayer.tempMultiplier;
-      const added = currentMult * touches;
+      const tempMult = currentPlayer.kielbasaCount > 0 ? 2 : 1;
+      const totalMult = currentPlayer.multiplier * tempMult;
+      const added = totalMult * touches;
 
       taps += added;
       currentPlayer.lifetime_taps += added;
@@ -382,13 +381,14 @@
 
       updateDisplays();
 
-      nosaczImg.style.transform = 'scale(1.10)';
-      nosaczImg.style.filter = 'hue-rotate(30deg) saturate(2.8) brightness(1.55)';
+      // Ultra smooth visual feedback
+      nosaczImg.style.transform = 'scale(1.135)';
+      nosaczImg.style.filter = 'hue-rotate(40deg) saturate(3.2) brightness(1.65)';
 
-      setTimeout(() => {
+      requestAnimationFrame(() => {
         nosaczImg.style.transform = 'scale(1)';
         nosaczImg.style.filter = '';
-      }, 70);
+      });
 
       sound.currentTime = 0;
       sound.play().catch(() => {});
@@ -406,7 +406,7 @@
       k.style.top = (Math.random() * 130 + 80) + 'px';
 
       container.appendChild(k);
-      setTimeout(() => k.remove(), 760);
+      setTimeout(() => k.remove(), 620);
     }
 
     function startTimer() {
@@ -436,19 +436,16 @@
     function endRound() {
       isRunning = false;
       const finalScore = Math.floor(taps);
-      const totalMult = currentPlayer.multiplier * currentPlayer.tempMultiplier;
+      const tempMult = currentPlayer.kielbasaCount > 0 ? 2 : 1;
+      const totalMult = currentPlayer.multiplier * tempMult;
       
       document.getElementById('finalScore').innerHTML = 
         `Koniec rundy! Twój wynik: <span style="color:#f00;">${finalScore}</span> <span style="font-size:20px;">(×${totalMult})</span>`;
       resultDiv.style.display = 'block';
       saveScore(finalScore);
 
-      // Zużywamy jedną kiełbasę
       if (currentPlayer.kielbasaCount > 0) {
         currentPlayer.kielbasaCount--;
-        currentPlayer.tempMultiplier = (currentPlayer.kielbasaCount > 0) ? 2 : 1;
-      } else {
-        currentPlayer.tempMultiplier = 1;
       }
 
       updateBoostDisplay();
@@ -602,9 +599,6 @@
 
       if (item.type === "temp_mult") {
         currentPlayer.kielbasaCount += 1;
-        if (currentPlayer.tempMultiplier === 1) {
-          currentPlayer.tempMultiplier = 2;
-        }
         showRetroAlert(`🍖 Kupiono Kiełbasę!<br>Pozostało: ${currentPlayer.kielbasaCount}`);
         updateBoostDisplay();
       } else {
@@ -672,10 +666,9 @@
       document.getElementById('leaderboardModal').style.display = 'none';
     }
 
-    // INICJALIZACJA
+    // INICJALIZACJA - ULTRA SMOOTH
     const container = document.getElementById('nosaczContainer');
-    container.addEventListener('touchstart', tap, { passive: true });
-    container.addEventListener('mousedown', tap);
+    container.addEventListener('pointerdown', tap, { passive: false });
 
     loadPlayer();
     updateDisplays();
