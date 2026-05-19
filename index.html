@@ -21,17 +21,17 @@
     .subtitle { font-size:27px; font-weight:900; color:#fff; margin:-6px 0 4px 0; letter-spacing:6px; width:100%; text-align:center; }
 
     #boostInfo {
-      font-size: 23px;
+      font-size: 19px;
       font-weight: 900;
       color: #ff0;
-      background: rgba(255, 80, 0, 0.3);
-      padding: 6px 20px;
-      border-radius: 12px;
+      background: rgba(255, 80, 0, 0.35);
+      padding: 4px 16px;
+      border-radius: 10px;
       margin: 4px 0 6px 0;
-      border: 3px solid #ff0;
+      border: 2px solid #ff0;
       display: none;
       text-align: center;
-      letter-spacing: 2px;
+      letter-spacing: 1.5px;
     }
 
     #timer { font-size:58px; font-weight:900; color:#f00; margin:2px 0 6px; }
@@ -42,8 +42,7 @@
     }
     #nosacz { 
       width:100%; height:100%; border-radius:50%; border:8px solid #ff0; 
-      box-shadow:0 0 30px #ff0; 
-      image-rendering: crisp-edges;
+      box-shadow:0 0 30px #ff0; image-rendering: crisp-edges;
       will-change: transform, filter;
       transition: transform 0.045s linear, filter 0.045s linear;
     }
@@ -88,21 +87,9 @@
       background: #ffeb3b;
       color: #111;
       box-shadow: 0 5px 0 #000;
-      text-decoration: none;
-      z-index: 15;
-      position: relative;
       animation: tokenPulse 2.6s infinite ease-in-out;
     }
-
-    .token-btn:active {
-      transform: translateY(3px);
-      box-shadow: 0 2px 0 #000;
-    }
-
-    @keyframes tokenPulse {
-      0%, 100% { background: #ffeb3b; transform: scale(1); }
-      50% { background: #ffed4e; transform: scale(1.05); }
-    }
+    @keyframes tokenPulse { 0%,100% {background:#ffeb3b; transform:scale(1);} 50% {background:#ffed4e; transform:scale(1.05);} }
 
     .bottom-panel {
       display: flex;
@@ -179,15 +166,19 @@
     }
     .shop-item img { width:110px; height:110px; object-fit:contain; flex-shrink:0; }
     .shop-text { flex:1; }
+
+    .buy-btn:disabled {
+      background: #555 !important;
+      color: #888 !important;
+      cursor: not-allowed;
+    }
   </style>
 </head>
 <body>
   <div id="game">
     <h1>2137MEME</h1>
     <div class="subtitle">WORTHLESS</div>
-    
     <div id="boostInfo">🍖 KIEŁBASA NA GRILLU</div>
-
     <div id="timer">21.37</div>
     
     <div id="nosaczContainer">
@@ -205,9 +196,9 @@
     </div>
 
     <div class="bottom-panel">
-      <button class="main-btn main-btn-left" onclick="showNicknameModal()">NICK</button>
+      <button class="main-btn" onclick="showNicknameModal()">NICK</button>
       <a href="https://pump.fun/coin/Df7fM9c3pPjWuurHYGe9a75LCDyh3x1vf3cmNaU1pump" target="_blank" class="token-btn">$2137</a>
-      <button class="main-btn main-btn-right" onclick="showShop()">KURŁA SKLEP</button>
+      <button class="main-btn" onclick="showShop()">KURŁA SKLEP</button>
     </div>
 
     <button onclick="showLeaderboard()" style="width:100%; margin-top:4px;">TOP 21 LEADERBOARD</button>
@@ -371,11 +362,9 @@
       if (!isRunning) startTimer();
 
       const touches = e.touches ? e.touches.length : 1;
-
-      // === POPRAWIONA MECHANIKA ===
       const tempMult = currentPlayer.kielbasaCount > 0 ? 2 : 1;
       const totalMult = currentPlayer.multiplier * tempMult;
-      const added = touches * totalMult;   // 1 palec = 1 punkt bazowy
+      const added = touches * totalMult;
 
       taps += added;
       currentPlayer.lifetime_taps += added;
@@ -383,7 +372,6 @@
 
       updateDisplays();
 
-      // Ultra smooth visual feedback
       nosaczImg.style.transform = 'scale(1.14)';
       nosaczImg.style.filter = 'hue-rotate(40deg) saturate(3.2) brightness(1.7)';
 
@@ -394,7 +382,6 @@
 
       sound.currentTime = 0;
       sound.play().catch(() => {});
-
       createKurwa();
     }
 
@@ -402,12 +389,9 @@
       const k = document.createElement('div');
       k.className = 'kurwa';
       k.textContent = 'Kurła!';
-
-      const container = document.getElementById('nosaczContainer');
       k.style.left = (Math.random() * 190 + 50) + 'px';
       k.style.top = (Math.random() * 130 + 80) + 'px';
-
-      container.appendChild(k);
+      document.getElementById('nosaczContainer').appendChild(k);
       setTimeout(() => k.remove(), 620);
     }
 
@@ -576,6 +560,9 @@
         else if (item.type === 'temp_mult') description = `×${item.value} na 1 rundę`;
         else description = `Stały ×${item.value}`;
 
+        const isCar = item.type === "mult";
+        const isOwned = isCar && currentPlayer.multiplier >= item.value;
+
         div.innerHTML = `
           <div class="shop-text">
             <strong>${item.name}</strong><br>
@@ -583,7 +570,7 @@
             Koszt: ${item.cost} KC
           </div>
           ${item.img ? `<img src="${item.img}" alt="${item.name}">` : ''}
-          <button onclick="buyItem(${i})" style="min-width:90px;">KUP</button>
+          <button onclick="buyItem(${i})" style="min-width:90px;" ${isOwned ? 'disabled' : ''}>${isOwned ? 'KUPIONE' : 'KUP'}</button>
         `;
         container.appendChild(div);
       });
@@ -610,7 +597,7 @@
 
       saveScore(0);
       updateDisplays();
-      showShop();
+      showShop();   // odświeżamy sklep, żeby wygasnąć przycisk
     }
 
     function hideShop() {
@@ -668,7 +655,7 @@
       document.getElementById('leaderboardModal').style.display = 'none';
     }
 
-    // INICJALIZACJA - ULTRA SMOOTH
+    // INICJALIZACJA
     const container = document.getElementById('nosaczContainer');
     container.addEventListener('pointerdown', tap, { passive: false });
 
