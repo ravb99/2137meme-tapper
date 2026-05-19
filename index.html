@@ -19,6 +19,21 @@
     }
     h1 { font-size:52px; font-weight:900; margin:4px 0 0 0; letter-spacing:4px; line-height:0.9; }
     .subtitle { font-size:27px; font-weight:900; color:#fff; margin:-6px 0 4px 0; letter-spacing:6px; width:100%; text-align:center; }
+
+    #boostInfo {
+      font-size: 23px;
+      font-weight: 900;
+      color: #ff0;
+      background: rgba(255, 80, 0, 0.25);
+      padding: 6px 20px;
+      border-radius: 12px;
+      margin: 4px 0 6px 0;
+      border: 3px solid #ff0;
+      display: none;
+      text-align: center;
+      letter-spacing: 3px;
+    }
+
     #timer { font-size:58px; font-weight:900; color:#f00; margin:2px 0 6px; }
 
     #nosaczContainer { 
@@ -166,6 +181,10 @@
   <div id="game">
     <h1>2137MEME</h1>
     <div class="subtitle">WORTHLESS</div>
+    
+    <!-- WSKAŹNIK KIEŁBASY -->
+    <div id="boostInfo">🍖 KIEŁBASA NA GRILLU</div>
+
     <div id="timer">21.37</div>
     
     <div id="nosaczContainer">
@@ -283,6 +302,7 @@
     const nosaczImg = document.getElementById('nosacz');
     const restartBtn = document.getElementById('restartBtn');
     const resultDiv = document.getElementById('result');
+    const boostInfo = document.getElementById('boostInfo');
     const sound = document.getElementById('kurlaSound');
 
     const shopItems = [
@@ -300,6 +320,10 @@
       currentPlayer.multiplier = 1;
       currentPlayer.tempMultiplier = 1;
       taps = 0;
+    }
+
+    function updateBoostDisplay() {
+      boostInfo.style.display = (currentPlayer.tempMultiplier > 1) ? 'block' : 'none';
     }
 
     function loadPlayer() {
@@ -330,6 +354,7 @@
         localStorage.setItem('2137player', JSON.stringify(currentPlayer));
       } catch (e) { console.error(e); }
       updateDisplays();
+      updateBoostDisplay();
     }
 
     function updateDisplays() {
@@ -412,8 +437,9 @@
       resultDiv.style.display = 'block';
       saveScore(finalScore);
 
-      // Reset kiełbasy po rundzie
+      // Reset kiełbasy
       currentPlayer.tempMultiplier = 1;
+      updateBoostDisplay();
 
       restartBtn.style.display = 'block';
     }
@@ -560,6 +586,7 @@
       if (item.type === "temp_mult") {
         currentPlayer.tempMultiplier = item.value;
         showRetroAlert(`🍖 Kiełbasa Grillowa aktywowana!<br>×2 taps na najbliższą rundę!`);
+        updateBoostDisplay();
       } else {
         currentPlayer.multiplier = Math.max(currentPlayer.multiplier, item.value);
         showRetroAlert(`Kupiłeś <b>${item.name}</b>!<br>Nowy multiplier: ×${currentPlayer.multiplier}`);
@@ -632,6 +659,7 @@
 
     loadPlayer();
     updateDisplays();
+    updateBoostDisplay();
 
     if (currentPlayer.name && currentPlayer.pin) {
       loadPlayerDataFromDB();
