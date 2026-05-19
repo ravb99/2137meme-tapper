@@ -381,9 +381,8 @@
 
       updateDisplays();
 
-      // Ultra smooth visual feedback
-      nosaczImg.style.transform = 'scale(1.135)';
-      nosaczImg.style.filter = 'hue-rotate(40deg) saturate(3.2) brightness(1.65)';
+      nosaczImg.style.transform = 'scale(1.14)';
+      nosaczImg.style.filter = 'hue-rotate(40deg) saturate(3.2) brightness(1.7)';
 
       requestAnimationFrame(() => {
         nosaczImg.style.transform = 'scale(1)';
@@ -603,7 +602,7 @@
         updateBoostDisplay();
       } else {
         currentPlayer.multiplier = Math.max(currentPlayer.multiplier, item.value);
-        showRetroAlert(`Kupiłeś <b>${item.name}</b>!<br>Nowy multiplier: ×${currentPlayer.multiplier}`);
+        showRetroAlert(`Kupiłeś <b>${item.name}</b>!<br>Aktualny mnożnik: ×${currentPlayer.multiplier}`);
       }
 
       saveScore(0);
