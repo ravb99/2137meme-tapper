@@ -42,9 +42,11 @@
     }
     #nosacz { 
       width:100%; height:100%; border-radius:50%; border:8px solid #ff0; 
-      box-shadow:0 0 30px #ff0; image-rendering: crisp-edges;
+      box-shadow:0 0 30px #ff0; 
+      image-rendering: crisp-edges;
       will-change: transform, filter;
-      transition: transform 0.045s linear, filter 0.045s linear;
+      transition: transform 0.035s linear, filter 0.035s linear;
+      transform: translateZ(0);
     }
 
     .kurwa { 
@@ -372,11 +374,14 @@
 
       updateDisplays();
 
-      nosaczImg.style.transform = 'scale(1.14)';
-      nosaczImg.style.filter = 'hue-rotate(40deg) saturate(3.2) brightness(1.7)';
+      // ULTRA HIPER SMOOTH
+      nosaczImg.style.transition = 'none';
+      nosaczImg.style.transform = 'scale(1.17) translateZ(0)';
+      nosaczImg.style.filter = 'hue-rotate(48deg) saturate(3.6) brightness(1.8)';
 
       requestAnimationFrame(() => {
-        nosaczImg.style.transform = 'scale(1)';
+        nosaczImg.style.transition = 'transform 0.035s linear, filter 0.035s linear';
+        nosaczImg.style.transform = 'scale(1) translateZ(0)';
         nosaczImg.style.filter = '';
       });
 
@@ -556,7 +561,7 @@
         div.className = 'shop-item';
         
         let description = '';
-        if (item.type === 'coins') description = `+${item.value} Kurła Coins`;
+        if (item.type === 'coins') description = `+${item.value} Kurła Coins (za punkty)`;
         else if (item.type === 'temp_mult') description = `×${item.value} na 1 rundę`;
         else description = `Stały ×${item.value}`;
 
@@ -567,7 +572,7 @@
           <div class="shop-text">
             <strong>${item.name}</strong><br>
             ${description}<br>
-            Koszt: ${item.cost} KC
+            Koszt: ${item.cost} ${item.type === 'coins' ? 'Kurła Punktów' : 'KC'}
           </div>
           ${item.img ? `<img src="${item.img}" alt="${item.name}">` : ''}
           <button onclick="buyItem(${i})" style="min-width:90px;" ${isOwned ? 'disabled' : ''}>${isOwned ? 'KUPIONE' : 'KUP'}</button>
@@ -579,25 +584,36 @@
 
     function buyItem(i) {
       const item = shopItems[i];
-      if (currentPlayer.kurla_coins < item.cost) {
-        showRetroAlert("Za mało Kurła Coins!");
-        return;
-      }
 
-      currentPlayer.kurla_coins -= item.cost;
-
-      if (item.type === "temp_mult") {
-        currentPlayer.kielbasaCount += 1;
-        showRetroAlert(`🍖 Kupiono Kiełbasę!<br>Pozostało: ${currentPlayer.kielbasaCount}`);
-        updateBoostDisplay();
+      if (item.type === "coins") {
+        // Specjalna logika dla Kurła Coins
+        if (currentPlayer.spendable_taps < item.cost) {
+          showRetroAlert("Za mało Kurła Punktów!");
+          return;
+        }
+        currentPlayer.spendable_taps -= item.cost;
+        currentPlayer.kurla_coins += item.value;
+        showRetroAlert(`+${item.value} Kurła Coins!<br>Pozostało punktów: ${currentPlayer.spendable_taps}`);
       } else {
-        currentPlayer.multiplier = Math.max(currentPlayer.multiplier, item.value);
-        showRetroAlert(`Kupiłeś <b>${item.name}</b>!<br>Aktualny mnożnik: ×${currentPlayer.multiplier}`);
+        if (currentPlayer.kurla_coins < item.cost) {
+          showRetroAlert("Za mało Kurła Coins!");
+          return;
+        }
+        currentPlayer.kurla_coins -= item.cost;
+
+        if (item.type === "temp_mult") {
+          currentPlayer.kielbasaCount += 1;
+          showRetroAlert(`🍖 Kupiono Kiełbasę!<br>Pozostało: ${currentPlayer.kielbasaCount}`);
+          updateBoostDisplay();
+        } else {
+          currentPlayer.multiplier = Math.max(currentPlayer.multiplier, item.value);
+          showRetroAlert(`Kupiłeś <b>${item.name}</b>!<br>Aktualny mnożnik: ×${currentPlayer.multiplier}`);
+        }
       }
 
       saveScore(0);
       updateDisplays();
-      showShop();   // odświeżamy sklep, żeby wygasnąć przycisk
+      showShop();
     }
 
     function hideShop() {
