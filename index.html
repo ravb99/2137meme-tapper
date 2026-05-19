@@ -182,7 +182,6 @@
     <h1>2137MEME</h1>
     <div class="subtitle">WORTHLESS</div>
     
-    <!-- WSKAŹNIK KIEŁBASY -->
     <div id="boostInfo">🍖 KIEŁBASA NA GRILLU</div>
 
     <div id="timer">21.37</div>
@@ -203,13 +202,7 @@
 
     <div class="bottom-panel">
       <button class="main-btn main-btn-left" onclick="showNicknameModal()">NICK</button>
-      
-      <a href="https://pump.fun/coin/Df7fM9c3pPjWuurHYGe9a75LCDyh3x1vf3cmNaU1pump" 
-         target="_blank" 
-         class="token-btn">
-        $2137
-      </a>
-      
+      <a href="https://pump.fun/coin/Df7fM9c3pPjWuurHYGe9a75LCDyh3x1vf3cmNaU1pump" target="_blank" class="token-btn">$2137</a>
       <button class="main-btn main-btn-right" onclick="showShop()">KURŁA SKLEP</button>
     </div>
 
@@ -437,7 +430,6 @@
       resultDiv.style.display = 'block';
       saveScore(finalScore);
 
-      // Reset kiełbasy
       currentPlayer.tempMultiplier = 1;
       updateBoostDisplay();
 
@@ -560,10 +552,20 @@
       shopItems.forEach((item, i) => {
         const div = document.createElement('div');
         div.className = 'shop-item';
+        
+        let description = '';
+        if (item.type === 'coins') {
+          description = `+${item.value} Kurła Coins`;
+        } else if (item.type === 'temp_mult') {
+          description = `×${item.value} na 1 rundę`;
+        } else {
+          description = `Stały ×${item.value}`;
+        }
+
         div.innerHTML = `
           <div class="shop-text">
             <strong>${item.name}</strong><br>
-            ${item.type === 'coins' ? `+${item.value} Kurła Coins` : `×${item.value} na 1 rundę`}<br>
+            ${description}<br>
             Koszt: ${item.cost} KC
           </div>
           ${item.img ? `<img src="${item.img}" alt="${item.name}">` : ''}
