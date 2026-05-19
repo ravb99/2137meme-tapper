@@ -371,9 +371,11 @@
       if (!isRunning) startTimer();
 
       const touches = e.touches ? e.touches.length : 1;
+
+      // === POPRAWIONA MECHANIKA ===
       const tempMult = currentPlayer.kielbasaCount > 0 ? 2 : 1;
       const totalMult = currentPlayer.multiplier * tempMult;
-      const added = totalMult * touches;
+      const added = touches * totalMult;   // 1 palec = 1 punkt bazowy
 
       taps += added;
       currentPlayer.lifetime_taps += added;
@@ -381,6 +383,7 @@
 
       updateDisplays();
 
+      // Ultra smooth visual feedback
       nosaczImg.style.transform = 'scale(1.14)';
       nosaczImg.style.filter = 'hue-rotate(40deg) saturate(3.2) brightness(1.7)';
 
