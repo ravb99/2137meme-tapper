@@ -66,16 +66,30 @@
     .main-btn { flex:1; }
 
     .token-btn {
-      min-width: 110px;
-      flex-shrink: 0;
-      font-size: 17px;
-      box-shadow: 0 4px 0 #000;
+      min-width: 130px;
+      height: 68px;
+      font-size: 19px;
+      font-weight: 900;
+      background: linear-gradient(145deg, #ffeb3b, #fbc02d);
+      color: #111;
+      border: 5px solid #000;
+      box-shadow: 0 6px 0 #000, 
+                  0 0 15px #ffeb3b,
+                  0 0 25px #ffeb3b;
       text-decoration: none;
-      z-index: 10;
+      z-index: 15;
+      position: relative;
+      animation: tokenPulse 2s infinite ease-in-out;
     }
+
     .token-btn:active {
-      transform: translateY(3px);
-      box-shadow: 0 1px 0 #000;
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 #000;
+    }
+
+    @keyframes tokenPulse {
+      0%, 100% { box-shadow: 0 6px 0 #000, 0 0 15px #ffeb3b; }
+      50%      { box-shadow: 0 6px 0 #000, 0 0 25px #ffeb3b, 0 0 35px #ffeb3b; }
     }
 
     .bottom-panel {
@@ -169,16 +183,16 @@
     </div>
 
     <div class="bottom-panel">
-      <button class="main-btn main-btn-left" onclick="showNicknameModal()">NICK</button>
-      
-      <a href="https://pump.fun/coin/Df7fM9c3pPjWuurHYGe9a75LCDyh3x1vf3cmNaU1pump" 
-         target="_blank" 
-         class="token-btn">
-        $2137
-      </a>
-      
-      <button class="main-btn main-btn-right" onclick="showShop()">KURŁA SKLEP</button>
-    </div>
+    <button class="main-btn main-btn-left" onclick="showNicknameModal()">NICK</button>
+    
+    <a href="https://pump.fun/coin/Df7fM9c3pPjWuurHYGe9a75LCDyh3x1vf3cmNaU1pump" 
+       target="_blank" 
+       class="token-btn">
+      $2137
+    </a>
+    
+    <button class="main-btn main-btn-right" onclick="showShop()">KURŁA SKLEP</button>
+  </div>
 
     <button onclick="showLeaderboard()" style="width:100%; margin-top:4px;">TOP 21 LEADERBOARD</button>
 
