@@ -50,9 +50,9 @@
     }
 
     button, .token-btn { 
-      background:#ff0; 
+      background:#ffeb3b; 
       color:#111; 
-      border:4px solid #000; 
+      border: none; 
       padding:13px 18px; 
       font-size:17.5px; 
       font-weight:900; 
@@ -65,38 +65,36 @@
     }
     .main-btn { flex:1; }
 
+    /* === DELIKATNIE PULSUJĄCY PRZYCISK $2137 === */
     .token-btn {
-      min-width: 130px;
+      min-width: 138px;
       height: 68px;
-      font-size: 19px;
+      font-size: 20px;
       font-weight: 900;
-      background: linear-gradient(145deg, #ffeb3b, #fbc02d);
+      background: #ffeb3b;
       color: #111;
-      border: 5px solid #000;
-      box-shadow: 
-        0 6px 0 #000, 
-        0 0 20px #ffeb3b,
-        0 0 35px #ffeb3b,
-        inset 0 0 25px rgba(255, 235, 59, 0.9);
+      box-shadow: 0 5px 0 #000;
       text-decoration: none;
       z-index: 15;
       position: relative;
-      animation: tokenGlow 2.3s infinite ease-in-out;
+      animation: tokenPulse 2.8s infinite ease-in-out;
     }
 
     .token-btn:active {
-      transform: translateY(4px);
-      box-shadow: 0 2px 0 #000, 
-                  0 0 15px #ffeb3b,
-                  inset 0 0 20px rgba(255, 235, 59, 0.8);
+      transform: translateY(3px);
+      box-shadow: 0 2px 0 #000;
     }
 
-    @keyframes tokenGlow {
-      0%, 100% { 
-        box-shadow: 0 6px 0 #000, 0 0 20px #ffeb3b, 0 0 35px #ffeb3b, inset 0 0 20px rgba(255, 235, 59, 0.85);
+    @keyframes tokenPulse {
+      0%, 100% {
+        background: #ffeb3b;
+        transform: scale(1);
+        box-shadow: 0 5px 0 #000;
       }
-      50% { 
-        box-shadow: 0 6px 0 #000, 0 0 30px #ffeb3b, 0 0 45px #ffeb3b, inset 0 0 35px rgba(255, 235, 59, 0.95);
+      50% {
+        background: #fff176;
+        transform: scale(1.05);
+        box-shadow: 0 5px 0 #000;
       }
     }
 
@@ -191,16 +189,16 @@
     </div>
 
     <div class="bottom-panel">
-    <button class="main-btn main-btn-left" onclick="showNicknameModal()">NICK</button>
-    
-    <a href="https://pump.fun/coin/Df7fM9c3pPjWuurHYGe9a75LCDyh3x1vf3cmNaU1pump" 
-       target="_blank" 
-       class="token-btn">
-      $2137
-    </a>
-    
-    <button class="main-btn main-btn-right" onclick="showShop()">KURŁA SKLEP</button>
-  </div>
+      <button class="main-btn main-btn-left" onclick="showNicknameModal()">NICK</button>
+      
+      <a href="https://pump.fun/coin/Df7fM9c3pPjWuurHYGe9a75LCDyh3x1vf3cmNaU1pump" 
+         target="_blank" 
+         class="token-btn">
+        $2137
+      </a>
+      
+      <button class="main-btn main-btn-right" onclick="showShop()">KURŁA SKLEP</button>
+    </div>
 
     <button onclick="showLeaderboard()" style="width:100%; margin-top:4px;">TOP 21 LEADERBOARD</button>
 
@@ -353,7 +351,6 @@
 
       updateDisplays();
 
-      // Delikatniejszy i płynniejszy efekt
       nosaczImg.style.transform = 'scale(1.10)';
       nosaczImg.style.filter = 'hue-rotate(30deg) saturate(2.8) brightness(1.55)';
 
