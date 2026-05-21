@@ -131,6 +131,64 @@
       color:#ff0; 
     }
 
+    /* === NOWY EKRAN Z MEMEM === */
+    #memeResultScreen {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.97);
+      z-index: 160;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    .crt-frame {
+      width: 92%;
+      max-width: 380px;
+      background: #0f0f0f;
+      border: 18px solid #222;
+      border-top: 36px solid #222;
+      border-radius: 8px;
+      box-shadow: 0 0 50px rgba(0,255,80,0.45),
+                  inset 0 0 90px rgba(0,0,0,0.95);
+      overflow: hidden;
+    }
+
+    #randomMeme {
+      width: 100%;
+      display: block;
+      image-rendering: pixelated;
+    }
+
+    .result-header {
+      background: #1a1a1a;
+      padding: 14px 0;
+      text-align: center;
+      border-bottom: 5px solid #ff0;
+      font-size: 23px;
+      font-weight: 900;
+      color: #ff0;
+    }
+
+    .meme-footer {
+      background: #1a1a1a;
+      padding: 18px;
+      text-align: center;
+    }
+
+    .meme-footer button {
+      background: #0f0;
+      color: #000;
+      font-size: 20px;
+      font-weight: 900;
+      padding: 16px 40px;
+      border: 6px solid #000;
+      border-radius: 12px;
+      width: 100%;
+      box-shadow: 0 6px 0 #000;
+    }
+
     .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.94); z-index:100; }
     .modal-content { 
       max-width:380px; margin:40px auto; background:#1a1a1a; border:6px solid #ff0; 
@@ -206,6 +264,17 @@
     <button onclick="showLeaderboard()" style="width:100%; margin-top:4px;">TOP 21 LEADERBOARD</button>
 
     <div id="result"><span id="finalScore"></span></div>
+  </div>
+
+  <!-- NOWY EKRAN Z MEMEM PO RUNDZIE -->
+  <div id="memeResultScreen">
+    <div class="crt-frame">
+      <div class="result-header" id="memeResultHeader">Koniec rundy! Twój wynik: <span id="memeFinalScore" style="color:#f00;"></span></div>
+      <img id="randomMeme" src="" alt="Meme">
+      <div class="meme-footer">
+        <button onclick="closeMemeScreen()">Na Drugą Nóżkę! 🥃</button>
+      </div>
+    </div>
   </div>
 
   <!-- LEADERBOARD MODAL -->
@@ -290,6 +359,7 @@
     let taps = 0;
     let isRunning = false;
     let lastFrame = 0;
+    let memesList = [];
 
     const nosaczImg = document.getElementById('nosacz');
     const restartBtn = document.getElementById('restartBtn');
@@ -374,7 +444,6 @@
 
       updateDisplays();
 
-      // DELIKATNA I PŁYNA ANIMACJA - SCALE 1.10
       nosaczImg.style.transition = 'none';
       nosaczImg.style.transform = 'scale(1.10) translateZ(0)';
       nosaczImg.style.filter = 'hue-rotate(35deg) saturate(2.8) brightness(1.55)';
@@ -424,23 +493,51 @@
       requestAnimationFrame(loop);
     }
 
+    async function loadMemeList() {
+      try {
+        const res = await fetch('https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/images/memes/memes.json');
+        const data = await res.json();
+        memesList = data.memes || [];
+        console.log(`Załadowano ${memesList.length} memów`);
+      } catch (e) {
+        console.error("Nie udało się załadować memes.json", e);
+      }
+    }
+
+    function getRandomMemeUrl() {
+      if (memesList.length === 0) return "https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/images/IMG_6356.jpeg";
+      const randomFile = memesList[Math.floor(Math.random() * memesList.length)];
+      return `https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/images/memes/${randomFile}`;
+    }
+
+    function showMemeResultScreen(finalScore, totalMult) {
+      document.getElementById('memeFinalScore').innerHTML = 
+        `${finalScore} <span style="font-size:18px;">(×${totalMult})</span>`;
+      
+      const memeImg = document.getElementById('randomMeme');
+      memeImg.src = getRandomMemeUrl();
+      
+      document.getElementById('memeResultScreen').style.display = 'flex';
+    }
+
+    function closeMemeScreen() {
+      document.getElementById('memeResultScreen').style.display = 'none';
+      restartGame();
+    }
+
     function endRound() {
       isRunning = false;
       const finalScore = Math.floor(taps);
       const tempMult = currentPlayer.kielbasaCount > 0 ? 2 : 1;
       const totalMult = currentPlayer.multiplier * tempMult;
-      
-      document.getElementById('finalScore').innerHTML = 
-        `Koniec rundy! Twój wynik: <span style="color:#f00;">${finalScore}</span> <span style="font-size:20px;">(×${totalMult})</span>`;
-      resultDiv.style.display = 'block';
-      saveScore(finalScore);
 
       if (currentPlayer.kielbasaCount > 0) {
         currentPlayer.kielbasaCount--;
       }
-
       updateBoostDisplay();
-      restartBtn.style.display = 'block';
+      saveScore(finalScore);
+
+      showMemeResultScreen(finalScore, totalMult);
     }
 
     function restartGame() {
@@ -677,6 +774,7 @@
     loadPlayer();
     updateDisplays();
     updateBoostDisplay();
+    loadMemeList();   // ← ładuje listę memów
 
     if (currentPlayer.name && currentPlayer.pin) {
       loadPlayerDataFromDB();
