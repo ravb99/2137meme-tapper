@@ -66,10 +66,10 @@
 
     button, .token-btn { 
       background:#ffeb3b; color:#111; border: none; padding:13px 18px; 
-      font-size:17.5px; font-weight:900; margin:0; border-radius: 14px; 
-      height: 58px; display: flex; align-items: center; justify-content: center;
+      font-size:17.5px; font-weight:900; margin:0 auto; border-radius: 14px; 
+      height: 58px; display: block; width: 85%; text-align: center;
     }
-    .main-btn { flex:1; min-width: 0; }
+    .main-btn { flex:1; min-width: 0; margin: 0 2px; }
 
     .token-btn {
       min-width: 138px; height: 58px; font-size: 19.5px; font-weight: 900;
@@ -83,14 +83,20 @@
       align-items: center; justify-content: center;
     }
 
-    .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:100; align-items:center; justify-content:center; }
+    .modal { 
+      display:none; position:fixed; inset:0; background:rgba(0,0,0,0.96); 
+      z-index:200; align-items:center; justify-content:center;
+    }
     .modal-content { 
-      max-width:380px; background:#1a1a1a; border:6px solid #ff0; 
-      border-radius:8px; padding:25px; text-align:center; color:#ff0; width:90%;
+      max-width:380px; width:90%; background:#1a1a1a; border:6px solid #ff0; 
+      border-radius:8px; padding:0; overflow:hidden; box-shadow:0 0 40px #ff0;
     }
     .title-bar { 
-      background:#333; color:#ff0; padding:14px; font-weight:900; 
-      text-align:center; border-bottom:4px solid #ff0; font-size:20px; margin:-25px -25px 20px -25px; border-radius:8px 8px 0 0;
+      background:#333; color:#ff0; padding:16px; font-weight:900; 
+      text-align:center; font-size:22px; 
+    }
+    .window-body { 
+      padding:25px; text-align:center;
     }
 
     #memeResultScreen {
@@ -190,11 +196,12 @@
     }
 
     .shop-item { 
-      background:#1f1f1f; border:3px solid #ff0; padding:12px; margin:12px 0; 
+      background:#1f1f1f; border:3px solid #ff0; padding:15px; margin:12px 0; 
       border-radius:8px; display:flex; align-items:center; gap:15px;
     }
-    .shop-item img { width:110px; height:110px; object-fit:contain; flex-shrink:0; }
-    .shop-text { flex:1; }
+    .shop-item img { width:100px; height:100px; object-fit:contain; flex-shrink:0; }
+    .shop-text { flex:1; text-align:left; }
+    .shop-text strong { font-size:20px; }
   </style>
 </head>
 <body>
@@ -313,7 +320,7 @@
   <div id="shopModal" class="modal">
     <div class="modal-content">
       <div class="title-bar">🛒 SKLEP KURŁA COINS</div>
-      <div id="shopItems"></div>
+      <div id="shopItems" style="max-height:420px; overflow-y:auto; padding:15px;"></div>
       <button onclick="hideShop()" style="margin:15px auto 20px; width:85%; height:58px; font-size:19px; background:#ff0; color:#000; border:5px solid #000;">
         Wyjdź
       </button>
@@ -757,7 +764,7 @@
 
     function showShop() {
       const container = document.getElementById('shopItems');
-      container.innerHTML = `<p style="text-align:center; color:#ff0; font-size:22px;">
+      container.innerHTML = `<p style="text-align:center; color:#ff0; font-size:22px; margin-bottom:20px;">
         Masz: <b>${currentPlayer.kurla_coins}</b> Kurła Coins<br>
         Kurła Punkty: <b>${currentPlayer.spendable_taps}</b><br>
         Multiplier: <b>×${currentPlayer.multiplier}</b>
@@ -777,11 +784,11 @@
         div.innerHTML = `
           <div class="shop-text">
             <strong>${item.name}</strong><br>
-            ${description}<br>
-            Koszt: ${item.cost} ${item.type === 'coins' ? 'Kurła Punktów' : 'KC'}
+            <span style="font-size:18px;">${description}</span><br>
+            <span style="color:#ffd700;">Koszt: ${item.cost} ${item.type === 'coins' ? 'Kurła Punktów' : 'KC'}</span>
           </div>
           ${item.img ? `<img src="${item.img}" alt="${item.name}">` : ''}
-          <button onclick="buyItem(${i})" style="min-width:90px;" ${isOwned ? 'disabled' : ''}>${isOwned ? 'KUPIONE' : 'KUP'}</button>
+          <button onclick="buyItem(${i})" style="min-width:100px;" ${isOwned ? 'disabled' : ''}>${isOwned ? 'KUPIONE' : 'KUP'}</button>
         `;
         container.appendChild(div);
       });
