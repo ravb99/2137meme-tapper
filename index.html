@@ -250,6 +250,17 @@
     </div>
   </div>
 
+  <div id="referralModal" class="modal">
+    <div class="modal-content" style="height:auto; max-height:420px;">
+      <div class="title-bar">REFERRAL REWARD</div>
+      <div class="window-body" style="text-align:center; padding:30px 20px;">
+        <h2 style="font-size:32px; margin:10px 0; color:#0f0;">Dzięki zaproszeniu!</h2>
+        <p style="font-size:28px; color:#ff0; margin:20px 0;">+200 Kurła Coins + 1 Kiełbasa</p>
+        <button onclick="claimReferral()" style="width:85%; padding:18px; font-size:20px; background:#0f0; color:#000; border:6px solid #000; border-radius:12px;">ODBIEŻ NAGRODĘ</button>
+      </div>
+    </div>
+  </div>
+
   <div id="leaderboardModal" class="modal">
     <div class="modal-content">
       <div class="title-bar">🏆 LEADERBOARD - 2137MEME</div>
@@ -403,7 +414,6 @@
       updateDisplays();
       updateBoostDisplay();
       checkDailyReward();
-      checkReferralBonus();
     }
 
     function updateDisplays() {
@@ -604,7 +614,14 @@
         localStorage.setItem('2137player', JSON.stringify(currentPlayer));
         hidePinModal();
         showRetroAlert(`Nowy nick zapisany!<br>Nick: <b>${currentPlayer.name}</b><br>PIN: <b>${pin}</b>`);
+        
         await loadPlayerDataFromDB();
+        
+        if (referrerFromUrl) {
+          setTimeout(() => {
+            checkReferralBonus();
+          }, 800);
+        }
       } else {
         try {
           const res = await fetch(`${SUPABASE_URL}/rest/v1/scores?select=pin&name=eq.${encodeURIComponent(currentPlayer.name)}&pin=eq.${pin}&limit=1`, {
@@ -626,6 +643,73 @@
           showRetroAlert("Błąd połączenia");
         }
       }
+    }
+
+    async function checkReferralBonus() {
+      if (!referrerFromUrl || currentPlayer.referral_claimed || !currentPlayer.name) return;
+
+      currentPlayer.referred_by = referrerFromUrl;
+      currentPlayer.kurla_coins += 200;
+      currentPlayer.kielbasaCount += 1;
+      currentPlayer.referral_claimed = true;
+
+      updateBoostDisplay();
+      updateDisplays();
+
+      document.getElementById('dailyRewardText').innerHTML = `+<b>200</b> Kurła Coins + 1 Kiełbasa`;
+      document.getElementById('dailyStreakText').textContent = `REFERRAL BONUS`;
+      document.getElementById('dailyModal').style.display = 'block';
+
+      saveScore(0);
+    }
+
+    function checkDailyReward() {
+      if (!currentPlayer.last_login) {
+        showDailyModal(1);
+        return;
+      }
+
+      const last = new Date(currentPlayer.last_login);
+      const now = new Date();
+      const hoursDiff = (now - last) / (1000 * 60 * 60);
+
+      let newStreak = currentPlayer.current_streak;
+
+      if (hoursDiff > 48) {
+        newStreak = 1;
+      } else if (hoursDiff > 24) {
+        newStreak++;
+      } else {
+        return;
+      }
+
+      showDailyModal(newStreak);
+    }
+
+    function showDailyModal(streak) {
+      const rewards = [0, 100, 150, 200, 300];
+      const reward = streak >= 5 ? 300 : rewards[streak];
+
+      document.getElementById('dailyStreakText').textContent = `SERIA ${streak} DNI`;
+      document.getElementById('dailyRewardText').innerHTML = `+<b>${reward}</b> Kurła Coins`;
+
+      document.getElementById('dailyModal').style.display = 'block';
+    }
+
+    async function claimDaily() {
+      const streak = currentPlayer.current_streak || 1;
+      const rewards = [0, 100, 150, 200, 300];
+      const reward = streak >= 5 ? 300 : rewards[streak];
+
+      currentPlayer.kurla_coins += reward;
+      currentPlayer.current_streak = streak >= 5 ? streak + 1 : streak;
+      currentPlayer.last_login = new Date().toISOString();
+
+      document.getElementById('dailyModal').style.display = 'none';
+      showRetroAlert(`+${reward} Kurła Coins!<br>Seria: ${currentPlayer.current_streak} dni`);
+
+      updateDisplays();
+      saveScore(0);
     }
 
     function showShop() {
@@ -758,69 +842,6 @@
       const link = `https://ravb99.github.io/2137meme-tapper/?ref=${encodeURIComponent(currentPlayer.name)}`;
       navigator.clipboard.writeText(link);
       showRetroAlert("Link referral skopiowany!<br>Udostępnij znajomym");
-    }
-
-    async function checkReferralBonus() {
-      if (!referrerFromUrl || currentPlayer.referral_claimed || !currentPlayer.name) return;
-
-      currentPlayer.referred_by = referrerFromUrl;
-      currentPlayer.kurla_coins += 200;
-      currentPlayer.kielbasaCount += 1;
-      currentPlayer.referral_claimed = true;
-
-      updateBoostDisplay();
-      updateDisplays();
-      showRetroAlert(`+200 Kurła Coins + 1 Kiełbasa!<br>Za zaproszenie przez link`);
-      saveScore(0);
-    }
-
-    function checkDailyReward() {
-      if (!currentPlayer.last_login) {
-        showDailyModal(1);
-        return;
-      }
-
-      const last = new Date(currentPlayer.last_login);
-      const now = new Date();
-      const hoursDiff = (now - last) / (1000 * 60 * 60);
-
-      let newStreak = currentPlayer.current_streak;
-
-      if (hoursDiff > 48) {
-        newStreak = 1;
-      } else if (hoursDiff > 24) {
-        newStreak++;
-      } else {
-        return;
-      }
-
-      showDailyModal(newStreak);
-    }
-
-    function showDailyModal(streak) {
-      const rewards = [0, 100, 150, 200, 300];
-      const reward = streak >= 5 ? 300 : rewards[streak];
-
-      document.getElementById('dailyStreakText').textContent = `SERIA ${streak} DNI`;
-      document.getElementById('dailyRewardText').innerHTML = `+<b>${reward}</b> Kurła Coins`;
-
-      document.getElementById('dailyModal').style.display = 'block';
-    }
-
-    async function claimDaily() {
-      const streak = currentPlayer.current_streak || 1;
-      const rewards = [0, 100, 150, 200, 300];
-      const reward = streak >= 5 ? 300 : rewards[streak];
-
-      currentPlayer.kurla_coins += reward;
-      currentPlayer.current_streak = streak >= 5 ? streak + 1 : streak;
-      currentPlayer.last_login = new Date().toISOString();
-
-      document.getElementById('dailyModal').style.display = 'none';
-      showRetroAlert(`+${reward} Kurła Coins!<br>Seria: ${currentPlayer.current_streak} dni`);
-
-      updateDisplays();
-      saveScore(0);
     }
 
     const container = document.getElementById('nosaczContainer');
