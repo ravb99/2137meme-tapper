@@ -556,32 +556,52 @@
     }
 
     async function saveScore(roundScore) {
+      if (!currentPlayer.name || !currentPlayer.pin) {
+        console.error("Brak nazwy lub PINu - nie zapisuję");
+        return;
+      }
+
+      const payload = [{
+        name: currentPlayer.name,
+        pin: currentPlayer.pin,
+        round_score: Math.floor(roundScore),
+        total_score: Math.floor(currentPlayer.lifetime_taps),
+        kurla_coins: Math.floor(currentPlayer.kurla_coins),
+        lifetime_taps: Math.floor(currentPlayer.lifetime_taps),
+        spendable_taps: Math.floor(currentPlayer.spendable_taps),
+        multiplier: currentPlayer.multiplier,
+        current_streak: currentPlayer.current_streak,
+        last_login: currentPlayer.last_login,
+        referred_by: currentPlayer.referred_by,
+        referral_claimed: currentPlayer.referral_claimed,
+        first_login: currentPlayer.first_login
+      }];
+
       try {
-        await fetch(`${SUPABASE_URL}/rest/v1/scores`, {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/scores`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'apikey': SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Prefer': 'resolution=merge-duplicates'
           },
-          body: JSON.stringify([{
-            name: currentPlayer.name,
-            pin: currentPlayer.pin,
-            round_score: roundScore,
-            total_score: currentPlayer.lifetime_taps,
-            kurla_coins: currentPlayer.kurla_coins,
-            lifetime_taps: currentPlayer.lifetime_taps,
-            spendable_taps: currentPlayer.spendable_taps,
-            multiplier: currentPlayer.multiplier,
-            current_streak: currentPlayer.current_streak,
-            last_login: currentPlayer.last_login,
-            referred_by: currentPlayer.referred_by,
-            referral_claimed: currentPlayer.referral_claimed,
-            first_login: currentPlayer.first_login
-          }])
+          body: JSON.stringify(payload)
         });
-        localStorage.setItem('2137player', JSON.stringify(currentPlayer));
-      } catch (e) { console.error(e); }
+
+        if (response.ok) {
+          console.log("✅ Wynik zapisany pomyślnie do Supabase");
+        } else {
+          const errorText = await response.text();
+          console.error("❌ Błąd Supabase:", response.status, errorText);
+          showRetroAlert("Błąd zapisu do bazy!<br>Sprawdź konsolę (F12)");
+        }
+      } catch (e) {
+        console.error("Błąd sieci przy zapisie:", e);
+        showRetroAlert("Błąd połączenia z bazą");
+      }
+
+      localStorage.setItem('2137player', JSON.stringify(currentPlayer));
     }
 
     function showRetroAlert(message) {
@@ -670,7 +690,6 @@
     async function checkReferralBonus() {
       if (!referrerFromUrl || currentPlayer.referral_claimed || !currentPlayer.name) return;
 
-      // === BONUS DLA NOWEGO UŻYTKOWNIKA ===
       currentPlayer.referred_by = referrerFromUrl;
       currentPlayer.kurla_coins += 200;
       currentPlayer.kielbasaCount += 1;
@@ -683,7 +702,7 @@
       document.getElementById('refModalText').innerHTML = `+<b>200</b> Kurła Coins + 1 Kiełbasa`;
       document.getElementById('referralModal').style.display = 'block';
 
-      // === BONUS 300 DLA WYSYŁAJĄCEGO (INVITER) ===
+      // Bonus 300 dla invitera
       try {
         const res = await fetch(`${SUPABASE_URL}/rest/v1/scores?select=pin,kurla_coins&name=eq.${encodeURIComponent(referrerFromUrl)}&limit=1`, {
           headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
@@ -722,9 +741,7 @@
             first_login: new Date().toISOString()
           }])
         });
-      } catch (e) {
-        console.error("Błąd bonusu dla invitera", e);
-      }
+      } catch (e) { console.error(e); }
 
       saveScore(0);
     }
