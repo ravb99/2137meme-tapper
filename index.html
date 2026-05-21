@@ -72,6 +72,15 @@
 
     .bottom-panel { display: flex; width: 100%; gap: 4px; margin: 8px 0 4px; align-items: center; justify-content: center; }
 
+    /* REF BUTTON */
+    #refBtn {
+      position: absolute; top: 18px; right: 18px; width: 52px; height: 52px;
+      background: #ffeb3b; color: #111; border: 5px solid #000;
+      border-radius: 50%; font-size: 13px; font-weight: 900;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 0 #000; z-index: 50; cursor: pointer;
+    }
+
     /* EKRAN Z MEMEM */
     #memeResultScreen {
       display: none;
@@ -198,6 +207,7 @@
     
     <div id="nosaczContainer">
       <img id="nosacz" src="https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/images/IMG_6353.jpeg" alt="Nosacz"> 
+      <div id="refBtn" onclick="copyRefLink()">REF</div>
     </div>
 
     <div id="stats">
@@ -233,7 +243,19 @@
     </div>
   </div>
 
-  <!-- LEADERBOARD MODAL -->
+  <!-- DAILY MODAL -->
+  <div id="dailyModal" class="modal">
+    <div class="modal-content" style="height:auto; max-height:420px;">
+      <div class="title-bar">DAILY REWARD</div>
+      <div class="window-body" style="text-align:center; padding:30px 20px;">
+        <h2 id="dailyStreakText" style="font-size:32px; margin:10px 0;">Dzień 1</h2>
+        <p id="dailyRewardText" style="font-size:28px; color:#0f0; margin:20px 0;">+100 Kurła Coins</p>
+        <button onclick="claimDaily()" style="width:85%; padding:18px; font-size:20px; background:#0f0; color:#000; border:6px solid #000; border-radius:12px;">ODBIEŻ NAGRODĘ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- reszta modalów bez zmian -->
   <div id="leaderboardModal" class="modal">
     <div class="modal-content">
       <div class="title-bar">🏆 LEADERBOARD - 2137MEME</div>
@@ -250,7 +272,6 @@
     </div>
   </div>
 
-  <!-- NICK MODAL -->
   <div id="nicknameModal" class="modal">
     <div class="modal-content">
       <div class="title-bar">ZMIANA NICKU</div>
@@ -265,7 +286,6 @@
     </div>
   </div>
 
-  <!-- PIN MODAL -->
   <div id="pinModal" class="modal">
     <div class="modal-content">
       <div class="title-bar" id="pinModalTitle">PIN</div>
@@ -277,7 +297,6 @@
     </div>
   </div>
 
-  <!-- SHOP MODAL -->
   <div id="shopModal" class="modal">
     <div class="modal-content">
       <div class="title-bar">🛒 SKLEP KURŁA COINS</div>
@@ -288,7 +307,6 @@
     </div>
   </div>
 
-  <!-- RETRO ALERT -->
   <div id="retroAlert" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:200; align-items:center; justify-content:center;">
     <div id="alertContent" style="background:#1a1a1a; border:6px solid #ff0; padding:25px; max-width:340px; text-align:center; color:#ff0; font-size:19px; border-radius:4px;"></div>
   </div>
@@ -306,7 +324,11 @@
       lifetime_taps: 0, 
       spendable_taps: 0, 
       multiplier: 1,
-      kielbasaCount: 0
+      kielbasaCount: 0,
+      current_streak: 0,
+      last_login: null,
+      referred_by: null,
+      referral_claimed: false
     };
 
     let currentTab = 0;
@@ -316,6 +338,7 @@
     let isRunning = false;
     let lastFrame = 0;
     let memesList = [];
+    let referrerFromUrl = null;
 
     const nosaczImg = document.getElementById('nosacz');
     const boostInfo = document.getElementById('boostInfo');
@@ -354,6 +377,10 @@
         currentPlayer.name = parsed.name || "";
         currentPlayer.pin = parsed.pin || "";
       }
+
+      // Pobierz ref z URL
+      const urlParams = new URLSearchParams(window.location.search);
+      referrerFromUrl = urlParams.get('ref');
     }
 
     async function loadPlayerDataFromDB() {
@@ -361,21 +388,29 @@
       resetPlayerData();
 
       try {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/scores?select=kurla_coins,lifetime_taps,spendable_taps,multiplier&name=eq.${encodeURIComponent(currentPlayer.name)}&pin=eq.${currentPlayer.pin}&order=created_at.desc&limit=1`, {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/scores?select=kurla_coins,lifetime_taps,spendable_taps,multiplier,current_streak,last_login,referred_by,referral_claimed&name=eq.${encodeURIComponent(currentPlayer.name)}&pin=eq.${currentPlayer.pin}&order=created_at.desc&limit=1`, {
           headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
         });
         const data = await res.json();
 
         if (data.length > 0) {
-          currentPlayer.kurla_coins = data[0].kurla_coins || 0;
-          currentPlayer.lifetime_taps = data[0].lifetime_taps || 0;
-          currentPlayer.spendable_taps = data[0].spendable_taps || 0;
-          currentPlayer.multiplier = data[0].multiplier || 1;
+          const p = data[0];
+          currentPlayer.kurla_coins = p.kurla_coins || 0;
+          currentPlayer.lifetime_taps = p.lifetime_taps || 0;
+          currentPlayer.spendable_taps = p.spendable_taps || 0;
+          currentPlayer.multiplier = p.multiplier || 1;
+          currentPlayer.current_streak = p.current_streak || 0;
+          currentPlayer.last_login = p.last_login;
+          currentPlayer.referred_by = p.referred_by;
+          currentPlayer.referral_claimed = p.referral_claimed || false;
         }
         localStorage.setItem('2137player', JSON.stringify(currentPlayer));
       } catch (e) { console.error(e); }
+
       updateDisplays();
       updateBoostDisplay();
+      checkDailyReward();
+      checkReferralBonus();
     }
 
     function updateDisplays() {
@@ -383,6 +418,85 @@
       document.getElementById('coins').textContent = currentPlayer.kurla_coins;
     }
 
+    // ==================== DAILY STREAK ====================
+    function checkDailyReward() {
+      if (!currentPlayer.last_login) {
+        showDailyModal(1);
+        return;
+      }
+
+      const last = new Date(currentPlayer.last_login);
+      const now = new Date();
+      const hoursDiff = (now - last) / (1000 * 60 * 60);
+
+      let newStreak = currentPlayer.current_streak;
+
+      if (hoursDiff > 48) {
+        newStreak = 1;
+      } else if (hoursDiff > 24) {
+        newStreak++;
+      } else {
+        return; // już odebrał dzisiaj
+      }
+
+      showDailyModal(newStreak);
+    }
+
+    function showDailyModal(streak) {
+      const rewards = [0, 100, 150, 200, 300];
+      const reward = streak >= 5 ? 300 : rewards[streak];
+
+      document.getElementById('dailyStreakText').textContent = `SERIA ${streak} DNI`;
+      document.getElementById('dailyRewardText').innerHTML = `+<b>${reward}</b> Kurła Coins`;
+
+      document.getElementById('dailyModal').style.display = 'block';
+    }
+
+    async function claimDaily() {
+      const streak = currentPlayer.current_streak || 1;
+      const rewards = [0, 100, 150, 200, 300];
+      const reward = streak >= 5 ? 300 : rewards[streak];
+
+      currentPlayer.kurla_coins += reward;
+      currentPlayer.current_streak = streak >= 5 ? streak + 1 : streak;
+      currentPlayer.last_login = new Date().toISOString();
+
+      document.getElementById('dailyModal').style.display = 'none';
+      showRetroAlert(`+${reward} Kurła Coins!<br>Seria: ${currentPlayer.current_streak} dni`);
+
+      updateDisplays();
+      saveScore(0);
+    }
+
+    // ==================== REFERRAL ====================
+    function copyRefLink() {
+      if (!currentPlayer.name) {
+        showRetroAlert("Najpierw ustaw nick!");
+        return;
+      }
+      const link = `https://ravb99.github.io/2137meme-tapper/?ref=${encodeURIComponent(currentPlayer.name)}`;
+      navigator.clipboard.writeText(link);
+      showRetroAlert("Link referral skopiowany!<br>Udostępnij znajomym");
+    }
+
+    async function checkReferralBonus() {
+      if (!referrerFromUrl || currentPlayer.referral_claimed || !currentPlayer.name) return;
+
+      // Zapisz referrer i daj bonusy
+      currentPlayer.referred_by = referrerFromUrl;
+      currentPlayer.kurla_coins += 200;
+      currentPlayer.kielbasaCount += 1;
+      currentPlayer.referral_claimed = true;
+
+      updateBoostDisplay();
+      updateDisplays();
+      showRetroAlert(`+200 Kurła Coins + 1 Kiełbasa!<br>Za zaproszenie przez link`);
+
+      // Zapisz do bazy
+      saveScore(0);
+    }
+
+    // reszta funkcji (tap, timer, saveScore itd.) pozostaje bez zmian
     function tap(e) {
       if (!isRunning) startTimer();
 
@@ -517,7 +631,11 @@
             kurla_coins: currentPlayer.kurla_coins,
             lifetime_taps: currentPlayer.lifetime_taps,
             spendable_taps: currentPlayer.spendable_taps,
-            multiplier: currentPlayer.multiplier
+            multiplier: currentPlayer.multiplier,
+            current_streak: currentPlayer.current_streak,
+            last_login: currentPlayer.last_login,
+            referred_by: currentPlayer.referred_by,
+            referral_claimed: currentPlayer.referral_claimed
           }])
         });
         localStorage.setItem('2137player', JSON.stringify(currentPlayer));
