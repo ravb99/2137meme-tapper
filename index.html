@@ -230,7 +230,7 @@
   </div>
 
   <div id="memeResultScreen">
-    <div class="crt-frame" id="crtFrame">
+    <div class="crt-frame">
       <div class="result-header">KONIEC RUNDY! TWÓJ WYNIK: <span id="memeFinalScore" style="color:#f00;"></span></div>
       <div class="meme-scroll">
         <img id="randomMeme" src="" alt="Meme">
@@ -315,7 +315,7 @@
   </div>
 
   <div id="retroAlert" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:200; align-items:center; justify-content:center;">
-    <div id="alertContent" style="background:#1a1a1a; border:6px solid #ff0; padding:25px; max-width:340px; text-align:center; color:#ff0; font-size:19px; border-radius:4px;"></div>
+    <div id="alertContent" style="background:#1a1a1a; border:6px solid #ff0; padding:25px; max-width:360px; text-align:center; color:#ff0; font-size:18px; border-radius:4px;"></div>
   </div>
 
   <audio id="kurlaSound" src="https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/sounds/Kurła.m4a" preload="auto"></audio>
@@ -542,8 +542,11 @@
         currentPlayer.kielbasaCount--;
       }
       updateBoostDisplay();
-      saveScore(finalScore);
 
+      // === DEBUG ALERT ===
+      showRetroAlert(`<b>endRound wywołany</b><br>Score: ${finalScore}<br>Name: ${currentPlayer.name || "BRAK"}<br>Pin: ${currentPlayer.pin ? "jest" : "BRAK"}`);
+
+      saveScore(finalScore);
       showMemeResultScreen(finalScore, totalMult);
     }
 
@@ -556,7 +559,12 @@
     }
 
     async function saveScore(roundScore) {
-      if (!currentPlayer.name || !currentPlayer.pin) return;
+      if (!currentPlayer.name || !currentPlayer.pin) {
+        showRetroAlert("saveScore: BRAK NAME lub PIN!");
+        return;
+      }
+
+      showRetroAlert(`Próba zapisu do bazy...<br>Score: ${roundScore}<br>Name: ${currentPlayer.name}`);
 
       const payload = [{
         name: currentPlayer.name,
@@ -587,20 +595,18 @@
         });
 
         if (response.ok) {
-          console.log("✅ Zapisano pomyślnie");
+          showRetroAlert(`✅ ZAPISANO POMYŚLNIE!<br>Score: ${roundScore}`);
         } else {
-          const err = await response.text();
-          console.error("Błąd zapisu:", response.status, err);
+          const errText = await response.text();
+          showRetroAlert(`❌ BŁĄD ZAPISU<br>Status: ${response.status}<br>${errText.substring(0,200)}`);
         }
       } catch (e) {
-        console.error("Błąd sieci:", e);
+        showRetroAlert(`BŁĄD WYJĄTKU:<br>${e.message}`);
       }
-
-      localStorage.setItem('2137player', JSON.stringify(currentPlayer));
     }
 
     function showRetroAlert(message) {
-      document.getElementById('alertContent').innerHTML = message + '<br><br><button onclick="hideRetroAlert()" style="background:#ff0; color:#000; padding:12px 30px; font-size:18px; border:3px solid #000; border-radius:4px;">OK</button>';
+      document.getElementById('alertContent').innerHTML = message + '<br><br><button onclick="hideRetroAlert()" style="background:#ff0;color:#000;padding:14px 32px;font-size:18px;border:4px solid #000;border-radius:8px;">OK</button>';
       document.getElementById('retroAlert').style.display = 'flex';
     }
 
