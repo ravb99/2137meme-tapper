@@ -315,7 +315,7 @@
   </div>
 
   <div id="retroAlert" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:200; align-items:center; justify-content:center;">
-    <div id="alertContent" style="background:#1a1a1a; border:6px solid #ff0; padding:25px; max-width:360px; text-align:center; color:#ff0; font-size:18px; border-radius:4px;"></div>
+    <div id="alertContent" style="background:#1a1a1a; border:6px solid #ff0; padding:25px; max-width:340px; text-align:center; color:#ff0; font-size:19px; border-radius:4px;"></div>
   </div>
 
   <audio id="kurlaSound" src="https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/sounds/Kurła.m4a" preload="auto"></audio>
@@ -542,11 +542,8 @@
         currentPlayer.kielbasaCount--;
       }
       updateBoostDisplay();
-
-      // === DEBUG ALERT ===
-      showRetroAlert(`<b>endRound wywołany</b><br>Score: ${finalScore}<br>Name: ${currentPlayer.name || "BRAK"}<br>Pin: ${currentPlayer.pin ? "jest" : "BRAK"}`);
-
       saveScore(finalScore);
+
       showMemeResultScreen(finalScore, totalMult);
     }
 
@@ -559,12 +556,7 @@
     }
 
     async function saveScore(roundScore) {
-      if (!currentPlayer.name || !currentPlayer.pin) {
-        showRetroAlert("saveScore: BRAK NAME lub PIN!");
-        return;
-      }
-
-      showRetroAlert(`Próba zapisu do bazy...<br>Score: ${roundScore}<br>Name: ${currentPlayer.name}`);
+      if (!currentPlayer.name || !currentPlayer.pin) return;
 
       const payload = [{
         name: currentPlayer.name,
@@ -579,7 +571,7 @@
         last_login: currentPlayer.last_login || new Date().toISOString(),
         referred_by: currentPlayer.referred_by,
         referral_claimed: currentPlayer.referral_claimed || false,
-        first_login: currentPlayer.first_login
+        first_login: currentPlayer.first_login || new Date().toISOString()
       }];
 
       try {
@@ -595,23 +587,15 @@
         });
 
         if (response.ok) {
-          showRetroAlert(`✅ ZAPISANO POMYŚLNIE!<br>Score: ${roundScore}`);
+          console.log("✅ Zapisano pomyślnie");
         } else {
-          const errText = await response.text();
-          showRetroAlert(`❌ BŁĄD ZAPISU<br>Status: ${response.status}<br>${errText.substring(0,200)}`);
+          console.error("Błąd zapisu:", await response.text());
         }
       } catch (e) {
-        showRetroAlert(`BŁĄD WYJĄTKU:<br>${e.message}`);
+        console.error("Błąd sieci:", e);
       }
-    }
 
-    function showRetroAlert(message) {
-      document.getElementById('alertContent').innerHTML = message + '<br><br><button onclick="hideRetroAlert()" style="background:#ff0;color:#000;padding:14px 32px;font-size:18px;border:4px solid #000;border-radius:8px;">OK</button>';
-      document.getElementById('retroAlert').style.display = 'flex';
-    }
-
-    function hideRetroAlert() {
-      document.getElementById('retroAlert').style.display = 'none';
+      localStorage.setItem('2137player', JSON.stringify(currentPlayer));
     }
 
     function showNicknameModal() {
@@ -647,15 +631,13 @@
 
     async function verifyOrSetPin() {
       const pin = document.getElementById('pinInput').value.trim();
-      if (pin.length !== 4) return showRetroAlert("PIN musi mieć dokładnie 4 cyfry!");
+      if (pin.length !== 4) return alert("PIN musi mieć dokładnie 4 cyfry!");
 
       if (isNewNick) {
         currentPlayer.pin = pin;
         currentPlayer.first_login = new Date().toISOString();
         localStorage.setItem('2137player', JSON.stringify(currentPlayer));
         hidePinModal();
-        showRetroAlert(`Nowy nick zapisany!<br>Nick: <b>${currentPlayer.name}</b><br>PIN: <b>${pin}</b>`);
-        
         isLoggedIn = true;
         updateNickButton();
         await loadPlayerDataFromDB();
@@ -674,16 +656,15 @@
             currentPlayer.pin = pin;
             localStorage.setItem('2137player', JSON.stringify(currentPlayer));
             hidePinModal();
-            showRetroAlert(`Zalogowano pomyślnie!<br>Nick: <b>${currentPlayer.name}</b>`);
             isLoggedIn = true;
             updateNickButton();
             await loadPlayerDataFromDB();
           } else {
-            showRetroAlert("Zły pin prywaciarzu");
+            alert("Zły pin prywaciarzu");
             document.getElementById('pinInput').value = "";
           }
         } catch (e) {
-          showRetroAlert("Błąd połączenia");
+          alert("Błąd połączenia");
         }
       }
     }
@@ -784,8 +765,6 @@
       currentPlayer.last_login = new Date().toISOString();
 
       document.getElementById('dailyModal').style.display = 'none';
-      showRetroAlert(`+${reward} Kurła Coins!<br>Seria: ${currentPlayer.current_streak} dni`);
-
       updateDisplays();
       saveScore(0);
     }
@@ -828,27 +807,18 @@
       const item = shopItems[i];
 
       if (item.type === "coins") {
-        if (currentPlayer.spendable_taps < item.cost) {
-          showRetroAlert("Za mało Kurła Punktów!");
-          return;
-        }
+        if (currentPlayer.spendable_taps < item.cost) return;
         currentPlayer.spendable_taps -= item.cost;
         currentPlayer.kurla_coins += item.value;
-        showRetroAlert(`+${item.value} Kurła Coins!<br>Pozostało punktów: ${currentPlayer.spendable_taps}`);
       } else {
-        if (currentPlayer.kurla_coins < item.cost) {
-          showRetroAlert("Za mało Kurła Coins!");
-          return;
-        }
+        if (currentPlayer.kurla_coins < item.cost) return;
         currentPlayer.kurla_coins -= item.cost;
 
         if (item.type === "temp_mult") {
           currentPlayer.kielbasaCount += 1;
-          showRetroAlert(`🍖 Kupiono Kiełbasę!<br>Pozostało: ${currentPlayer.kielbasaCount}`);
           updateBoostDisplay();
         } else {
           currentPlayer.multiplier = Math.max(currentPlayer.multiplier, item.value);
-          showRetroAlert(`Kupiłeś <b>${item.name}</b>!<br>Aktualny mnożnik: ×${currentPlayer.multiplier}`);
         }
       }
 
@@ -913,13 +883,9 @@
     }
 
     function copyRefLink() {
-      if (!currentPlayer.name) {
-        showRetroAlert("Najpierw ustaw nick!");
-        return;
-      }
+      if (!currentPlayer.name) return;
       const link = `https://ravb99.github.io/2137meme-tapper/?ref=${encodeURIComponent(currentPlayer.name)}`;
       navigator.clipboard.writeText(link);
-      showRetroAlert("Link referral skopiowany!<br>Udostępnij znajomym");
     }
 
     const container = document.getElementById('nosaczContainer');
