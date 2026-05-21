@@ -83,6 +83,16 @@
       align-items: center; justify-content: center;
     }
 
+    .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.94); z-index:100; align-items:center; justify-content:center; }
+    .modal-content { 
+      max-width:380px; background:#1a1a1a; border:6px solid #ff0; 
+      border-radius:4px; padding:25px; text-align:center; color:#ff0;
+    }
+    .title-bar { 
+      background:#333; color:#ff0; padding:12px 15px; font-weight:900; 
+      text-align:center; border-bottom:4px solid #ff0; font-size:20px; margin:-25px -25px 20px -25px;
+    }
+
     #memeResultScreen {
       display: none;
       position: fixed;
@@ -160,19 +170,6 @@
       box-shadow: 0 8px 0 #000;
     }
 
-    .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.94); z-index:100; }
-    .modal-content { 
-      max-width:380px; margin:40px auto; background:#1a1a1a; border:6px solid #ff0; 
-      border-radius:4px; overflow:hidden; display:flex; flex-direction:column; height:85vh;
-    }
-    .title-bar { 
-      background:#333; color:#ff0; padding:12px 15px; font-weight:900; 
-      text-align:center; border-bottom:4px solid #ff0; font-size:20px; 
-    }
-    .window-body { 
-      padding:15px; background:#1a1a1a; flex:1; overflow-y:auto; 
-    }
-
     .lb-entry { 
       display:flex; justify-content:space-between; padding:14px 16px; margin:8px 0; 
       background:#1f1f1f; border:2px solid #ff0; border-radius:8px; font-size:19px; 
@@ -231,7 +228,7 @@
 
   <!-- REFERRAL MODAL -->
   <div id="referralModal" class="modal">
-    <div class="modal-content" style="height:auto; max-height:420px;">
+    <div class="modal-content">
       <div class="title-bar">🔥 REF LINK!</div>
       <div class="window-body" style="text-align:center; padding:30px 20px;">
         <h2 style="font-size:32px; margin:10px 0; color:#0f0;">Prześlij link znajomemu</h2>
@@ -239,6 +236,24 @@
         <p style="font-size:22px;">Nowy ziomek: +200 KC + Kiełbasa<br>Ty: +300 KC</p>
         <button onclick="hideReferralModal()" style="width:85%; padding:18px; font-size:20px; background:#0f0; color:#000; border:6px solid #000; border-radius:12px;">Dawaj Janusza!</button>
       </div>
+    </div>
+  </div>
+
+  <!-- SUCCESS MODAL -->
+  <div id="successModal" class="modal">
+    <div class="modal-content">
+      <div class="title-bar" style="background:#0f0; color:#000;">ZALOGOWANO POMYŚLNIE</div>
+      <p style="font-size:24px; margin:30px 0;">Witaj z powrotem, Januszu!</p>
+      <button onclick="hideSuccessModal()" style="width:100%; padding:18px; font-size:20px; background:#ff0; color:#000; border:6px solid #000; border-radius:12px;">Dawaj Janusza!</button>
+    </div>
+  </div>
+
+  <!-- PIN ERROR MODAL -->
+  <div id="pinErrorModal" class="modal">
+    <div class="modal-content">
+      <div class="title-bar" style="background:#f00; color:#fff;">ZŁY PIN PRYWACIARZU</div>
+      <p style="font-size:24px; margin:30px 0;">Spróbuj jeszcze raz</p>
+      <button onclick="hidePinErrorModal()" style="width:100%; padding:18px; font-size:20px; background:#ff0; color:#000; border:6px solid #000; border-radius:12px;">OK</button>
     </div>
   </div>
 
@@ -397,7 +412,7 @@
 
     function showReferralModalOnLoad() {
       if (referrerFromUrl) {
-        document.getElementById('referralModal').style.display = 'block';
+        document.getElementById('referralModal').style.display = 'flex';
       }
     }
 
@@ -610,6 +625,8 @@
     function hideNicknameModal() { document.getElementById('nicknameModal').style.display = 'none'; }
     function hidePinModal() { document.getElementById('pinModal').style.display = 'none'; }
     function hideReferralModal() { document.getElementById('referralModal').style.display = 'none'; }
+    function hideSuccessModal() { document.getElementById('successModal').style.display = 'none'; }
+    function hidePinErrorModal() { document.getElementById('pinErrorModal').style.display = 'none'; }
 
     async function checkNickAndContinue() {
       const name = document.getElementById('nickInput').value.trim();
@@ -635,7 +652,7 @@
 
     async function verifyOrSetPin() {
       const pin = document.getElementById('pinInput').value.trim();
-      if (pin.length !== 4) return alert("PIN musi mieć dokładnie 4 cyfry!");
+      if (pin.length !== 4) return;
 
       if (isNewNick) {
         currentPlayer.pin = pin;
@@ -645,7 +662,7 @@
         isLoggedIn = true;
         updateNickButton();
         await loadPlayerDataFromDB();
-        
+        document.getElementById('successModal').style.display = 'flex';
         if (referrerFromUrl) {
           setTimeout(() => checkReferralBonus(), 600);
         }
@@ -663,8 +680,9 @@
             isLoggedIn = true;
             updateNickButton();
             await loadPlayerDataFromDB();
+            document.getElementById('successModal').style.display = 'flex';
           } else {
-            alert("Zły pin prywaciarzu");
+            document.getElementById('pinErrorModal').style.display = 'flex';
             document.getElementById('pinInput').value = "";
           }
         } catch (e) {
@@ -684,7 +702,7 @@
       updateBoostDisplay();
       updateDisplays();
 
-      document.getElementById('referralModal').style.display = 'block';
+      document.getElementById('referralModal').style.display = 'flex';
 
       try {
         const res = await fetch(`${SUPABASE_URL}/rest/v1/scores?select=pin,kurla_coins&name=eq.${encodeURIComponent(referrerFromUrl)}&limit=1`, {
@@ -885,22 +903,24 @@
     }
 
     function copyRefLink() {
-      if (!currentPlayer.name) return;
+      if (!currentPlayer.name) {
+        alert("Najpierw ustaw nick!");
+        return;
+      }
       const link = `https://ravb99.github.io/2137meme-tapper/?ref=${encodeURIComponent(currentPlayer.name)}`;
       navigator.clipboard.writeText(link);
+      document.getElementById('referralModal').style.display = 'flex';
     }
 
     const container = document.getElementById('nosaczContainer');
     container.addEventListener('pointerdown', tap, { passive: false });
 
-    // Inicjalizacja
     loadPlayer();
     updateDisplays();
     updateBoostDisplay();
     updateNickButton();
     loadMemeList();
 
-    // Pokazujemy referral modal OD RAZU jeśli jest ref link
     showReferralModalOnLoad();
 
     if (currentPlayer.name && currentPlayer.pin) {
