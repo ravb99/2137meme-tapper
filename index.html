@@ -102,7 +102,6 @@
       justify-content: center;
     }
 
-    /* === EKRAN Z MEMEM - SCROLLABLE === */
     #memeResultScreen {
       display: none;
       position: fixed;
@@ -175,7 +174,6 @@
       box-shadow: 0 8px 0 #000;
     }
 
-    /* Modal styles */
     .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.94); z-index:100; }
     .modal-content { 
       max-width:380px; margin:40px auto; background:#1a1a1a; border:6px solid #ff0; 
@@ -250,7 +248,6 @@
     <button onclick="showLeaderboard()" style="width:100%; margin-top:4px;">TOP 21 LEADERBOARD</button>
   </div>
 
-  <!-- EKRAN Z MEMEM - SCROLLABLE -->
   <div id="memeResultScreen">
     <div class="crt-frame" id="crtFrame">
       <div class="result-header">KONIEC RUNDY! TWÓJ WYNIK: <span id="memeFinalScore" style="color:#f00;"></span></div>
@@ -265,7 +262,6 @@
     </div>
   </div>
 
-  <!-- LEADERBOARD MODAL -->
   <div id="leaderboardModal" class="modal">
     <div class="modal-content">
       <div class="title-bar">🏆 LEADERBOARD - 2137MEME</div>
@@ -282,7 +278,6 @@
     </div>
   </div>
 
-  <!-- NICK MODAL -->
   <div id="nicknameModal" class="modal">
     <div class="modal-content">
       <div class="title-bar">ZMIANA NICKU</div>
@@ -297,7 +292,6 @@
     </div>
   </div>
 
-  <!-- PIN MODAL -->
   <div id="pinModal" class="modal">
     <div class="modal-content">
       <div class="title-bar" id="pinModalTitle">PIN</div>
@@ -309,7 +303,6 @@
     </div>
   </div>
 
-  <!-- SHOP MODAL -->
   <div id="shopModal" class="modal">
     <div class="modal-content">
       <div class="title-bar">🛒 SKLEP KURŁA COINS</div>
@@ -320,7 +313,6 @@
     </div>
   </div>
 
-  <!-- RETRO ALERT -->
   <div id="retroAlert" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:200; align-items:center; justify-content:center;">
     <div id="alertContent" style="background:#1a1a1a; border:6px solid #ff0; padding:25px; max-width:340px; text-align:center; color:#ff0; font-size:19px; border-radius:4px;"></div>
   </div>
@@ -483,10 +475,7 @@
         const res = await fetch('https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/images/memes/memes.json');
         const data = await res.json();
         memesList = data.memes || [];
-        console.log(`Załadowano ${memesList.length} memów`);
-      } catch (e) {
-        console.error("Nie udało się załadować memes.json", e);
-      }
+      } catch (e) { console.error(e); }
     }
 
     function getRandomMemeUrl() {
@@ -746,7 +735,6 @@
       document.getElementById('leaderboardModal').style.display = 'none';
     }
 
-    // INICJALIZACJA
     const container = document.getElementById('nosaczContainer');
     container.addEventListener('pointerdown', tap, { passive: false });
 
