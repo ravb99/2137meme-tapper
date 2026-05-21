@@ -102,7 +102,7 @@
       justify-content: center;
     }
 
-    /* === RETRO CRT EKRAN PO RUNDZIE - PŁYNNE POJAWIENIE === */
+    /* === EKRAN Z MEMEM - SCROLLABLE (bez skalowania) === */
     #memeResultScreen {
       display: none;
       position: fixed;
@@ -117,30 +117,17 @@
     .crt-frame {
       width: 92%;
       max-width: 390px;
+      height: 92vh;
+      max-height: 680px;
       background: #0c0c0c;
       border: 22px solid #1a1a1a;
       border-top: 42px solid #1a1a1a;
       border-radius: 8px;
       box-shadow: 0 0 60px rgba(0,255,80,0.5), inset 0 0 100px rgba(0,0,0,0.95);
       overflow: hidden;
+      display: flex;
+      flex-direction: column;
       position: relative;
-      opacity: 0;
-      transform: scale(0.92);
-      transition: all 0.45s cubic-bezier(0.23, 1, 0.32, 1);
-    }
-
-    #memeResultScreen.show .crt-frame {
-      opacity: 1;
-      transform: scale(1);
-    }
-
-    .crt-frame::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: repeating-linear-gradient(transparent 0px, transparent 2px, rgba(255,255,255,0.04) 2px, rgba(255,255,255,0.04) 4px);
-      pointer-events: none;
-      z-index: 2;
     }
 
     .result-header {
@@ -152,6 +139,14 @@
       font-weight: 900;
       color: #ff0;
       letter-spacing: 2px;
+      flex-shrink: 0;
+    }
+
+    .meme-scroll {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      background: #000;
     }
 
     #randomMeme {
@@ -162,8 +157,10 @@
 
     .meme-footer {
       background: #1a1a1a;
-      padding: 20px;
+      padding: 18px;
       text-align: center;
+      border-top: 6px solid #ff0;
+      flex-shrink: 0;
     }
 
     .meme-footer button {
@@ -233,7 +230,6 @@
     
     <div id="nosaczContainer">
       <img id="nosacz" src="https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/images/IMG_6353.jpeg" alt="Nosacz"> 
-      <button id="restartBtn" onclick="restartGame()">Na Drugą Nóżkę!</button>
     </div>
 
     <div id="stats">
@@ -254,11 +250,15 @@
     <button onclick="showLeaderboard()" style="width:100%; margin-top:4px;">TOP 21 LEADERBOARD</button>
   </div>
 
-  <!-- NOWY EKRAN Z MEMEM PO RUNDZIE -->
+  <!-- EKRAN Z MEMEM PO RUNDZIE - SCROLLABLE -->
   <div id="memeResultScreen">
     <div class="crt-frame" id="crtFrame">
       <div class="result-header">KONIEC RUNDY! TWÓJ WYNIK: <span id="memeFinalScore" style="color:#f00;"></span></div>
-      <img id="randomMeme" src="" alt="Meme">
+      
+      <div class="meme-scroll">
+        <img id="randomMeme" src="" alt="Meme">
+      </div>
+      
       <div class="meme-footer">
         <button onclick="closeMemeScreen()">Na Drugą Nóżkę! 🥃</button>
       </div>
@@ -350,7 +350,6 @@
     let memesList = [];
 
     const nosaczImg = document.getElementById('nosacz');
-    const restartBtn = document.getElementById('restartBtn');
     const boostInfo = document.getElementById('boostInfo');
     const sound = document.getElementById('kurlaSound');
 
@@ -417,7 +416,6 @@
     }
 
     function tap(e) {
-      if (restartBtn.style.display === 'block') return;
       if (!isRunning) startTimer();
 
       const touches = e.touches ? e.touches.length : 1;
@@ -498,35 +496,14 @@
     }
 
     function showMemeResultScreen(finalScore, totalMult) {
-      const screen = document.getElementById('memeResultScreen');
-      const frame = document.getElementById('crtFrame');
-      const memeImg = document.getElementById('randomMeme');
-
-      document.getElementById('memeFinalScore').innerHTML = 
-        `${finalScore} <span style="font-size:19px;">(×${totalMult})</span>`;
-
-      memeImg.src = getRandomMemeUrl();
-
-      memeImg.onload = () => {
-        screen.style.display = 'flex';
-        setTimeout(() => screen.classList.add('show'), 10);
-      };
-
-      setTimeout(() => {
-        if (screen.style.display !== 'flex') {
-          screen.style.display = 'flex';
-          screen.classList.add('show');
-        }
-      }, 350);
+      document.getElementById('memeFinalScore').innerHTML = `${finalScore} <span style="font-size:19px;">(×${totalMult})</span>`;
+      document.getElementById('randomMeme').src = getRandomMemeUrl();
+      document.getElementById('memeResultScreen').style.display = 'flex';
     }
 
     function closeMemeScreen() {
-      const screen = document.getElementById('memeResultScreen');
-      screen.classList.remove('show');
-      setTimeout(() => {
-        screen.style.display = 'none';
-        restartGame();
-      }, 450);
+      document.getElementById('memeResultScreen').style.display = 'none';
+      restartGame();
     }
 
     function endRound() {
