@@ -254,11 +254,12 @@
 
   <div id="referralModal" class="modal">
     <div class="modal-content" style="height:auto; max-height:420px;">
-      <div class="title-bar">REFERRAL REWARD</div>
+      <div class="title-bar">🔥 REF LINK!</div>
       <div class="window-body" style="text-align:center; padding:30px 20px;">
-        <h2 id="refModalTitle" style="font-size:32px; margin:10px 0; color:#0f0;">REFERRAL BONUS</h2>
-        <p id="refModalText" style="font-size:28px; color:#ff0; margin:20px 0;"></p>
-        <button onclick="hideReferralModal()" style="width:85%; padding:18px; font-size:20px; background:#0f0; color:#000; border:6px solid #000; border-radius:12px;">ODBIEŻ NAGRODĘ</button>
+        <h2 style="font-size:32px; margin:10px 0; color:#0f0;">Prześlij link znajomemu</h2>
+        <p style="font-size:26px; color:#ff0; margin:20px 0;">i odbierzcie razem nagrody!</p>
+        <p style="font-size:22px;">Nowy ziomek: +200 KC + Kiełbasa<br>Ty: +300 KC</p>
+        <button onclick="hideReferralModal()" style="width:85%; padding:18px; font-size:20px; background:#0f0; color:#000; border:6px solid #000; border-radius:12px;">Dawaj Janusza!</button>
       </div>
     </div>
   </div>
@@ -312,10 +313,6 @@
         Wyjdź
       </button>
     </div>
-  </div>
-
-  <div id="retroAlert" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:200; align-items:center; justify-content:center;">
-    <div id="alertContent" style="background:#1a1a1a; border:6px solid #ff0; padding:25px; max-width:340px; text-align:center; color:#ff0; font-size:19px; border-radius:4px;"></div>
   </div>
 
   <audio id="kurlaSound" src="https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/sounds/Kurła.m4a" preload="auto"></audio>
@@ -395,6 +392,12 @@
 
       const urlParams = new URLSearchParams(window.location.search);
       referrerFromUrl = urlParams.get('ref');
+    }
+
+    function showReferralModalOnLoad() {
+      if (referrerFromUrl) {
+        document.getElementById('referralModal').style.display = 'block';
+      }
     }
 
     async function loadPlayerDataFromDB() {
@@ -900,6 +903,8 @@
     if (currentPlayer.name && currentPlayer.pin) {
       isLoggedIn = true;
       loadPlayerDataFromDB();
+    } else {
+      showReferralModalOnLoad();
     }
 
     Telegram.WebApp.ready();
