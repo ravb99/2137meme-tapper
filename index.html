@@ -31,7 +31,7 @@
 
     #nosaczContainer { 
       position:relative; width:290px; height:290px; margin:2px auto 4px; 
-      touch-action: none; 
+      touch-action: none; cursor: pointer;
     }
     #nosacz { 
       width:100%; height:100%; border-radius:50%; border:8px solid #ff0; 
@@ -79,121 +79,6 @@
     @keyframes tokenPulse { 0%,100% {background:#ffeb3b; transform:scale(1);} 50% {background:#ffed4e; transform:scale(1.05);} }
 
     .bottom-panel { display: flex; width: 100%; gap: 4px; margin: 8px 0 4px; align-items: center; justify-content: center; }
-
-    #memeResultScreen {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.98);
-      z-index: 160;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      opacity: 0;
-      transition: opacity 0.4s ease;
-    }
-
-    #memeResultScreen.show {
-      opacity: 1;
-    }
-
-    .crt-frame {
-      width: 92%;
-      max-width: 390px;
-      height: 92vh;
-      max-height: 680px;
-      background: #0c0c0c;
-      border: 22px solid #1a1a1a;
-      border-top: 42px solid #1a1a1a;
-      border-radius: 8px;
-      box-shadow: 0 0 60px rgba(0,255,80,0.5), inset 0 0 100px rgba(0,0,0,0.95);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .result-header {
-      background: #1f1f1f;
-      padding: 16px 0;
-      text-align: center;
-      border-bottom: 6px solid #ff0;
-      font-size: 24px;
-      font-weight: 900;
-      color: #ff0;
-      letter-spacing: 2px;
-      flex-shrink: 0;
-    }
-
-    .meme-scroll {
-      flex: 1;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      background: #000;
-    }
-
-    #randomMeme {
-      width: 100%;
-      display: block;
-      image-rendering: pixelated;
-    }
-
-    .meme-footer {
-      background: #1a1a1a;
-      padding: 18px;
-      text-align: center;
-      border-top: 6px solid #ff0;
-      flex-shrink: 0;
-    }
-
-    .meme-footer button {
-      background: #0f0;
-      color: #000;
-      font-size: 21px;
-      font-weight: 900;
-      padding: 18px 40px;
-      border: 7px solid #000;
-      border-radius: 12px;
-      width: 100%;
-      box-shadow: 0 8px 0 #000;
-    }
-
-    .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.94); z-index:100; }
-    .modal-content { 
-      max-width:380px; margin:40px auto; background:#1a1a1a; border:6px solid #ff0; 
-      border-radius:4px; overflow:hidden; display:flex; flex-direction:column; height:85vh;
-    }
-    .title-bar { 
-      background:#333; color:#ff0; padding:12px 15px; font-weight:900; 
-      text-align:center; border-bottom:4px solid #ff0; font-size:20px; 
-    }
-    .window-body { 
-      padding:15px; background:#1a1a1a; flex:1; overflow-y:auto; 
-    }
-
-    .lb-entry { 
-      display:flex; justify-content:space-between; padding:14px 16px; margin:8px 0; 
-      background:#1f1f1f; border:2px solid #ff0; border-radius:8px; font-size:19px; 
-    }
-    .lb-entry:nth-child(even) { background:#252525; }
-
-    input { 
-      width:100%; padding:16px; font-size:22px; background:#111; color:#ff0; 
-      border:4px solid #ff0; font-family:'Oswald'; text-align:center; 
-      margin-bottom:15px; border-radius:8px;
-    }
-
-    #shopItems { 
-      padding:15px; 
-      overflow-y:auto; 
-      flex:1; 
-    }
-
-    .shop-item { 
-      background:#1f1f1f; border:3px solid #ff0; padding:12px; margin:12px 0; 
-      border-radius:8px; display:flex; align-items:center; gap:15px;
-    }
-    .shop-item img { width:110px; height:110px; object-fit:contain; flex-shrink:0; }
-    .shop-text { flex:1; }
   </style>
 </head>
 <body>
@@ -212,14 +97,13 @@
     <div id="stats">
       <div>Taps: <span id="count">0</span></div>
       <div style="display:flex; align-items:center; gap:6px;">
-        <img src="https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/images/coin.png" 
-             width="36" style="vertical-align:middle; height:auto;">
+        <img src="https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/images/coin.png" width="36" style="vertical-align:middle; height:auto;">
         Kurła Coins: <span id="coins">0</span>
       </div>
     </div>
 
     <div class="bottom-panel">
-      <button class="main-btn" onclick="showNicknameModal()">NICK</button>
+      <button class="main-btn" id="nickButton" onclick="showNicknameModal()">NICK</button>
       <a href="https://pump.fun/coin/Df7fM9c3pPjWuurHYGe9a75LCDyh3x1vf3cmNaU1pump" target="_blank" class="token-btn">$2137</a>
       <button class="main-btn" onclick="showShop()">KURŁA SKLEP</button>
     </div>
@@ -350,6 +234,7 @@
     const nosaczImg = document.getElementById('nosacz');
     const boostInfo = document.getElementById('boostInfo');
     const sound = document.getElementById('kurlaSound');
+    const nickButton = document.getElementById('nickButton');
 
     const shopItems = [
       { name: "100 Kurła Coins", cost: 2137, type: "coins", value: 100, img: "" },
@@ -375,6 +260,10 @@
       } else {
         boostInfo.style.display = 'none';
       }
+    }
+
+    function updateNickButton() {
+      nickButton.textContent = currentPlayer.name ? currentPlayer.name : "NICK";
     }
 
     function loadPlayer() {
@@ -417,6 +306,7 @@
 
       updateDisplays();
       updateBoostDisplay();
+      updateNickButton();
       checkDailyReward();
       checkReferralBonus();
     }
@@ -507,7 +397,8 @@
       return `https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/images/memes/${randomFile}`;
     }
 
-    function showMemeResultScreen(finalScore, totalMult) {
+    function showMemeResultScreen(finalScore) {
+      const totalMult = currentPlayer.multiplier * (currentPlayer.kielbasaCount > 0 ? 2 : 1);
       document.getElementById('memeFinalScore').innerHTML = `${finalScore} <span style="font-size:19px;">(×${totalMult})</span>`;
       document.getElementById('randomMeme').src = getRandomMemeUrl();
       const screen = document.getElementById('memeResultScreen');
@@ -527,16 +418,10 @@
     function endRound() {
       isRunning = false;
       const finalScore = Math.floor(taps);
-      const tempMult = currentPlayer.kielbasaCount > 0 ? 2 : 1;
-      const totalMult = currentPlayer.multiplier * tempMult;
-
-      if (currentPlayer.kielbasaCount > 0) {
-        currentPlayer.kielbasaCount--;
-      }
+      if (currentPlayer.kielbasaCount > 0) currentPlayer.kielbasaCount--;
       updateBoostDisplay();
       saveScore(finalScore);
-
-      showMemeResultScreen(finalScore, totalMult);
+      showMemeResultScreen(finalScore);
     }
 
     function restartGame() {
@@ -586,7 +471,7 @@
     }
 
     function showNicknameModal() {
-      document.getElementById('nickInput').value = "";
+      document.getElementById('nickInput').value = currentPlayer.name || "";
       document.getElementById('nicknameModal').style.display = 'block';
     }
 
@@ -625,28 +510,23 @@
         localStorage.setItem('2137player', JSON.stringify(currentPlayer));
         hidePinModal();
         showRetroAlert(`Nowy nick zapisany!<br>Nick: <b>${currentPlayer.name}</b><br>PIN: <b>${pin}</b>`);
-        
         isLoggedIn = true;
+        updateNickButton();
         await loadPlayerDataFromDB();
-        
-        if (referrerFromUrl) {
-          setTimeout(() => {
-            checkReferralBonus();
-          }, 800);
-        }
+        if (referrerFromUrl) setTimeout(checkReferralBonus, 800);
       } else {
         try {
           const res = await fetch(`${SUPABASE_URL}/rest/v1/scores?select=pin&name=eq.${encodeURIComponent(currentPlayer.name)}&pin=eq.${pin}&limit=1`, {
             headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
           });
           const data = await res.json();
-
           if (data.length > 0) {
             currentPlayer.pin = pin;
             localStorage.setItem('2137player', JSON.stringify(currentPlayer));
             hidePinModal();
             showRetroAlert(`Zalogowano pomyślnie!<br>Nick: <b>${currentPlayer.name}</b>`);
             isLoggedIn = true;
+            updateNickButton();
             await loadPlayerDataFromDB();
           } else {
             showRetroAlert("Zły pin prywaciarzu");
@@ -660,29 +540,23 @@
 
     async function checkReferralBonus() {
       if (!referrerFromUrl || currentPlayer.referral_claimed || !currentPlayer.name) return;
-
       currentPlayer.referred_by = referrerFromUrl;
       currentPlayer.kurla_coins += 200;
       currentPlayer.kielbasaCount += 1;
       currentPlayer.referral_claimed = true;
-
       updateBoostDisplay();
       updateDisplays();
-
       document.getElementById('dailyStreakText').textContent = `REFERRAL BONUS`;
       document.getElementById('dailyRewardText').innerHTML = `+<b>200</b> Kurła Coins + 1 Kiełbasa`;
       document.getElementById('dailyModal').style.display = 'block';
-
       saveScore(0);
     }
 
     function checkDailyReward() {
       if (!currentPlayer.first_login) return;
-
       const first = new Date(currentPlayer.first_login);
       const now = new Date();
       const hoursFromFirst = (now - first) / (1000 * 60 * 60);
-
       if (hoursFromFirst < 24) return;
 
       if (!currentPlayer.last_login) {
@@ -692,22 +566,17 @@
 
       const last = new Date(currentPlayer.last_login);
       const hoursDiff = (now - last) / (1000 * 60 * 60);
-
       let newStreak = currentPlayer.current_streak;
-
       if (hoursDiff > 48) newStreak = 1;
       else if (hoursDiff > 24) newStreak++;
-
       if (hoursDiff > 24) showDailyModal(newStreak);
     }
 
     function showDailyModal(streak) {
       const rewards = [0, 100, 150, 200, 300];
       const reward = streak >= 5 ? 300 : rewards[streak];
-
       document.getElementById('dailyStreakText').textContent = `SERIA ${streak} DNI`;
       document.getElementById('dailyRewardText').innerHTML = `+<b>${reward}</b> Kurła Coins`;
-
       document.getElementById('dailyModal').style.display = 'block';
     }
 
@@ -715,14 +584,11 @@
       const streak = currentPlayer.current_streak || 1;
       const rewards = [0, 100, 150, 200, 300];
       const reward = streak >= 5 ? 300 : rewards[streak];
-
       currentPlayer.kurla_coins += reward;
       currentPlayer.current_streak = streak >= 5 ? streak + 1 : streak;
       currentPlayer.last_login = new Date().toISOString();
-
       document.getElementById('dailyModal').style.display = 'none';
       showRetroAlert(`+${reward} Kurła Coins!<br>Seria: ${currentPlayer.current_streak} dni`);
-
       updateDisplays();
       saveScore(0);
     }
@@ -738,15 +604,12 @@
       shopItems.forEach((item, i) => {
         const div = document.createElement('div');
         div.className = 'shop-item';
-        
         let description = '';
         if (item.type === 'coins') description = `+${item.value} Kurła Coins (za punkty)`;
         else if (item.type === 'temp_mult') description = `×${item.value} na 1 rundę`;
         else description = `Stały ×${item.value}`;
-
         const isCar = item.type === "mult";
         const isOwned = isCar && currentPlayer.multiplier >= item.value;
-
         div.innerHTML = `
           <div class="shop-text">
             <strong>${item.name}</strong><br>
@@ -763,22 +626,14 @@
 
     function buyItem(i) {
       const item = shopItems[i];
-
       if (item.type === "coins") {
-        if (currentPlayer.spendable_taps < item.cost) {
-          showRetroAlert("Za mało Kurła Punktów!");
-          return;
-        }
+        if (currentPlayer.spendable_taps < item.cost) return showRetroAlert("Za mało Kurła Punktów!");
         currentPlayer.spendable_taps -= item.cost;
         currentPlayer.kurla_coins += item.value;
         showRetroAlert(`+${item.value} Kurła Coins!<br>Pozostało punktów: ${currentPlayer.spendable_taps}`);
       } else {
-        if (currentPlayer.kurla_coins < item.cost) {
-          showRetroAlert("Za mało Kurła Coins!");
-          return;
-        }
+        if (currentPlayer.kurla_coins < item.cost) return showRetroAlert("Za mało Kurła Coins!");
         currentPlayer.kurla_coins -= item.cost;
-
         if (item.type === "temp_mult") {
           currentPlayer.kielbasaCount += 1;
           showRetroAlert(`🍖 Kupiono Kiełbasę!<br>Pozostało: ${currentPlayer.kielbasaCount}`);
@@ -788,7 +643,6 @@
           showRetroAlert(`Kupiłeś <b>${item.name}</b>!<br>Aktualny mnożnik: ×${currentPlayer.multiplier}`);
         }
       }
-
       saveScore(0);
       updateDisplays();
       showShop();
@@ -805,7 +659,6 @@
         });
         const data = await response.json();
         const grouped = {};
-
         data.forEach(row => {
           const key = `${row.name}|${row.pin || ''}`;
           if (!grouped[key]) {
@@ -815,11 +668,9 @@
             grouped[key].total = Math.max(grouped[key].total, Number(row.total_score) || 0);
           }
         });
-
         const list = document.getElementById('lbList');
         list.innerHTML = '';
         const sorted = Object.values(grouped).sort((a, b) => currentTab === 0 ? (b.best - a.best) : (b.total - a.total));
-
         sorted.forEach((player, i) => {
           const div = document.createElement('div');
           div.className = 'lb-entry';
@@ -827,10 +678,7 @@
           div.innerHTML = `<span>${i+1}. ${player.name}</span><span style="color:#0f0; font-weight:900;">${score}</span>`;
           list.appendChild(div);
         });
-
-        if (sorted.length === 0) {
-          list.innerHTML = '<div style="color:#f66; padding:30px; text-align:center;">Brak wyników jeszcze...</div>';
-        }
+        if (sorted.length === 0) list.innerHTML = '<div style="color:#f66; padding:30px; text-align:center;">Brak wyników jeszcze...</div>';
       } catch (e) { console.error(e); }
     }
 
@@ -850,10 +698,7 @@
     }
 
     function copyRefLink() {
-      if (!currentPlayer.name) {
-        showRetroAlert("Najpierw ustaw nick!");
-        return;
-      }
+      if (!currentPlayer.name) return showRetroAlert("Najpierw ustaw nick!");
       const link = `https://ravb99.github.io/2137meme-tapper/?ref=${encodeURIComponent(currentPlayer.name)}`;
       navigator.clipboard.writeText(link);
       showRetroAlert("Link referral skopiowany!<br>Udostępnij znajomym");
@@ -865,6 +710,7 @@
     loadPlayer();
     updateDisplays();
     updateBoostDisplay();
+    updateNickButton();
     loadMemeList();
 
     if (currentPlayer.name && currentPlayer.pin) {
