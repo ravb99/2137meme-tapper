@@ -2,12 +2,17 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8">
-  <title>Test Supabase Save</title>
+  <title>Supabase Test</title>
+  <style>
+    body { font-family: Arial; padding: 20px; background: #111; color: #0f0; text-align: center; }
+    button { padding: 15px 30px; font-size: 18px; background: #ff0; color: #000; border: none; margin: 20px; }
+    #log { margin-top: 30px; text-align: left; background: #000; padding: 15px; white-space: pre-wrap; font-family: monospace; }
+  </style>
 </head>
 <body>
-  <h1>Test zapisu do Supabase</h1>
+  <h2>Test zapisu do Supabase</h2>
   <button onclick="testSave()">TEST ZAPISU</button>
-  <div id="log" style="margin-top:20px; white-space:pre-wrap; font-family:monospace;"></div>
+  <div id="log"></div>
 
   <script>
     const SUPABASE_URL = 'https://gmyhsgxnpbvwgexrvpik.supabase.co';
@@ -15,26 +20,21 @@
 
     async function testSave() {
       const log = document.getElementById('log');
-      log.innerHTML = 'Wysyłam dane...\n';
+      log.innerHTML = 'Wysyłam...\n';
 
       const payload = [{
-        name: "TestUser123",
-        pin: "9999",
-        round_score: 420,
+        name: "TestUser" + Date.now(),
+        pin: "1234",
+        round_score: 777,
         total_score: 1337,
         kurla_coins: 999,
         lifetime_taps: 1337,
         spendable_taps: 500,
-        multiplier: 1,
-        current_streak: 3,
-        last_login: new Date().toISOString(),
-        referred_by: null,
-        referral_claimed: false,
-        first_login: new Date().toISOString()
+        multiplier: 1
       }];
 
       try {
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/scores`, {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/scores`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -45,18 +45,16 @@
           body: JSON.stringify(payload)
         });
 
-        const responseText = await response.text();
-
-        log.innerHTML += `Status: ${response.status}\n`;
-        log.innerHTML += `Odpowiedź: ${responseText}\n`;
-
-        if (response.ok) {
-          log.innerHTML += `\n✅ ZAPISANO POMYŚLNIE!`;
+        const text = await res.text();
+        log.innerHTML += `Status: ${res.status}\nOdpowiedź:\n${text}`;
+        
+        if (res.ok) {
+          log.innerHTML += `\n\n✅ ZAPISANO POMYŚLNIE!`;
         } else {
-          log.innerHTML += `\n❌ BŁĄD: ${response.status}`;
+          log.innerHTML += `\n\n❌ BŁĄD`;
         }
-      } catch (e) {
-        log.innerHTML += `\nBŁĄD WYJĄTKU: ${e.message}`;
+      } catch (err) {
+        log.innerHTML += `\nBŁĄD: ${err.message}`;
       }
     }
   </script>
