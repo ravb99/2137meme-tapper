@@ -79,6 +79,121 @@
     @keyframes tokenPulse { 0%,100% {background:#ffeb3b; transform:scale(1);} 50% {background:#ffed4e; transform:scale(1.05);} }
 
     .bottom-panel { display: flex; width: 100%; gap: 4px; margin: 8px 0 4px; align-items: center; justify-content: center; }
+
+    #memeResultScreen {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.98);
+      z-index: 160;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    #memeResultScreen.show {
+      opacity: 1;
+    }
+
+    .crt-frame {
+      width: 92%;
+      max-width: 390px;
+      height: 92vh;
+      max-height: 680px;
+      background: #0c0c0c;
+      border: 22px solid #1a1a1a;
+      border-top: 42px solid #1a1a1a;
+      border-radius: 8px;
+      box-shadow: 0 0 60px rgba(0,255,80,0.5), inset 0 0 100px rgba(0,0,0,0.95);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .result-header {
+      background: #1f1f1f;
+      padding: 16px 0;
+      text-align: center;
+      border-bottom: 6px solid #ff0;
+      font-size: 24px;
+      font-weight: 900;
+      color: #ff0;
+      letter-spacing: 2px;
+      flex-shrink: 0;
+    }
+
+    .meme-scroll {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      background: #000;
+    }
+
+    #randomMeme {
+      width: 100%;
+      display: block;
+      image-rendering: pixelated;
+    }
+
+    .meme-footer {
+      background: #1a1a1a;
+      padding: 18px;
+      text-align: center;
+      border-top: 6px solid #ff0;
+      flex-shrink: 0;
+    }
+
+    .meme-footer button {
+      background: #0f0;
+      color: #000;
+      font-size: 21px;
+      font-weight: 900;
+      padding: 18px 40px;
+      border: 7px solid #000;
+      border-radius: 12px;
+      width: 100%;
+      box-shadow: 0 8px 0 #000;
+    }
+
+    .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.94); z-index:100; }
+    .modal-content { 
+      max-width:380px; margin:40px auto; background:#1a1a1a; border:6px solid #ff0; 
+      border-radius:4px; overflow:hidden; display:flex; flex-direction:column; height:85vh;
+    }
+    .title-bar { 
+      background:#333; color:#ff0; padding:12px 15px; font-weight:900; 
+      text-align:center; border-bottom:4px solid #ff0; font-size:20px; 
+    }
+    .window-body { 
+      padding:15px; background:#1a1a1a; flex:1; overflow-y:auto; 
+    }
+
+    .lb-entry { 
+      display:flex; justify-content:space-between; padding:14px 16px; margin:8px 0; 
+      background:#1f1f1f; border:2px solid #ff0; border-radius:8px; font-size:19px; 
+    }
+    .lb-entry:nth-child(even) { background:#252525; }
+
+    input { 
+      width:100%; padding:16px; font-size:22px; background:#111; color:#ff0; 
+      border:4px solid #ff0; font-family:'Oswald'; text-align:center; 
+      margin-bottom:15px; border-radius:8px;
+    }
+
+    #shopItems { 
+      padding:15px; 
+      overflow-y:auto; 
+      flex:1; 
+    }
+
+    .shop-item { 
+      background:#1f1f1f; border:3px solid #ff0; padding:12px; margin:12px 0; 
+      border-radius:8px; display:flex; align-items:center; gap:15px;
+    }
+    .shop-item img { width:110px; height:110px; object-fit:contain; flex-shrink:0; }
+    .shop-text { flex:1; }
   </style>
 </head>
 <body>
@@ -103,7 +218,7 @@
     </div>
 
     <div class="bottom-panel">
-      <button class="main-btn" id="nickButton" onclick="showNicknameModal()">NICK</button>
+      <button class="main-btn" onclick="showNicknameModal()">NICK</button>
       <a href="https://pump.fun/coin/Df7fM9c3pPjWuurHYGe9a75LCDyh3x1vf3cmNaU1pump" target="_blank" class="token-btn">$2137</a>
       <button class="main-btn" onclick="showShop()">KURŁA SKLEP</button>
     </div>
@@ -234,7 +349,6 @@
     const nosaczImg = document.getElementById('nosacz');
     const boostInfo = document.getElementById('boostInfo');
     const sound = document.getElementById('kurlaSound');
-    const nickButton = document.getElementById('nickButton');
 
     const shopItems = [
       { name: "100 Kurła Coins", cost: 2137, type: "coins", value: 100, img: "" },
@@ -262,10 +376,6 @@
       }
     }
 
-    function updateNickButton() {
-      nickButton.textContent = currentPlayer.name ? currentPlayer.name : "NICK";
-    }
-
     function loadPlayer() {
       const saved = localStorage.getItem('2137player');
       if (saved) {
@@ -274,7 +384,6 @@
         currentPlayer.pin = parsed.pin || "";
         currentPlayer.first_login = parsed.first_login || null;
       }
-
       const urlParams = new URLSearchParams(window.location.search);
       referrerFromUrl = urlParams.get('ref');
     }
@@ -306,7 +415,6 @@
 
       updateDisplays();
       updateBoostDisplay();
-      updateNickButton();
       checkDailyReward();
       checkReferralBonus();
     }
@@ -471,7 +579,7 @@
     }
 
     function showNicknameModal() {
-      document.getElementById('nickInput').value = currentPlayer.name || "";
+      document.getElementById('nickInput').value = "";
       document.getElementById('nicknameModal').style.display = 'block';
     }
 
@@ -511,7 +619,6 @@
         hidePinModal();
         showRetroAlert(`Nowy nick zapisany!<br>Nick: <b>${currentPlayer.name}</b><br>PIN: <b>${pin}</b>`);
         isLoggedIn = true;
-        updateNickButton();
         await loadPlayerDataFromDB();
         if (referrerFromUrl) setTimeout(checkReferralBonus, 800);
       } else {
@@ -526,7 +633,6 @@
             hidePinModal();
             showRetroAlert(`Zalogowano pomyślnie!<br>Nick: <b>${currentPlayer.name}</b>`);
             isLoggedIn = true;
-            updateNickButton();
             await loadPlayerDataFromDB();
           } else {
             showRetroAlert("Zły pin prywaciarzu");
@@ -591,6 +697,10 @@
       showRetroAlert(`+${reward} Kurła Coins!<br>Seria: ${currentPlayer.current_streak} dni`);
       updateDisplays();
       saveScore(0);
+    }
+
+    function claimReferral() {
+      document.getElementById('referralModal').style.display = 'none';
     }
 
     function showShop() {
@@ -704,13 +814,11 @@
       showRetroAlert("Link referral skopiowany!<br>Udostępnij znajomym");
     }
 
-    const container = document.getElementById('nosaczContainer');
-    container.addEventListener('pointerdown', tap, { passive: false });
+    document.getElementById('nosaczContainer').addEventListener('pointerdown', tap, { passive: false });
 
     loadPlayer();
     updateDisplays();
     updateBoostDisplay();
-    updateNickButton();
     loadMemeList();
 
     if (currentPlayer.name && currentPlayer.pin) {
