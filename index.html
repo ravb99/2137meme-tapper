@@ -229,14 +229,15 @@
     <button onclick="showLeaderboard()" style="width:100%; margin-top:4px;">TOP 21 LEADERBOARD</button>
   </div>
 
-  <div id="memeResultScreen">
-    <div class="crt-frame">
-      <div class="result-header">KONIEC RUNDY! TWÓJ WYNIK: <span id="memeFinalScore" style="color:#f00;"></span></div>
-      <div class="meme-scroll">
-        <img id="randomMeme" src="" alt="Meme">
-      </div>
-      <div class="meme-footer">
-        <button onclick="closeMemeScreen()">Na Drugą Nóżkę! 🥃</button>
+  <!-- REFERRAL MODAL -->
+  <div id="referralModal" class="modal">
+    <div class="modal-content" style="height:auto; max-height:420px;">
+      <div class="title-bar">🔥 REF LINK!</div>
+      <div class="window-body" style="text-align:center; padding:30px 20px;">
+        <h2 style="font-size:32px; margin:10px 0; color:#0f0;">Prześlij link znajomemu</h2>
+        <p style="font-size:26px; color:#ff0; margin:20px 0;">i odbierzcie razem nagrody!</p>
+        <p style="font-size:22px;">Nowy ziomek: +200 KC + Kiełbasa<br>Ty: +300 KC</p>
+        <button onclick="hideReferralModal()" style="width:85%; padding:18px; font-size:20px; background:#0f0; color:#000; border:6px solid #000; border-radius:12px;">Dawaj Janusza!</button>
       </div>
     </div>
   </div>
@@ -248,18 +249,6 @@
         <h2 id="dailyStreakText" style="font-size:32px; margin:10px 0;">Dzień 1</h2>
         <p id="dailyRewardText" style="font-size:28px; color:#0f0; margin:20px 0;">+100 Kurła Coins</p>
         <button onclick="claimDaily()" style="width:85%; padding:18px; font-size:20px; background:#0f0; color:#000; border:6px solid #000; border-radius:12px;">ODBIEŻ NAGRODĘ</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="referralModal" class="modal">
-    <div class="modal-content" style="height:auto; max-height:420px;">
-      <div class="title-bar">🔥 REF LINK!</div>
-      <div class="window-body" style="text-align:center; padding:30px 20px;">
-        <h2 style="font-size:32px; margin:10px 0; color:#0f0;">Prześlij link znajomemu</h2>
-        <p style="font-size:26px; color:#ff0; margin:20px 0;">i odbierzcie razem nagrody!</p>
-        <p style="font-size:22px;">Nowy ziomek: +200 KC + Kiełbasa<br>Ty: +300 KC</p>
-        <button onclick="hideReferralModal()" style="width:85%; padding:18px; font-size:20px; background:#0f0; color:#000; border:6px solid #000; border-radius:12px;">Dawaj Janusza!</button>
       </div>
     </div>
   </div>
@@ -312,6 +301,18 @@
       <button onclick="hideShop()" style="margin:15px auto 20px; width:85%; height:58px; font-size:19px; background:#ff0; color:#000; border:5px solid #000;">
         Wyjdź
       </button>
+    </div>
+  </div>
+
+  <div id="memeResultScreen">
+    <div class="crt-frame">
+      <div class="result-header">KONIEC RUNDY! TWÓJ WYNIK: <span id="memeFinalScore" style="color:#f00;"></span></div>
+      <div class="meme-scroll">
+        <img id="randomMeme" src="" alt="Meme">
+      </div>
+      <div class="meme-footer">
+        <button onclick="closeMemeScreen()">Na Drugą Nóżkę! 🥃</button>
+      </div>
     </div>
   </div>
 
@@ -683,8 +684,6 @@
       updateBoostDisplay();
       updateDisplays();
 
-      document.getElementById('refModalTitle').textContent = "Dzięki zaproszeniu!";
-      document.getElementById('refModalText').innerHTML = `+<b>200</b> Kurła Coins + 1 Kiełbasa`;
       document.getElementById('referralModal').style.display = 'block';
 
       try {
@@ -894,17 +893,19 @@
     const container = document.getElementById('nosaczContainer');
     container.addEventListener('pointerdown', tap, { passive: false });
 
+    // Inicjalizacja
     loadPlayer();
     updateDisplays();
     updateBoostDisplay();
     updateNickButton();
     loadMemeList();
 
+    // Pokazujemy referral modal OD RAZU jeśli jest ref link
+    showReferralModalOnLoad();
+
     if (currentPlayer.name && currentPlayer.pin) {
       isLoggedIn = true;
       loadPlayerDataFromDB();
-    } else {
-      showReferralModalOnLoad();
     }
 
     Telegram.WebApp.ready();
