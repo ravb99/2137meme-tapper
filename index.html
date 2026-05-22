@@ -70,7 +70,7 @@
     .main-btn, .token-btn, #leaderboardBtn { 
       flex:1; background:#ffeb3b; color:#111; border: none; 
       padding:14px 12px; font-size:17px; font-weight:900; 
-      border-radius: 14px; height: 58px; display: flex; 
+      border-radius: 14px; height: 58px !important; display: flex; 
       align-items: center; justify-content: center;
     }
 
@@ -99,7 +99,8 @@
       text-align:center; font-size:21px; 
     }
     .window-body { 
-      padding:25px 20px; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center;
+      padding:25px 20px; text-align:center; display:flex; flex-direction:column; 
+      align-items:center; justify-content:center; gap:15px;
     }
 
     /* SKLEP */
@@ -124,6 +125,13 @@
       background:#ffeb3b; color:#111; border:none; padding:14px 24px; 
       font-size:18px; font-weight:900; border-radius:12px; cursor:pointer;
       min-width:140px;
+    }
+
+    #errorModal .modal-content {
+      border-color: #f00;
+    }
+    #errorModal .title-bar {
+      background:#f00; color:#fff;
     }
 
     #memeResultScreen {
@@ -179,7 +187,7 @@
       <button class="main-btn" onclick="showShop()">KURŁA SKLEP</button>
     </div>
 
-    <button id="leaderboardBtn" onclick="showLeaderboard()" style="width:100%; margin-top:8px; height:58px; font-size:21px; background:#ffeb3b; color:#111; border: none; border-radius:14px; font-weight:900;">
+    <button id="leaderboardBtn" onclick="showLeaderboard()" style="width:100%; margin-top:8px; height:58px !important; font-size:21px; background:#ffeb3b; color:#111; border: none; border-radius:14px; font-weight:900;">
       TOP 21 LEADERBOARD
     </button>
   </div>
@@ -188,11 +196,11 @@
   <div id="referralModal" class="modal">
     <div class="modal-content">
       <div class="title-bar">🔥 REF LINK!</div>
-      <div class="window-body" style="text-align:center; padding:30px 20px;">
+      <div class="window-body">
         <h2 style="font-size:32px; margin:10px 0; color:#0f0;">Prześlij link znajomemu</h2>
         <p style="font-size:26px; color:#ff0; margin:20px 0;">i odbierzcie razem nagrody!</p>
         <p style="font-size:22px;">Nowy ziomek: +200 KC + Kiełbasa<br>Ty: +300 KC</p>
-        <button onclick="hideReferralModal()" style="width:85%; padding:18px; font-size:20px; background:#0f0; color:#000; border:5px solid #000; border-radius:12px;">Dawaj Janusza!</button>
+        <button onclick="hideReferralModal()">Dawaj Janusza!</button>
       </div>
     </div>
   </div>
@@ -200,26 +208,40 @@
   <div id="successModal" class="modal">
     <div class="modal-content">
       <div class="title-bar" style="background:#0f0; color:#000;">ZALOGOWANO POMYŚLNIE</div>
-      <p style="font-size:24px; margin:30px 0; text-align:center;">Witaj z powrotem, Januszu!</p>
-      <button onclick="hideSuccessModal()" style="width:100%; padding:18px; font-size:20px; background:#ff0; color:#000; border:5px solid #000; border-radius:12px;">Dawaj Janusza!</button>
+      <div class="window-body">
+        <p style="font-size:24px; margin:30px 0;">Witaj z powrotem, Januszu!</p>
+        <button onclick="hideSuccessModal()">Dawaj Janusza!</button>
+      </div>
     </div>
   </div>
 
   <div id="pinErrorModal" class="modal">
     <div class="modal-content">
       <div class="title-bar" style="background:#f00; color:#fff;">ZŁY PIN PRYWACIARZU</div>
-      <p style="font-size:24px; margin:30px 0; text-align:center;">Spróbuj jeszcze raz</p>
-      <button onclick="hidePinErrorModal()" style="width:100%; padding:18px; font-size:20px; background:#ff0; color:#000; border:5px solid #000; border-radius:12px;">OK</button>
+      <div class="window-body">
+        <p style="font-size:24px; margin:30px 0;">Spróbuj jeszcze raz</p>
+        <button onclick="hidePinErrorModal()">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="errorModal" class="modal">
+    <div class="modal-content">
+      <div class="title-bar" style="background:#f00; color:#fff;">BŁĄD</div>
+      <div class="window-body">
+        <p id="errorMessage" style="font-size:24px; margin:20px 0;"></p>
+        <button onclick="hideErrorModal()">OK</button>
+      </div>
     </div>
   </div>
 
   <div id="dailyModal" class="modal">
     <div class="modal-content" style="height:auto; max-height:420px;">
       <div class="title-bar">DAILY REWARD</div>
-      <div class="window-body" style="text-align:center; padding:30px 20px;">
+      <div class="window-body">
         <h2 id="dailyStreakText" style="font-size:32px; margin:10px 0;">Dzień 1</h2>
         <p id="dailyRewardText" style="font-size:28px; color:#0f0; margin:20px 0;">+100 Kurła Coins</p>
-        <button onclick="claimDaily()" style="width:85%; padding:18px; font-size:20px; background:#0f0; color:#000; border:5px solid #000; border-radius:12px;">ODBIEŻ NAGRODĘ</button>
+        <button onclick="claimDaily()">ODBIEŻ NAGRODĘ</button>
       </div>
     </div>
   </div>
@@ -234,9 +256,7 @@
       <div class="window-body">
         <div id="lbList"></div>
       </div>
-      <button onclick="hideLeaderboard()" style="margin:12px auto 20px; width:85%; height:58px; font-size:19px; background:#ffeb3b; color:#111; border: none; border-radius:14px; font-weight:900;">
-        Dawaj Janusza!
-      </button>
+      <button onclick="hideLeaderboard()">Dawaj Janusza!</button>
     </div>
   </div>
 
@@ -244,7 +264,7 @@
     <div class="modal-content">
       <div class="title-bar">ZMIANA NICKU</div>
       <div class="window-body">
-        <p style="margin:10px 0 15px; color:#ccc; text-align:center;">Wpisz nick:</p>
+        <p style="margin:10px 0 15px; color:#ccc;">Wpisz nick:</p>
         <input type="text" id="nickInput" maxlength="20" placeholder="Janusz420" style="background:#111; color:#ff0; border:4px solid #ff0; font-size:22px;">
         <div style="display:flex; justify-content:center; gap:12px; margin-top:20px;">
           <button onclick="checkNickAndContinue()" style="width:48%;">Dalej</button>
@@ -570,6 +590,12 @@
     function hideReferralModal() { document.getElementById('referralModal').style.display = 'none'; }
     function hideSuccessModal() { document.getElementById('successModal').style.display = 'none'; }
     function hidePinErrorModal() { document.getElementById('pinErrorModal').style.display = 'none'; }
+    function hideErrorModal() { document.getElementById('errorModal').style.display = 'none'; }
+
+    function showErrorModal(message) {
+      document.getElementById('errorMessage').textContent = message;
+      document.getElementById('errorModal').style.display = 'flex';
+    }
 
     async function checkNickAndContinue() {
       const name = document.getElementById('nickInput').value.trim();
@@ -759,14 +785,14 @@
 
       if (item.type === "coins") {
         if (currentPlayer.spendable_taps < item.cost) {
-          alert("Za mało Kurła Punktów!");
+          showErrorModal("Za mało Kurła Punktów!");
           return;
         }
         currentPlayer.spendable_taps -= item.cost;
         currentPlayer.kurla_coins += item.value;
       } else {
         if (currentPlayer.kurla_coins < item.cost) {
-          alert("Za mało Kurła Coins!");
+          showErrorModal("Za mało Kurła Coins!");
           return;
         }
         currentPlayer.kurla_coins -= item.cost;
@@ -838,7 +864,7 @@
 
     function copyRefLink() {
       if (!currentPlayer.name) {
-        alert("Najpierw ustaw nick!");
+        showErrorModal("Najpierw ustaw nick!");
         return;
       }
       const link = `https://ravb99.github.io/2137meme-tapper/?ref=${encodeURIComponent(currentPlayer.name)}`;
