@@ -96,7 +96,7 @@
       padding:20px 18px; text-align:center;
     }
 
-    /* SKLEP - nowe ułożenie */
+    /* SKLEP */
     #shopItems { 
       padding:12px; overflow-y:auto; max-height:460px;
     }
@@ -164,7 +164,7 @@
     <div id="stats">
       <div>Taps: <span id="count">0</span></div>
       <div style="display:flex; align-items:center; gap:6px;">
-        <img src="https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/images/coin.png" width="36" style="vertical-align:middle;">
+        <img src="https://raw.githubusercontent.com/ravb99/2137meme-tapper/main/images/coin.png" width="36" style="vertical-align:middle; height:auto;">
         Kurła Coins: <span id="coins">0</span>
       </div>
     </div>
@@ -180,19 +180,20 @@
     </button>
   </div>
 
-  <!-- MODALE (pozostałe bez zmian) -->
+  <!-- REFERRAL MODAL -->
   <div id="referralModal" class="modal">
     <div class="modal-content">
       <div class="title-bar">🔥 REF LINK!</div>
-      <div class="window-body">
-        <h2 style="font-size:29px; margin:12px 0; color:#0f0;">Prześlij link znajomemu</h2>
-        <p style="font-size:26px; color:#ff0; margin:15px 0;">i odbierzcie razem nagrody!</p>
+      <div class="window-body" style="text-align:center; padding:30px 20px;">
+        <h2 style="font-size:32px; margin:10px 0; color:#0f0;">Prześlij link znajomemu</h2>
+        <p style="font-size:26px; color:#ff0; margin:20px 0;">i odbierzcie razem nagrody!</p>
         <p style="font-size:22px;">Nowy ziomek: +200 KC + Kiełbasa<br>Ty: +300 KC</p>
         <button onclick="hideReferralModal()" style="width:85%; padding:18px; font-size:20px; background:#0f0; color:#000; border:6px solid #000; border-radius:12px;">Dawaj Janusza!</button>
       </div>
     </div>
   </div>
 
+  <!-- SUCCESS MODAL -->
   <div id="successModal" class="modal">
     <div class="modal-content">
       <div class="title-bar" style="background:#0f0; color:#000;">ZALOGOWANO POMYŚLNIE</div>
@@ -201,6 +202,7 @@
     </div>
   </div>
 
+  <!-- PIN ERROR MODAL -->
   <div id="pinErrorModal" class="modal">
     <div class="modal-content">
       <div class="title-bar" style="background:#f00; color:#fff;">ZŁY PIN PRYWACIARZU</div>
@@ -535,7 +537,7 @@
       }];
 
       try {
-        await fetch(`${SUPABASE_URL}/rest/v1/scores`, {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/scores`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -780,11 +782,7 @@
         data.forEach(row => {
           const key = `${row.name}|${row.pin || ''}`;
           if (!grouped[key]) {
-            grouped[key] = { 
-              name: row.name, 
-              best: Number(row.round_score) || 0, 
-              total: 0 
-            };
+            grouped[key] = { name: row.name, best: Number(row.round_score) || 0, total: 0 };
           }
           grouped[key].best = Math.max(grouped[key].best, Number(row.round_score) || 0);
           grouped[key].total += Number(row.total_score) || 0;
