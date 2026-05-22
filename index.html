@@ -103,6 +103,10 @@
       align-items:center; justify-content:center; gap:15px;
     }
 
+    /* ERROR MODAL */
+    #errorModal .modal-content { border-color: #f00; }
+    #errorModal .title-bar { background:#f00; color:#fff; }
+
     /* SKLEP */
     #shopItems { 
       padding:12px; overflow-y:auto; max-height:460px;
@@ -125,13 +129,6 @@
       background:#ffeb3b; color:#111; border:none; padding:14px 24px; 
       font-size:18px; font-weight:900; border-radius:12px; cursor:pointer;
       min-width:140px;
-    }
-
-    #errorModal .modal-content {
-      border-color: #f00;
-    }
-    #errorModal .title-bar {
-      background:#f00; color:#fff;
     }
 
     #memeResultScreen {
@@ -229,7 +226,7 @@
     <div class="modal-content">
       <div class="title-bar" style="background:#f00; color:#fff;">BŁĄD</div>
       <div class="window-body">
-        <p id="errorMessage" style="font-size:24px; margin:20px 0;"></p>
+        <p id="errorMessage" style="font-size:24px; margin:25px 0; color:#ff0;"></p>
         <button onclick="hideErrorModal()">OK</button>
       </div>
     </div>
@@ -599,7 +596,7 @@
 
     async function checkNickAndContinue() {
       const name = document.getElementById('nickInput').value.trim();
-      if (!name) return alert("Wpisz nick!");
+      if (!name) return showErrorModal("Wpisz nick!");
 
       currentPlayer.name = name;
       resetPlayerData();
@@ -616,7 +613,7 @@
         document.getElementById('pinModalTitle').textContent = isNewNick ? "USTAW PIN (4 cyfry)" : "WPISZ PIN";
         document.getElementById('pinInput').value = "";
         document.getElementById('pinModal').style.display = 'block';
-      } catch (e) { alert("Błąd połączenia"); }
+      } catch (e) { showErrorModal("Błąd połączenia"); }
     }
 
     async function verifyOrSetPin() {
@@ -653,7 +650,7 @@
             document.getElementById('pinErrorModal').style.display = 'flex';
           }
         } catch (e) {
-          alert("Błąd połączenia");
+          showErrorModal("Błąd połączenia");
         }
       }
     }
