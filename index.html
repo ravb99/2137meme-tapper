@@ -38,7 +38,6 @@
       box-shadow:0 0 30px #ff0; image-rendering: crisp-edges;
       will-change: transform, filter;
       transition: transform 0.06s ease-out, filter 0.06s ease-out;
-      transform: translateZ(0);
     }
 
     #refBtn {
@@ -67,11 +66,23 @@
     .bottom-panel { 
       display: flex; width: 100%; gap: 6px; margin: 8px 0 6px; 
     }
-    .main-btn, .token-btn, #leaderboardBtn { 
+    .main-btn, .token-btn { 
       flex:1; background:#ffeb3b; color:#111; border: none; 
       padding:14px 12px; font-size:17px; font-weight:900; 
       border-radius: 14px; height: 56px !important; display: flex; 
       align-items: center; justify-content: center;
+    }
+
+    #leaderboardBtn {
+      width:100% !important; 
+      margin-top:8px; 
+      height:56px !important; 
+      font-size:19.5px; 
+      background:#ffeb3b; 
+      color:#111; 
+      border: none; 
+      border-radius:14px; 
+      font-weight:900;
     }
 
     .token-btn {
@@ -100,7 +111,7 @@
     }
     .window-body { 
       padding:25px 20px; text-align:center; display:flex; flex-direction:column; 
-      align-items:center; justify-content:center; gap:15px;
+      align-items:center; justify-content:center; gap:18px;
     }
 
     /* ERROR MODAL */
@@ -168,7 +179,7 @@
       <button class="main-btn" onclick="showShop()">KURŁA SKLEP</button>
     </div>
 
-    <button id="leaderboardBtn" onclick="showLeaderboard()" style="width:100%; margin-top:8px; height:56px !important; font-size:20px; background:#ffeb3b; color:#111; border: none; border-radius:14px; font-weight:900;">
+    <button id="leaderboardBtn" onclick="showLeaderboard()" style="width:100%; margin-top:8px; height:56px !important; font-size:19.5px; background:#ffeb3b; color:#111; border: none; border-radius:14px; font-weight:900;">
       TOP 21 LEADERBOARD
     </button>
   </div>
@@ -181,7 +192,7 @@
         <h2 style="font-size:32px; margin:10px 0; color:#0f0;">Prześlij link znajomemu</h2>
         <p style="font-size:26px; color:#ff0; margin:20px 0;">i odbierzcie razem nagrody!</p>
         <p style="font-size:22px;">Nowy ziomek: +200 KC + Kiełbasa<br>Ty: +300 KC</p>
-        <button onclick="hideReferralModal()" style="width:85%;">Dawaj Janusza!</button>
+        <button onclick="hideReferralModal()" style="width:85% !important; height:56px !important;">Dawaj Janusza!</button>
       </div>
     </div>
   </div>
@@ -191,7 +202,7 @@
       <div class="title-bar" style="background:#0f0; color:#000;">ZALOGOWANO POMYŚLNIE</div>
       <div class="window-body">
         <p style="font-size:24px; margin:30px 0;">Witaj z powrotem, Januszu!</p>
-        <button onclick="hideSuccessModal()" style="width:85%;">Dawaj Janusza!</button>
+        <button onclick="hideSuccessModal()" style="width:85% !important; height:56px !important;">Dawaj Janusza!</button>
       </div>
     </div>
   </div>
@@ -201,7 +212,7 @@
       <div class="title-bar" style="background:#f00; color:#fff;">ZŁY PIN PRYWACIARZU</div>
       <div class="window-body">
         <p style="font-size:24px; margin:30px 0;">Spróbuj jeszcze raz</p>
-        <button onclick="hidePinErrorModal()" style="width:85%;">OK</button>
+        <button onclick="hidePinErrorModal()" style="width:85% !important; height:56px !important;">OK</button>
       </div>
     </div>
   </div>
@@ -211,7 +222,7 @@
       <div class="title-bar" style="background:#f00; color:#fff;">BŁĄD</div>
       <div class="window-body">
         <p id="errorMessage" style="font-size:24px; margin:25px 0; color:#ff0;"></p>
-        <button onclick="hideErrorModal()" style="width:85%;">OK</button>
+        <button onclick="hideErrorModal()" style="width:85% !important; height:56px !important;">OK</button>
       </div>
     </div>
   </div>
@@ -222,7 +233,7 @@
       <div class="window-body">
         <h2 id="dailyStreakText" style="font-size:32px; margin:10px 0;">Dzień 1</h2>
         <p id="dailyRewardText" style="font-size:28px; color:#0f0; margin:20px 0;">+100 Kurła Coins</p>
-        <button onclick="claimDaily()" style="width:85%;">ODBIEŻ NAGRODĘ</button>
+        <button onclick="claimDaily()" style="width:85% !important; height:56px !important;">ODBIEŻ NAGRODĘ</button>
       </div>
     </div>
   </div>
@@ -237,7 +248,7 @@
       <div class="window-body">
         <div id="lbList"></div>
       </div>
-      <button onclick="hideLeaderboard()" style="width:85%;">Dawaj Janusza!</button>
+      <button onclick="hideLeaderboard()" style="width:85% !important; height:56px !important;">Dawaj Janusza!</button>
     </div>
   </div>
 
@@ -283,7 +294,7 @@
         <img id="randomMeme" src="" alt="Meme">
       </div>
       <div class="meme-footer">
-        <button onclick="closeMemeScreen()">Na Drugą Nóżkę! 🥃</button>
+        <button onclick="closeMemeScreen()" style="width:85% !important; height:56px !important;">Na Drugą Nóżkę! 🥃</button>
       </div>
     </div>
   </div>
