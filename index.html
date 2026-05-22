@@ -90,9 +90,9 @@
       max-width:360px; width:92%; background:#1a1a1a; border:4px solid #ff0; 
       border-radius:10px; padding:0; overflow:hidden; box-shadow:0 0 40px #ff0;
       position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+      top: 50% !important;
+      left: 50% !important;
+      transform: translate(-50%, -50%) !important;
     }
     .title-bar { 
       background:#333; color:#ff0; padding:14px; font-weight:900; 
@@ -417,6 +417,17 @@
       currentPlayer.spendable_taps += added;
 
       updateDisplays();
+
+      // === WIBRACJE ===
+      if (Telegram.WebApp && Telegram.WebApp.HapticFeedback) {
+        if (touches >= 3) {
+          Telegram.WebApp.HapticFeedback.impactOccurred('heavy');
+        } else if (touches === 2) {
+          Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+        } else {
+          Telegram.WebApp.HapticFeedback.impactOccurred('light');
+        }
+      }
 
       nosaczImg.style.transition = 'none';
       nosaczImg.style.transform = 'scale(1.10) translateZ(0)';
