@@ -99,7 +99,7 @@
       text-align:center; font-size:21px; 
     }
     .window-body { 
-      padding:25px 20px; text-align:center;
+      padding:25px 20px; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center;
     }
 
     /* SKLEP */
@@ -119,13 +119,11 @@
     .shop-item img { 
       width:88px; height:88px; object-fit:contain; flex-shrink:0; 
     }
-    .shop-text { flex:1; text-align:left; font-size:17.5px; line-height:1.3; }
-    .shop-text strong { font-size:20px; display:block; margin-bottom:4px; color:#ff0; }
 
     button { 
-      background:#ffeb3b; color:#111; border:none; padding:12px 24px; 
+      background:#ffeb3b; color:#111; border:none; padding:14px 24px; 
       font-size:18px; font-weight:900; border-radius:12px; cursor:pointer;
-      min-width:110px;
+      min-width:140px;
     }
 
     #memeResultScreen {
@@ -418,15 +416,10 @@
 
       updateDisplays();
 
-      // === WIBRACJE ===
       if (Telegram.WebApp && Telegram.WebApp.HapticFeedback) {
-        if (touches >= 3) {
-          Telegram.WebApp.HapticFeedback.impactOccurred('heavy');
-        } else if (touches === 2) {
-          Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-        } else {
-          Telegram.WebApp.HapticFeedback.impactOccurred('light');
-        }
+        if (touches >= 3) Telegram.WebApp.HapticFeedback.impactOccurred('heavy');
+        else if (touches === 2) Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+        else Telegram.WebApp.HapticFeedback.impactOccurred('light');
       }
 
       nosaczImg.style.transition = 'none';
@@ -763,12 +756,19 @@
 
     function buyItem(i) {
       const item = shopItems[i];
+
       if (item.type === "coins") {
-        if (currentPlayer.spendable_taps < item.cost) return;
+        if (currentPlayer.spendable_taps < item.cost) {
+          alert("Za mało Kurła Punktów!");
+          return;
+        }
         currentPlayer.spendable_taps -= item.cost;
         currentPlayer.kurla_coins += item.value;
       } else {
-        if (currentPlayer.kurla_coins < item.cost) return;
+        if (currentPlayer.kurla_coins < item.cost) {
+          alert("Za mało Kurła Coins!");
+          return;
+        }
         currentPlayer.kurla_coins -= item.cost;
         if (item.type === "temp_mult") {
           currentPlayer.kielbasaCount += 1;
